@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:muitou/data_entry_page.dart';
+import 'package:muitou/pages/data_entry_page.dart';
 
 void main() => runApp(MyApp());
 
