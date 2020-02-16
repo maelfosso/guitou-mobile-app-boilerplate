@@ -73,7 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
     print(selectedXorm);
   }
 
-
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
     return await showDialog<String>(
       context: context,
@@ -90,32 +89,8 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           }).toList(),
         );
-      });
-    }
-
-    Widget filterByXormWidget() {
-      return DropdownButtonHideUnderline(
-          child: DropdownButton(
-            onChanged: (String value) {
-              setState(() {
-                this._currentlySelectedXorms = value;
-              });
-            },
-            // selectedItemBuilder: (BuildContext context) {
-            //   return _xormsList.map<Widget>((String text) {
-            //     return Text(text, maxLines: 1, style: TextStyle(color: Colors.white));
-            //   }).toList();
-            // },
-            items: _xormsList.map<DropdownMenuItem<String>>((String text) {
-              return DropdownMenuItem<String>(
-                value: text,
-                child:Text(text) //, maxLines: 2, overflow: TextOverflow.ellipsis),
-              );
-            }).toList(),
-            isExpanded: true,
-            value: this._currentlySelectedXorms
-          )
-      );
+      }
+    );
   }
 
   @override
@@ -146,16 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ) : Container()
           ],
         ),
-        // centerTitle: true,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _fillAXorm
           ),
-          // Container(
-          //   width: 50.0,
-          //   child: filterByXormWidget(),
-          // ),
           PopupMenuButton<String>(
             onSelected: (String value) {
               setState(() {
@@ -169,25 +139,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: 
                   Row(
                     children: [
-                      this._currentlySelectedXorms == choice ? IconButton(
-                        icon: Icon(Icons.check), 
+                      this._currentlySelectedXorms == choice ? Icon(
+                        Icons.check, 
                         color: Colors.black
                       ) : Container(),
                       Expanded(
                         child: Text(choice),
                         flex: 1,
                       )
-                    ]
-                    
+                    ]                    
                   ),
-                  // Text(choice)
                 );
               }).toList();
             },
           )
-          // filterByXormWidget()
         ],
-        // titleSpacing: 200.0,
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
