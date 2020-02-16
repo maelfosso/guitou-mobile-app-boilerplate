@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Collected Data'),
     );
   }
 }
@@ -46,6 +46,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  final List<String> _xormsList = [
+    "All",
+    "Questionnaire Radio Communautaire",
+    "Questionnaire Promoteur",
+    "Questionnaire Beneficiaire",
+    // "One",
+    // "Two",
+    // "Three",
+    // "Four",
+    // "Five"
+  ];
+  String _currentlySelectedXorms;
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -55,6 +68,31 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  Widget filterByXormWidget() {
+    return DropdownButtonHideUnderline(
+        child: DropdownButton(
+          onChanged: (String value) {
+            setState(() {
+              this._currentlySelectedXorms = value;
+            });
+          },
+          // selectedItemBuilder: (BuildContext context) {
+          //   return _xormsList.map<Widget>((String text) {
+          //     return Text(text, maxLines: 1, style: TextStyle(color: Colors.white));
+          //   }).toList();
+          // },
+          items: _xormsList.map<DropdownMenuItem<String>>((String text) {
+            return DropdownMenuItem<String>(
+              value: text,
+              child:Text(text) //, maxLines: 2, overflow: TextOverflow.ellipsis),
+            );
+          }).toList(),
+          isExpanded: true,
+          value: this._currentlySelectedXorms
+        )
+    );
   }
 
   @override
@@ -70,6 +108,21 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        // centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              print("Open the dialog xorms selection.");
+            },
+          ),
+          Container(
+            width: 50.0,
+            child: filterByXormWidget(),
+          )
+          // filterByXormWidget()
+        ],
+        // titleSpacing: 200.0,
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
