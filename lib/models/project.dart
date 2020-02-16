@@ -10,11 +10,11 @@ class Project {
   static Project get instance { return _instance;}
 
   List<Xorm> xorms;
-  List<XormDetail> xormsDetails;
+  List<XormDetails> xormsDetails;
 
-  factory Project({List<Xorm> xorms}) { // }, List<XormDetails> xormsDetails}) {
+  factory Project({List<Xorm> xorms, List<XormDetails> xormsDetails}) {
     _instance.xorms = xorms;
-    // _instance.xormsDetails = xormsDetails;
+    _instance.xormsDetails = xormsDetails;
     return _instance;
   }
 
@@ -22,13 +22,13 @@ class Project {
     return Project(
       xorms: (parsedJson['xorms'] as List)
         .map((i) => Xorm.fromJson(i))
+        .toList(),
+      xormsDetails: json.decode(parsedJson['xormsDetails'])
+        .cast<Map<String, dynamic>>()
+        .map<XormDetails>((json) {
+          return XormDetails.fromJson(json.key, json.decode(json.value));
+        })
         .toList()
-      // json.decode(parsedJson['xorms'].toString())
-        // .cast<Map<String, dynamic>>()
-        // .cast<String>()
-        // .map<Xorm>((json) => new Xorm.fromJson(json))
-        // .toList(), // Xorm.fromJson(parsedJson['xorms']),
-      // xormsDetails: parsedJson['xormsDetails']
     );
   }
   

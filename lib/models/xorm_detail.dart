@@ -1,11 +1,11 @@
-class XormDetail {
+class XormDetails {
   final String id;
   final List<XormSection> sections;
 
-  XormDetail({this.id, this.sections});
+  XormDetails({this.id, this.sections});
 
-  factory XormDetail.fromJson(String id, Map<String, dynamic> json) {
-    return new XormDetail(
+  factory XormDetails.fromJson(String id, Map<String, dynamic> json) {
+    return new XormDetails(
       id: id,
       sections: [] // json['title'] as String
     );

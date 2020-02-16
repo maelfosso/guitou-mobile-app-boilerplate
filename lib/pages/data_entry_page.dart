@@ -10,7 +10,6 @@ class DataEntryPage extends StatefulWidget {
   _DataEntryPageState createState() => _DataEntryPageState();
 }
 
-
 class _DataEntryPageState extends State<DataEntryPage> {
 
   @override
@@ -36,7 +35,10 @@ class _DataEntryPageState extends State<DataEntryPage> {
         ),
       ),
       body: Center(
-        child: Text("Data Entry Page"),
+        child: Column(
+          children: Project.instance.xormsDetails.map((xormDetails) => Text(xormDetails.id)).toList()
+          // <Widget>[],
+        )
       ),
     );
   }
