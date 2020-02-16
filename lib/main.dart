@@ -70,29 +70,49 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Widget filterByXormWidget() {
-    return DropdownButtonHideUnderline(
-        child: DropdownButton(
-          onChanged: (String value) {
-            setState(() {
-              this._currentlySelectedXorms = value;
-            });
-          },
-          // selectedItemBuilder: (BuildContext context) {
-          //   return _xormsList.map<Widget>((String text) {
-          //     return Text(text, maxLines: 1, style: TextStyle(color: Colors.white));
-          //   }).toList();
-          // },
-          items: _xormsList.map<DropdownMenuItem<String>>((String text) {
-            return DropdownMenuItem<String>(
-              value: text,
-              child:Text(text) //, maxLines: 2, overflow: TextOverflow.ellipsis),
+
+  Future<String> _asyncSelectXormDialog(BuildContext context) async {
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select the xorm'),
+          children: this._xormsList.skip(1).map((String xorm) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, xorm);
+              },
+              child: Text(xorm),
             );
           }).toList(),
-          isExpanded: true,
-          value: this._currentlySelectedXorms
-        )
-    );
+        );
+      });
+    }
+
+    Widget filterByXormWidget() {
+      return DropdownButtonHideUnderline(
+          child: DropdownButton(
+            onChanged: (String value) {
+              setState(() {
+                this._currentlySelectedXorms = value;
+              });
+            },
+            // selectedItemBuilder: (BuildContext context) {
+            //   return _xormsList.map<Widget>((String text) {
+            //     return Text(text, maxLines: 1, style: TextStyle(color: Colors.white));
+            //   }).toList();
+            // },
+            items: _xormsList.map<DropdownMenuItem<String>>((String text) {
+              return DropdownMenuItem<String>(
+                value: text,
+                child:Text(text) //, maxLines: 2, overflow: TextOverflow.ellipsis),
+              );
+            }).toList(),
+            isExpanded: true,
+            value: this._currentlySelectedXorms
+          )
+      );
   }
 
   @override
@@ -107,7 +127,22 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        // title: Text(widget.title),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text(
+              widget.title,
+              style: TextStyle(fontSize: 20.0),
+            ),
+            this._currentlySelectedXorms != "All" ? Text(
+              this._currentlySelectedXorms,
+              style: TextStyle(fontSize: 14.0),
+            ) : Container()
+          ],
+        ),
         // centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -116,9 +151,35 @@ class _MyHomePageState extends State<MyHomePage> {
               print("Open the dialog xorms selection.");
             },
           ),
-          Container(
-            width: 50.0,
-            child: filterByXormWidget(),
+          // Container(
+          //   width: 50.0,
+          //   child: filterByXormWidget(),
+          // ),
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              setState(() {
+                this._currentlySelectedXorms = value;
+              });
+            },
+            itemBuilder: (BuildContext context) {
+              return _xormsList.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: 
+                  Row(
+                    children: [
+                      this._currentlySelectedXorms == choice ? Icon(Icons.check, color: Colors.black,) : Container(),
+                      Expanded(
+                        child: Text(choice),
+                        flex: 1,
+                      )
+                    ]
+                    
+                  ),
+                  // Text(choice)
+                );
+              }).toList();
+            },
           )
           // filterByXormWidget()
         ],
