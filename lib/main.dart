@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:muitou/data_entry_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -51,13 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
     "Questionnaire Radio Communautaire",
     "Questionnaire Promoteur",
     "Questionnaire Beneficiaire",
-    // "One",
-    // "Two",
-    // "Three",
-    // "Four",
-    // "Five"
   ];
-  String _currentlySelectedXorms = "All";
+  String _currentlySelectedXorm = "All";
 
   void _fillAXorm() async {
     setState(() {
@@ -70,7 +66,10 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     String selectedXorm = await _asyncSelectXormDialog(context);
-    print(selectedXorm);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+    );
   }
 
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
@@ -115,8 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
               widget.title,
               style: TextStyle(fontSize: 20.0),
             ),
-            this._currentlySelectedXorms != null && this._currentlySelectedXorms != "All" ? Text(
-              this._currentlySelectedXorms,
+            this._currentlySelectedXorm != null && this._currentlySelectedXorm != "All" ? Text(
+              this._currentlySelectedXorm,
               style: TextStyle(fontSize: 14.0),
             ) : Container()
           ],
@@ -129,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
           PopupMenuButton<String>(
             onSelected: (String value) {
               setState(() {
-                this._currentlySelectedXorms = value;
+                this._currentlySelectedXorm = value;
               });
             },
             itemBuilder: (BuildContext context) {
@@ -139,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: 
                   Row(
                     children: [
-                      this._currentlySelectedXorms == choice ? Icon(
+                      this._currentlySelectedXorm == choice ? Icon(
                         Icons.check, 
                         color: Colors.black
                       ) : Container(),
