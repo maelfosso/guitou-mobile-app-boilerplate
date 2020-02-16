@@ -17,10 +17,7 @@
   "author": "5e3ebedc20c20f795be4fbd3",
   "__v": 0,
   "xorms": [
-    {
-      "_id": "5e3ebef020c20f795be4fbd3",
-      "name": "Questionnaire Radio Communautaire"
-    }
+    {"id": "5e3ebef020c20f795be4fbd3", "title": "Questionnaire Radio Communautaire"}
   ],
   "xormsDetails": {
     "5e3ebef020c20f795be4fbd3": {
