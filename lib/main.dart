@@ -57,9 +57,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // "Four",
     // "Five"
   ];
-  String _currentlySelectedXorms;
+  String _currentlySelectedXorms = "All";
 
-  void _incrementCounter() {
+  void _fillAXorm() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -68,37 +68,35 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+
+    String selectedXorm = await _asyncSelectXormDialog(context);
+    print(selectedXorm);
   }
 
-  Widget filterByXormWidget() {
-    return DropdownButtonHideUnderline(
-        child: DropdownButton(
-          onChanged: (String value) {
-            setState(() {
-              this._currentlySelectedXorms = value;
-            });
-          },
-          // selectedItemBuilder: (BuildContext context) {
-          //   return _xormsList.map<Widget>((String text) {
-          //     return Text(text, maxLines: 1, style: TextStyle(color: Colors.white));
-          //   }).toList();
-          // },
-          items: _xormsList.map<DropdownMenuItem<String>>((String text) {
-            return DropdownMenuItem<String>(
-              value: text,
-              child:Text(text) //, maxLines: 2, overflow: TextOverflow.ellipsis),
+  Future<String> _asyncSelectXormDialog(BuildContext context) async {
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select the xorm'),
+          children: this._xormsList.skip(1).map((String xorm) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, xorm);
+              },
+              child: Text(xorm),
             );
           }).toList(),
-          isExpanded: true,
-          value: this._currentlySelectedXorms
-        )
+        );
+      }
     );
   }
 
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
+    // by the _fillAXorm method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
@@ -107,22 +105,55 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-        // centerTitle: true,
+        // title: Text(widget.title),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Text(
+              widget.title,
+              style: TextStyle(fontSize: 20.0),
+            ),
+            this._currentlySelectedXorms != null && this._currentlySelectedXorms != "All" ? Text(
+              this._currentlySelectedXorms,
+              style: TextStyle(fontSize: 14.0),
+            ) : Container()
+          ],
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {
-              print("Open the dialog xorms selection.");
-            },
+            onPressed: _fillAXorm
           ),
-          Container(
-            width: 50.0,
-            child: filterByXormWidget(),
+          PopupMenuButton<String>(
+            onSelected: (String value) {
+              setState(() {
+                this._currentlySelectedXorms = value;
+              });
+            },
+            itemBuilder: (BuildContext context) {
+              return _xormsList.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: 
+                  Row(
+                    children: [
+                      this._currentlySelectedXorms == choice ? Icon(
+                        Icons.check, 
+                        color: Colors.black
+                      ) : Container(),
+                      Expanded(
+                        child: Text(choice),
+                        flex: 1,
+                      )
+                    ]                    
+                  ),
+                );
+              }).toList();
+            },
           )
-          // filterByXormWidget()
         ],
-        // titleSpacing: 200.0,
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -155,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _fillAXorm,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
