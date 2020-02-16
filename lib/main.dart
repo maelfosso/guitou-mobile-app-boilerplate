@@ -57,9 +57,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // "Four",
     // "Five"
   ];
-  String _currentlySelectedXorms;
+  String _currentlySelectedXorms = "All";
 
-  void _incrementCounter() {
+  void _fillAXorm() async {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -68,6 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+
+    String selectedXorm = await _asyncSelectXormDialog(context);
+    print(selectedXorm);
   }
 
 
@@ -118,7 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
+    // by the _fillAXorm method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
@@ -137,7 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
               widget.title,
               style: TextStyle(fontSize: 20.0),
             ),
-            this._currentlySelectedXorms != "All" ? Text(
+            this._currentlySelectedXorms != null && this._currentlySelectedXorms != "All" ? Text(
               this._currentlySelectedXorms,
               style: TextStyle(fontSize: 14.0),
             ) : Container()
@@ -147,9 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {
-              print("Open the dialog xorms selection.");
-            },
+            onPressed: _fillAXorm
           ),
           // Container(
           //   width: 50.0,
@@ -168,7 +169,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: 
                   Row(
                     children: [
-                      this._currentlySelectedXorms == choice ? Icon(Icons.check, color: Colors.black,) : Container(),
+                      this._currentlySelectedXorms == choice ? IconButton(
+                        icon: Icon(Icons.check), 
+                        color: Colors.black
+                      ) : Container(),
                       Expanded(
                         child: Text(choice),
                         flex: 1,
@@ -216,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _fillAXorm,
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
