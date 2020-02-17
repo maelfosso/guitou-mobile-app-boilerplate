@@ -31,45 +31,24 @@ class _DataEntryPageState extends State<DataEntryPage> {
     });
   }
 
-  List<Widget> _buildQuestion() {
-
-    return [];
-  }
-
   Widget _buildPage(int position) {
-    
-    if (position <= this._currentXormDetails.sections.length - 1) {
-      XormSection currentXormSection = this._currentXormDetails.sections[position];
+    XormSection currentXormSection = this._currentXormDetails.sections[position];
 
-      List<Widget> widgets = <Widget>[
-        Text(currentXormSection.params.title),
-        Text(currentXormSection.params.description),
+    List<Widget> widgets = <Widget>[
+      Text(currentXormSection.params.title),
+      Text(currentXormSection.params.description),
 
-        currentXormSection.build()
-      ];
+      currentXormSection.build()
+    ];
 
-      return ListView(
-        children: widgets,
-        scrollDirection: Axis.vertical,
-      );
-      
-    } else {
-      return Container(
-        child: Column(
-          children: <Widget>[
-            Text("Thank you for filling that form"),
-            Text("Please, sign here to confirm your data entry and then validate"),
-
-            // Input for his signature
-            // Check for whether or not he want to restart again for the next one
-          ],
-        ),
-      );
-    }
+    return ListView(
+      children: widgets,
+      scrollDirection: Axis.vertical,
+    );
   }
 
   Widget buildPageView() {
-    bool isLastPage = !(this.currentPageViewPosition <= this._currentXormDetails.sections.length - 1);
+    bool isLastPage = this.currentPageViewPosition == this._currentXormDetails.sections.length - 1;
     
     return Column(
       children: <Widget>[

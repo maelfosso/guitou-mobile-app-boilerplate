@@ -5,14 +5,33 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class XormDetails {
   final String id;
-  final List<XormSection> sections;
+  List<XormSection> sections;
 
   XormDetails({this.id, this.sections});
 
   factory XormDetails.fromJson(String id, Map<String, dynamic> parsedJson) {
+
+    final XormSection finalSection = XormSection(
+      id: "section_final",
+      params: XormSectionParams(
+        key: "section_final", 
+        title: "Thank you for filling that form", 
+        description: "Please, sign here to confirm your data entry and then validate"
+      ),
+      questions: <XormQuestion>[
+        XormQuestionString(id: "section_final__name", title: "Enter your name", hint: "", type: "string"),
+        XormQuestionOptional(id: "section_final__again", title: "Are you going to enter another data?", hint: "", type: "optional")
+      ]
+    );
+
+    final List<XormSection> sections = parsedJson.entries
+      .map((entry) => XormSection.fromJson(entry.key, entry.value))
+      .toList();
+    sections.add(finalSection);
+
     return new XormDetails(
       id: id,
-      sections: parsedJson.entries.map((entry) => XormSection.fromJson(entry.key, entry.value)).toList()
+      sections: sections
     );
   }
 }
@@ -58,9 +77,6 @@ class XormSection {
   }
 
   Widget build() {
-    // Column(
-    //   children: <Widget>[]
-    // )
     return FormBuilder(
       key: _fbKey,
       initialValue: {
@@ -209,6 +225,37 @@ class XormQuestionTime extends XormQuestion {
 
 }
 
+class XormQuestionOptional extends XormQuestion {
+
+  XormQuestionOptional({ String id, String title, String hint, String type }) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionOptional.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionOptional(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+    );
+  }
+
+  @override
+  Widget build() {
+    // TODO: implement build
+    return FormBuilderCheckbox(
+      attribute: this.id,
+      label: Text(this.title),
+      
+      // validators: [
+      //   // FormBuilderValidators.requiredTrue(
+      //   //   errorText: this.errorMessage
+      //   //       // "You must accept terms and conditions to continue",
+      //   // ),
+      // ],
+    );
+  }
+
+}
+
 class XormQuestionSingleChoiceSelect extends XormQuestion {
   Map<String, String> kv;
 
@@ -232,7 +279,7 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
       decoration: InputDecoration(labelText: this.title),
       // initialValue: 'Male',
       hint: Text('Select a choice'),
-      validators: [FormBuilderValidators.required()],
+      // validators: [FormBuilderValidators.required()],
       items: this.kv.entries // ['Male', 'Female', 'Other']
         .map((entry) => DropdownMenuItem(
             value: entry.key,
@@ -242,3 +289,4 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
   }
 
 }
+
