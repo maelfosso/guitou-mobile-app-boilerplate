@@ -82,9 +82,16 @@ class _DataEntryPageState extends State<DataEntryPage> {
               child: Text(isLastPage ? "Save it" : "Next"),
               color: Colors.blue,
               onPressed: () {
+                if (this._currentXormDetails.sections[this.currentPageViewPosition].sectionKey.currentState.saveAndValidate()) {
+                  print(this._currentXormDetails.sections[this.currentPageViewPosition].sectionKey.currentState.value);
+                }
+
                 if (isLastPage) {
 
                 } else {
+
+                  
+
                   this.controller.nextPage(duration: _kDuration, curve: _kCurve);
                 }
               },

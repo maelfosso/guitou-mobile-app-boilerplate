@@ -55,15 +55,17 @@ class XormSection {
 
           switch (type) {
             case 'string':
-              return XormQuestionString.fromJson(id, entry.value);
+              return XormQuestionString.fromJson(entry.key, entry.value);
             case 'text':
-              return XormQuestionText.fromJson(id, entry.value);
+              return XormQuestionText.fromJson(entry.key, entry.value);
             case 'date':
-              return XormQuestionDate.fromJson(id, entry.value);
+              return XormQuestionDate.fromJson(entry.key, entry.value);
             case 'time':
-              return XormQuestionTime.fromJson(id, entry.value);
+              return XormQuestionTime.fromJson(entry.key, entry.value);
+            case 'optional':
+              return XormQuestionOptional.fromJson(entry.key, entry.value);
             case 'single_choice_select':
-              return XormQuestionSingleChoiceSelect.fromJson(id, entry.value);
+              return XormQuestionSingleChoiceSelect.fromJson(entry.key, entry.value);
             default:
               return null; 
           }
@@ -79,10 +81,10 @@ class XormSection {
   Widget build() {
     return FormBuilder(
       key: _fbKey,
-      initialValue: {
-        // 'date': DateTime.now(),
-        // 'accept_terms': false,
-      },
+      // initialValue: {
+      //   // 'date': DateTime.now(),
+      //   // 'accept_terms': false,
+      // },
       autovalidate: true,
       child: Column(
         children: this.questions.map((q) => q.build()).toList()
@@ -165,7 +167,7 @@ class XormQuestionText extends XormQuestion {
     return FormBuilderTextField(
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
-      minLines: 5,
+      minLines: 3,
       // validators: [
       //   FormBuilderValidators.numeric(),
       //   FormBuilderValidators.max(70),
