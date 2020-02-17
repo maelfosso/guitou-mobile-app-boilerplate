@@ -31,10 +31,22 @@ class _DataEntryPageState extends State<DataEntryPage> {
     });
   }
 
+  List<Widget> _buildQuestion() {
+    
+    return [];
+  }
+
   Widget _buildPage(int position) {
     
     if (position <= this._currentXormDetails.sections.length - 1) {
       XormSection currentXormSection = this._currentXormDetails.sections[position];
+
+      List<Widget> widgets = <Widget>[
+        Text(currentXormSection.params.title),
+        Text(currentXormSection.params.description),
+        Spacer(flex: 1)
+      ];
+      widgets.addAll(_buildQuestion());
 
       return Container(
         child: 
@@ -42,11 +54,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
         //   scrollDirection: Axis.vertical,
         //   child: 
           Column(
-            children: <Widget>[
-              Text(currentXormSection.params.title),
-              Text(currentXormSection.params.description),
-              Spacer(flex: 1)
-            ],
+            children: widgets
           ),
         // )
       );
