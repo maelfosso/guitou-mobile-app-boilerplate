@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 class XormDetails {
   final String id;
   final List<XormSection> sections;
@@ -26,7 +28,7 @@ class XormSection {
       questions: Map<String, dynamic>.from(parsedJson['questions'])
         .entries.map((entry) {
           String type = entry.value['type'];
-          
+
           switch (type) {
             case 'string':
               return XormQuestionString.fromJson(id, entry.value);
@@ -39,7 +41,7 @@ class XormSection {
             case 'single_choice_select':
               return XormQuestionSingleChoiceSelect.fromJson(id, entry.value);
             default:
-              return XormQuestion.fromJson(id, entry.value);
+              return null; 
           }
         })
         .toList()
@@ -63,7 +65,7 @@ class XormSectionParams {
   }
 }
 
-class XormQuestion {
+abstract class XormQuestion {
   String id;
   String title;
   String hint;
@@ -71,14 +73,7 @@ class XormQuestion {
 
   XormQuestion({this.id, this.title, this.hint, this.type});
 
-  factory XormQuestion.fromJson(String id, Map<String, dynamic> parsedJson) {
-    return new XormQuestion(
-      id: id,
-      title: parsedJson['title'],
-      hint: parsedJson['hint'],
-      type: parsedJson['type']
-    );
-  }
+  Widget build();
 }
 
 class XormQuestionString extends XormQuestion {
@@ -93,6 +88,13 @@ class XormQuestionString extends XormQuestion {
       type: parsedJson['type']
     );
   }
+
+  @override
+  Widget build() {
+    // TODO: implement build
+    return null;
+  }
+
 }
 
 class XormQuestionText extends XormQuestion {
@@ -106,6 +108,13 @@ class XormQuestionText extends XormQuestion {
       type: parsedJson['type']
     );
   }
+
+  @override
+  Widget build() {
+    // TODO: implement build
+    return null;
+  }
+
 }
 
 class XormQuestionDate extends XormQuestion {
@@ -119,6 +128,13 @@ class XormQuestionDate extends XormQuestion {
       type: parsedJson['type']
     );
   }
+
+  @override
+  Widget build() {
+    // TODO: implement build
+    return null;
+  }
+
 }
 
 class XormQuestionTime extends XormQuestion {
@@ -132,6 +148,13 @@ class XormQuestionTime extends XormQuestion {
       type: parsedJson['type']
     );
   }
+
+  @override
+  Widget build() {
+    // TODO: implement build
+    return null;
+  }
+
 }
 
 class XormQuestionSingleChoiceSelect extends XormQuestion {
@@ -148,4 +171,11 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
       kv: Map<String, String>.from(parsedJson['kv_full'])
     );
   }
+
+  @override
+  Widget build() {
+    // TODO: implement build
+    return null;
+  }
+
 }
