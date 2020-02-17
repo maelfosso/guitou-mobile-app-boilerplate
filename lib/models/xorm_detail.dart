@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 class XormDetails {
   final String id;
@@ -15,6 +18,8 @@ class XormDetails {
 }
 
 class XormSection {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
   final String id;
   final XormSectionParams params;
   final List<XormQuestion> questions;
@@ -45,6 +50,27 @@ class XormSection {
           }
         })
         .toList()
+    );
+  }
+
+  GlobalKey<FormBuilderState> get sectionKey {
+    return _fbKey;
+  }
+
+  Widget build() {
+    // Column(
+    //   children: <Widget>[]
+    // )
+    return FormBuilder(
+      key: _fbKey,
+      initialValue: {
+        // 'date': DateTime.now(),
+        // 'accept_terms': false,
+      },
+      autovalidate: true,
+      child: Column(
+        children: this.questions.map((q) => q.build()).toList()
+      )
     );
   }
 }
@@ -92,7 +118,15 @@ class XormQuestionString extends XormQuestion {
   @override
   Widget build() {
     // TODO: implement build
-    return null;
+    return FormBuilderTextField(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      maxLines: 1,
+      // validators: [
+      //   FormBuilderValidators.numeric(),
+      //   FormBuilderValidators.max(70),
+      // ],
+    );
   }
 
 }
@@ -112,7 +146,15 @@ class XormQuestionText extends XormQuestion {
   @override
   Widget build() {
     // TODO: implement build
-    return null;
+    return FormBuilderTextField(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      minLines: 5,
+      // validators: [
+      //   FormBuilderValidators.numeric(),
+      //   FormBuilderValidators.max(70),
+      // ],
+    );
   }
 
 }
@@ -132,7 +174,12 @@ class XormQuestionDate extends XormQuestion {
   @override
   Widget build() {
     // TODO: implement build
-    return null;
+    return FormBuilderDateTimePicker(
+      attribute: this.id,
+      inputType: InputType.date,
+      format: DateFormat("yyyy-MM-dd"),
+      decoration: InputDecoration(labelText: this.title),
+    );
   }
 
 }
@@ -152,7 +199,12 @@ class XormQuestionTime extends XormQuestion {
   @override
   Widget build() {
     // TODO: implement build
-    return null;
+    return FormBuilderDateTimePicker(
+      attribute: this.id,
+      inputType: InputType.time,
+      format: DateFormat("HH:mm"),
+      decoration: InputDecoration(labelText: this.title),
+    );
   }
 
 }
@@ -175,7 +227,18 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
   @override
   Widget build() {
     // TODO: implement build
-    return null;
+    return FormBuilderDropdown(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      // initialValue: 'Male',
+      hint: Text('Select a choice'),
+      validators: [FormBuilderValidators.required()],
+      items: this.kv.entries // ['Male', 'Female', 'Other']
+        .map((entry) => DropdownMenuItem(
+            value: entry.key,
+            child: Text(entry.value)
+      )).toList(),
+    );
   }
 
 }

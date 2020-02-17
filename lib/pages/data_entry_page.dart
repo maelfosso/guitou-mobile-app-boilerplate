@@ -32,7 +32,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
   }
 
   List<Widget> _buildQuestion() {
-    
+
     return [];
   }
 
@@ -44,20 +44,15 @@ class _DataEntryPageState extends State<DataEntryPage> {
       List<Widget> widgets = <Widget>[
         Text(currentXormSection.params.title),
         Text(currentXormSection.params.description),
-        Spacer(flex: 1)
-      ];
-      widgets.addAll(_buildQuestion());
 
-      return Container(
-        child: 
-        // SingleChildScrollView(
-        //   scrollDirection: Axis.vertical,
-        //   child: 
-          Column(
-            children: widgets
-          ),
-        // )
+        currentXormSection.build()
+      ];
+
+      return ListView(
+        children: widgets,
+        scrollDirection: Axis.vertical,
       );
+      
     } else {
       return Container(
         child: Column(
