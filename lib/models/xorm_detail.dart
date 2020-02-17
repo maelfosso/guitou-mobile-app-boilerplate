@@ -4,10 +4,10 @@ class XormDetails {
 
   XormDetails({this.id, this.sections});
 
-  factory XormDetails.fromJson(String id, Map<String, dynamic> json) {
+  factory XormDetails.fromJson(String id, Map<String, dynamic> parsedJson) {
     return new XormDetails(
       id: id,
-      sections: [] // json['title'] as String
+      sections: parsedJson.entries.map((entry) => XormSection.fromJson(entry.key, entry.value)).toList()
     );
   }
 }
@@ -23,7 +23,7 @@ class XormSection {
     return new XormSection(
       id: id,
       params: XormSectionParams.fromJson(json['_params']),
-      questions: [] // json['title'] as String
+      questions: [] 
     );
   }
 }

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/models/xorm_detail.dart';
 
+import 'xorm_detail.dart';
+
 class Project {
   Project._privateConstructor();
 
@@ -19,15 +21,13 @@ class Project {
   }
 
   factory Project.fromJson(Map<String, dynamic> parsedJson) {
+    
     return Project(
       xorms: (parsedJson['xorms'] as List)
         .map((i) => Xorm.fromJson(i))
         .toList(),
-      xormsDetails: json.decode(parsedJson['xormsDetails'])
-        .cast<Map<String, dynamic>>()
-        .map<XormDetails>((json) {
-          return XormDetails.fromJson(json.key, json.decode(json.value));
-        })
+      xormsDetails: Map<String, dynamic>.from(parsedJson['xormsDetails'])
+        .entries.map((entry) =>  XormDetails.fromJson(entry.key, entry.value))
         .toList()
     );
   }
