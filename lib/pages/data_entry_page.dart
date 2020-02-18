@@ -23,7 +23,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   int currentPageViewPosition = 0;
 
-  Map<String, Map<String, dynamic>> data = new Map();
+  Map<String, Map<String, dynamic>> data = {};
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
       Text(currentXormSection.params.title),
       Text(currentXormSection.params.description),
 
-      currentXormSection.build()
+      currentXormSection.build(data: this.data.containsKey(currentXormSection.id) ? this.data[currentXormSection.id] : {} )
     ];
 
     return ListView(

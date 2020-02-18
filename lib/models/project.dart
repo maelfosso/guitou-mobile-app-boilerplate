@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/models/xorm_detail.dart';
 

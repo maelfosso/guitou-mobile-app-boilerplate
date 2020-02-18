@@ -78,13 +78,10 @@ class XormSection {
     return _fbKey;
   }
 
-  Widget build() {
+  Widget build({ Map<String, dynamic> data }) {
     return FormBuilder(
       key: _fbKey,
-      // initialValue: {
-      //   // 'date': DateTime.now(),
-      //   // 'accept_terms': false,
-      // },
+      initialValue: data,
       autovalidate: true,
       child: Column(
         children: this.questions.map((q) => q.build()).toList()
