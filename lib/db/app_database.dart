@@ -15,7 +15,9 @@ class AppDatabase{
   static AppDatabase get instance => _singleton;
 
   // Completer is used for transforming synchronous code into asynchronous code.
-  Completer<Database> _dbOpenCompleter;
+  // Completer<Database> _dbOpenCompleter;
+
+  Database _database;
 
   // A private constructor. Allows us to create instances of AppDatabase
   // only from within the AppDatabase class itself.
@@ -23,29 +25,42 @@ class AppDatabase{
 
   // Database object accessor
   Future<Database> get database async {
+  // Database get database async {
     // If completer is null, AppDatabaseClass is newly instantiated, so database is not yet opened
-    if (_dbOpenCompleter == null) {
-      _dbOpenCompleter = Completer();
+    // if (_dbOpenCompleter == null) {
+    //   _dbOpenCompleter = Completer();
+    //   // Calling _openDatabase will also complete the completer with database instance
+    //   _openDatabase();
+    // }
+    if (_database == null) {
+      // _dbOpenCompleter = Completer();
       // Calling _openDatabase will also complete the completer with database instance
-      _openDatabase();
+      _database = await _openDatabase();
     }
     // If the database is already opened, awaiting the future will happen instantly.
     // Otherwise, awaiting the returned future will take some time - until complete() is called
     // on the Completer in _openDatabase() below.
-    return _dbOpenCompleter.future;
+    // return _dbOpenCompleter.future;
+    return _database;
   }
 
-  Future _openDatabase() async {
+  Future<Database> _openDatabase() async {
     // Get a platform-specific directory where persistent app data can be stored
     final appDocumentDir = await getApplicationDocumentsDirectory();
     // Path with the form: /platform-specific-directory/demo.db
 
-    final dbPath = join(appDocumentDir.path, 'Guitou_', Project.instance.id, '.db');
+    print("\n_openDatabase: " + appDocumentDir.path + " - " + Project.instance.id + " - " + Project.instance.name);
+
+    final dbPath = join(appDocumentDir.path, 'Guitou_' + Project.instance.id + '.db');
+
+    print("\nDB PATH : $dbPath");
 
     final database = await databaseFactoryIo.openDatabase(dbPath);
 
+    print("\nDatabase : " + database.toString());
 
     // Any code awaiting the Completer's future will now start executing
-    _dbOpenCompleter.complete(database);
+    // _dbOpenCompleter.complete(database);
+    return database;
   }
 }

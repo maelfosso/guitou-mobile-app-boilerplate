@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:muitou/bloc/data_collected_bloc.dart';
+import 'package:muitou/bloc/data_collected_event.dart';
+import 'package:muitou/bloc/data_collected_state.dart';
+import 'package:muitou/models/data_collected.dart';
 import 'package:muitou/models/project.dart';
 
 import '../models/project.dart';
@@ -15,6 +20,7 @@ class DataEntryPage extends StatefulWidget {
 }
 
 class _DataEntryPageState extends State<DataEntryPage> {
+  DataCollectedBloc _dataCollectedBloc;
   XormDetails _currentXormDetails;
 
   PageController controller = PageController();
@@ -28,6 +34,8 @@ class _DataEntryPageState extends State<DataEntryPage> {
   @override
   void initState() {
     super.initState();
+
+    _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
 
     setState(() {
       currentPageViewPosition = 0;
@@ -100,6 +108,10 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   print("\nIS LAST PAGE");
                   print(this.data);
                   print("\n");
+                  
+                  this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
+                  
+                  Navigator.of(context).pop();
                 } else {               
                   this.controller.nextPage(duration: _kDuration, curve: _kCurve);
                 }
@@ -136,7 +148,12 @@ class _DataEntryPageState extends State<DataEntryPage> {
           ],
         ),
       ),
-      body: buildPageView()
+      body: BlocBuilder(
+        bloc: _dataCollectedBloc,
+        builder: (BuildContext context, DataCollectedState state) {
+          return buildPageView();
+        }
+      )
     );
   }
 }

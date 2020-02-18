@@ -6,21 +6,19 @@ class DataCollectedDao {
   static const String folderName = "Datas";
   final _datasFolder = intMapStoreFactory.store(folderName);
 
-
   Future<Database> get  _db  async => await AppDatabase.instance.database;
 
-  Future insertData(DataCollected data) async{
+  Future insertData(DataCollected data) async {
 
-    await  _datasFolder.add(await _db, data.toJson() );
-    print('Data Inserted successfully !!');
+    print('Data Insert start... !! \n' + data.toJson().toString() + " - \n" + (await _db).toString());
+    int key = await  _datasFolder.add(await _db, data.toJson() );
+    print('Data Inserted successfully !! $key');
   }
 
   Future updateData(DataCollected data) async{
     final finder = Finder(filter: Filter.byKey(data.id));
     await _datasFolder.update(await _db, data.toJson(), finder: finder);
-
   }
-
 
   Future delete(DataCollected data) async{
     final finder = Finder(filter: Filter.byKey(data.id));

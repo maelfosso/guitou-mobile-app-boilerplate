@@ -3,14 +3,14 @@ class DataCollected {
   String remoteId;
   
   DateTime savedRemotelyAt;
-  DateTime createdAt;
+  DateTime createdAt = DateTime.now();
   DateTime updatedAt;
 
   String provider = 'mobile';
   String dataLocation = 'local';
 
   String form;
-  Map<String, dynamic> values;
+  Map<String, Map<String, dynamic>> values;
 
   DataCollected({
     this.form,
@@ -37,12 +37,12 @@ class DataCollected {
   Map<String, dynamic> toJson() => {
     "form": this.form,
     "values": this.values,
-    "id": this.id,
-    "remoteId": this.remoteId,
-    "savedRemotelyAt": this.savedRemotelyAt,
-    "createdAt": this.createdAt,
-    "provider": this.provider,
-    "dataLocation": this.dataLocation,
+    // "id": this.id,
+    // "remoteId": this.remoteId,
+    // "savedRemotelyAt": this.savedRemotelyAt,
+    // "createdAt": this.createdAt,
+    // "provider": this.provider,
+    // "dataLocation": this.dataLocation,
   };
 
 

@@ -17,6 +17,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
       yield DataCollectedLoading();
       yield* _reloadData();
     } else if (event is AddDataCollected) {
+      print("\nDATA COLLECTED BLOCK - event is AddDataCollected");
       await _dataCollectedDao.insertData(event.data);
       yield* _reloadData();
     } else if (event is UpdateDataCollected) {
