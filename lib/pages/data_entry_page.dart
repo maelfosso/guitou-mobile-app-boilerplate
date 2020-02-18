@@ -93,7 +93,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   print(currentSection.sectionKey.currentState.value);
                   currentSectionData = currentSection.sectionKey.currentState.value;
                   
-                  this.data[currentSectionKey] =currentSectionData;
+                  this.data[currentSectionKey] = currentSectionData;
                 }
 
                 if (isLastPage) {
