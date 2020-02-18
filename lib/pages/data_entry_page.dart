@@ -3,6 +3,7 @@ import 'package:muitou/models/project.dart';
 
 import '../models/project.dart';
 import '../models/xorm_detail.dart';
+import '../models/xorm_detail.dart';
 
 class DataEntryPage extends StatefulWidget {
   DataEntryPage({Key key, this.currentXorm}) : super(key: key);
@@ -21,6 +22,8 @@ class _DataEntryPageState extends State<DataEntryPage> {
   static const _kCurve = Curves.ease;
 
   int currentPageViewPosition = 0;
+
+  Map<String, Map<String, dynamic>> data = new Map();
 
   @override
   void initState() {
@@ -82,16 +85,22 @@ class _DataEntryPageState extends State<DataEntryPage> {
               child: Text(isLastPage ? "Save it" : "Next"),
               color: Colors.blue,
               onPressed: () {
-                if (this._currentXormDetails.sections[this.currentPageViewPosition].sectionKey.currentState.saveAndValidate()) {
-                  print(this._currentXormDetails.sections[this.currentPageViewPosition].sectionKey.currentState.value);
+                final XormSection currentSection = this._currentXormDetails.sections[this.currentPageViewPosition];
+                final String currentSectionKey = currentSection.id;
+                Map<String, dynamic> currentSectionData = new Map();
+
+                if (currentSection.sectionKey.currentState.saveAndValidate()) {
+                  print(currentSection.sectionKey.currentState.value);
+                  currentSectionData = currentSection.sectionKey.currentState.value;
+                  
+                  this.data[currentSectionKey] =currentSectionData;
                 }
 
                 if (isLastPage) {
-
-                } else {
-
-                  
-
+                  print("\nIS LAST PAGE");
+                  print(this.data);
+                  print("\n");
+                } else {               
                   this.controller.nextPage(duration: _kDuration, curve: _kCurve);
                 }
               },
