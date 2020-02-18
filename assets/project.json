@@ -1,0 +1,96 @@
+{
+  "settings": {
+    "display_data": {
+      "web": {
+        "columns": [],
+        "data": []
+      }
+    }
+  },
+  "title": "Untitled form",
+  "data": [],
+  "_id": "5e3ebef020c20f795be4fbd4",
+  "name": "EVALUATION DES RADIOS COMMUNAUTAIRES AU CAMEROUN",
+  "description": "",
+  "collaborators": [],
+  "createdAt": "2020-02-08T14:00:16.044Z",
+  "author": "5e3ebedc20c20f795be4fbd3",
+  "__v": 0,
+  "xorms": [
+    {"id": "5e3ebef020c20f795be4fbd3", "title": "Questionnaire Radio Communautaire"}
+  ],
+  "xormsDetails": {
+    "5e3ebef020c20f795be4fbd3": {
+      "section_0": {
+        "_params": {
+          "title": "Identifiant de la radio communautaire",
+          "description": "",
+          "key": "section_0"
+        },
+        "questions": {
+          "section_0__0": {
+            "type": "single_choice_select",
+            "title": "Region",
+            "hint": "",
+            "kv": {
+              "1": "Adamaoua",
+              "2": "Centre",
+              "3": "Est",
+              "4": "Extreme-nord",
+              "5": "Littoral",
+              "6": "Nord",
+              "7": "Nord-ouest",
+              "8": "Ouest",
+              "9": "Sud",
+              "10": "Sud-ouest"
+            },
+            "kv_full": {
+              "Adamaoua": "Adamaoua",
+              "Centre": "Centre",
+              "Est": "Est",
+              "Extreme-nord": "Extreme-nord",
+              "Littoral": "Littoral",
+              "Nord": "Nord",
+              "Nord-ouest": "Nord-ouest",
+              "Ouest": "Ouest",
+              "Sud": "Sud",
+              "Sud-ouest": "Sud-ouest"
+            }
+          },
+          "section_0__1": {
+            "type": "string",
+            "title": "Localite",
+            "hint": "",
+            "subtype": "String"
+          },
+          "section_0__2": {
+            "type": "string",
+            "title": "Promoteur de la radio communautaire",
+            "hint": "",
+            "subtype": "String"
+          },
+          "section_0__3": {
+            "type": "date",
+            "title": "Mois et annee d'entree en service de la radio communautaire",
+            "hint": ""
+          },
+          "section_0__4": {
+            "type": "text",
+            "title": "Contacts/Telephones",
+            "hint": ""
+          },
+          "section_0__5": {
+            "type": "string",
+            "title": "Qualite du repondant",
+            "hint": ""
+          },
+          "section_0__6": {
+            "type": "string",
+            "title": "Dimensions du batiment/de la piece abritant la radio communautaire",
+            "hint": ""
+          }
+        }
+      }
+    }
+  }
+}

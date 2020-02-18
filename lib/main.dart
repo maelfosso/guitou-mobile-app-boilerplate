@@ -1,6 +1,30 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:async' show Future;
+import 'package:flutter/services.dart'; // show rootBundle;
+import 'package:muitou/models/project.dart';
+import 'package:muitou/models/xorm.dart';
+import 'package:muitou/pages/data_entry_page.dart';
 
-void main() => runApp(MyApp());
+Future<String> _loadProjectAsset() async {
+  return await rootBundle.loadString('assets/project.json');
+}
+
+Future<Project> loadProject() async {
+  String jsonString = await _loadProjectAsset();
+  final jsonResponse = json.decode(jsonString);
+  return new Project.fromJson(jsonResponse);
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setEnabledSystemUIOverlays([]);
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await loadProject();
+  runApp(MyApp());
+}
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -46,18 +70,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  final List<String> _xormsList = [
-    "All",
-    "Questionnaire Radio Communautaire",
-    "Questionnaire Promoteur",
-    "Questionnaire Beneficiaire",
-    // "One",
-    // "Two",
-    // "Three",
-    // "Four",
-    // "Five"
+  final List<Xorm> _xormsList = [
+    Xorm(id:"all", title:"All")
   ];
-  String _currentlySelectedXorms = "All";
+
+  Xorm _currentlySelectedXorm = Xorm(id:"all", title:"All");
 
   void _fillAXorm() async {
     setState(() {
@@ -70,7 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     String selectedXorm = await _asyncSelectXormDialog(context);
-    print(selectedXorm);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+    );
   }
 
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
@@ -80,12 +100,12 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (BuildContext context) {
         return SimpleDialog(
           title: const Text('Select the xorm'),
-          children: this._xormsList.skip(1).map((String xorm) {
+          children: this._xormsList.skip(1).map((Xorm xorm) {
             return SimpleDialogOption(
               onPressed: () {
-                Navigator.pop(context, xorm);
+                Navigator.pop(context, xorm.id);
               },
-              child: Text(xorm),
+              child: Text(xorm.title),
             );
           }).toList(),
         );
@@ -95,6 +115,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (this._xormsList.length == 1) {
+      this._xormsList.addAll(Project.instance.xorms);
+    }
+
     // This method is rerun every time setState is called, for instance as done
     // by the _fillAXorm method above.
     //
@@ -115,8 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
               widget.title,
               style: TextStyle(fontSize: 20.0),
             ),
-            this._currentlySelectedXorms != null && this._currentlySelectedXorms != "All" ? Text(
-              this._currentlySelectedXorms,
+            this._currentlySelectedXorm != null && this._currentlySelectedXorm.id != "all" ? Text(
+              this._currentlySelectedXorm.title,
               style: TextStyle(fontSize: 14.0),
             ) : Container()
           ],
@@ -126,25 +150,25 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.add),
             onPressed: _fillAXorm
           ),
-          PopupMenuButton<String>(
-            onSelected: (String value) {
+          PopupMenuButton<Xorm>(
+            onSelected: (Xorm value) {
               setState(() {
-                this._currentlySelectedXorms = value;
+                this._currentlySelectedXorm = value;
               });
             },
             itemBuilder: (BuildContext context) {
-              return _xormsList.map((String choice) {
-                return PopupMenuItem<String>(
+              return _xormsList.map((Xorm choice) {
+                return PopupMenuItem<Xorm>(
                   value: choice,
                   child: 
                   Row(
                     children: [
-                      this._currentlySelectedXorms == choice ? Icon(
+                      this._currentlySelectedXorm.id == choice.id ? Icon(
                         Icons.check, 
                         color: Colors.black
                       ) : Container(),
                       Expanded(
-                        child: Text(choice),
+                        child: Text(choice.title),
                         flex: 1,
                       )
                     ]                    
