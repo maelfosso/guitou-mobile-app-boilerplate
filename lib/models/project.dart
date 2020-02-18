@@ -10,10 +10,14 @@ class Project {
 
   static Project get instance { return _instance;}
 
+  String id;
+  String name;
   List<Xorm> xorms;
   List<XormDetails> xormsDetails;
 
-  factory Project({List<Xorm> xorms, List<XormDetails> xormsDetails}) {
+  factory Project({String id, String name, List<Xorm> xorms, List<XormDetails> xormsDetails}) {
+    _instance.id = id;
+    _instance.name = name;
     _instance.xorms = xorms;
     _instance.xormsDetails = xormsDetails;
     return _instance;
@@ -21,6 +25,8 @@ class Project {
 
   factory Project.fromJson(Map<String, dynamic> parsedJson) {
     return Project(
+      id: parsedJson['id'],
+      name: parsedJson['name'],
       xorms: (parsedJson['xorms'] as List)
         .map((i) => Xorm.fromJson(i))
         .toList(),
