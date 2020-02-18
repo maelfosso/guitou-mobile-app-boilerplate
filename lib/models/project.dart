@@ -25,7 +25,7 @@ class Project {
 
   factory Project.fromJson(Map<String, dynamic> parsedJson) {
     return Project(
-      id: parsedJson['id'],
+      id: parsedJson['_id'],
       name: parsedJson['name'],
       xorms: (parsedJson['xorms'] as List)
         .map((i) => Xorm.fromJson(i))

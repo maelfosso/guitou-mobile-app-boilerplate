@@ -13,6 +13,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
   Stream<DataCollectedState> mapEventToState(DataCollectedEvent event) async* {
     // TODO: implement mapEventToState
     if (event is LoadDataCollected) {
+      print("\nDATA COLLECTED BLOCK - event is LoadDataCollected");
       yield DataCollectedLoading();
       yield* _reloadData();
     } else if (event is AddDataCollected) {
@@ -29,6 +30,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
 
   Stream<DataCollectedState> _reloadData() async* {
     final datas = await _dataCollectedDao.getAllDatas();
+      print("\nDATA COLLECTED BLOCK - _reloadData - $datas.length");
     yield DataCollectedLoaded(datas: datas);
   }
   

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async' show Future;
 import 'package:flutter/services.dart'; // show rootBundle;
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:muitou/bloc/data_collected_bloc.dart';
+import 'package:muitou/bloc/data_collected_event.dart';
+import 'package:muitou/bloc/data_collected_state.dart';
+import 'package:muitou/models/data_collected.dart';
 import 'package:muitou/models/project.dart';
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/pages/data_entry_page.dart';
@@ -30,21 +35,24 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Collected Data'),
+    return BlocProvider(
+      create: (BuildContext context) => DataCollectedBloc(),
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(title: 'Home'),
+      )
     );
   }
 }
@@ -68,7 +76,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  DataCollectedBloc _dataCollectedBloc;
 
   final List<Xorm> _xormsList = [
     Xorm(id:"all", title:"All")
@@ -76,16 +84,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Xorm _currentlySelectedXorm = Xorm(id:"all", title:"All");
 
-  void _fillAXorm() async {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
 
+    _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
+    _dataCollectedBloc.add(LoadDataCollected());  
+  }
+
+  void _fillAXorm() async {
     String selectedXorm = await _asyncSelectXormDialog(context);
     Navigator.push(
       context,
@@ -110,6 +117,65 @@ class _MyHomePageState extends State<MyHomePage> {
           }).toList(),
         );
       }
+    );
+  }
+
+  Widget _buildBody() {
+    return BlocBuilder(
+      bloc: _dataCollectedBloc,
+      builder: (BuildContext context, DataCollectedState state) {
+        if (state is DataCollectedLoading) {
+          // context.
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (state is DataCollectedLoaded) {
+          return ListView.builder(
+            itemCount: state.datas.length,
+            itemBuilder: (context, index) {
+              final data = state.datas[index];
+
+              return ListTile(
+                title: Text(data.id.toString()),
+                subtitle: Text(data.createdAt.toLocal().toString()),
+                trailing: _buildActionButtons(data),
+              );
+            }
+          );
+        }
+
+        // if (state is ) {
+
+        // }
+      },
+    );
+  }
+
+  Widget _buildActionButtons(DataCollected data) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.visibility),
+          onPressed: () {
+            print("See Data $data.id");
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.refresh),
+          onPressed: () {
+            print("Update Data $data.id");
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () {
+            print("Delete Data $data.id");
+          },
+        )
+      ],
     );
   }
 
@@ -179,36 +245,37 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
+      body: _buildBody(),
+      // Center(
+      //   // Center is a layout widget. It takes a single child and positions it
+      //   // in the middle of the parent.
+      //   child: Column(
+      //     // Column is also a layout widget. It takes a list of children and
+      //     // arranges them vertically. By default, it sizes itself to fit its
+      //     // children horizontally, and tries to be as tall as its parent.
+      //     //
+      //     // Invoke "debug painting" (press "p" in the console, choose the
+      //     // "Toggle Debug Paint" action from the Flutter Inspector in Android
+      //     // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+      //     // to see the wireframe for each widget.
+      //     //
+      //     // Column has various properties to control how it sizes itself and
+      //     // how it positions its children. Here we use mainAxisAlignment to
+      //     // center the children vertically; the main axis here is the vertical
+      //     // axis because Columns are vertical (the cross axis would be
+      //     // horizontal).
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: <Widget>[
+      //       Text(
+      //         'You have pushed the button this many times:',
+      //       ),
+      //       Text(
+      //         '$_counter',
+      //         style: Theme.of(context).textTheme.display1,
+      //       ),
+      //     ],
+      //   ),
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: _fillAXorm,
         tooltip: 'Increment',
