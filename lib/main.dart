@@ -165,6 +165,19 @@ class _MyHomePageState extends State<MyHomePage> {
           icon: Icon(Icons.edit),
           onPressed: () {
             print("Update Data $data.id");
+            print(json.encode(data.values));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DataEntryPage(
+                  currentXorm: data.form, 
+                  values: data.values.map((key, vals) {
+                    return MapEntry(key.toString(), Map<String, String>.from(vals));
+                  })
+                  // Map<String, Map<String, String>>.from(json.encode(data.values))
+                )
+              ),
+            );
           },
         ),
         IconButton(

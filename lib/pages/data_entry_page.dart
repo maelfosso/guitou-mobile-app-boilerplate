@@ -13,9 +13,10 @@ import '../models/xorm_detail.dart';
 import '../models/xorm_detail.dart';
 
 class DataEntryPage extends StatefulWidget {
-  DataEntryPage({Key key, this.currentXorm}) : super(key: key);
+  DataEntryPage({Key key, this.currentXorm, this.values = const {} }) : super(key: key);
 
   final String currentXorm;
+  final Map<String, Map<String, String>> values;
 
   @override
   _DataEntryPageState createState() => _DataEntryPageState();
@@ -38,6 +39,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
     super.initState();
 
     _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
+    this.data = widget.values;
 
     setState(() {
       currentPageViewPosition = 0;

@@ -84,7 +84,7 @@ class XormSection {
       initialValue: data,
       autovalidate: true,
       child: Column(
-        children: this.questions.map((q) => q.build()).toList()
+        children: this.questions.map((q) => q.build(value: data[q.id])).toList()
       )
     );
   }
@@ -114,7 +114,7 @@ abstract class XormQuestion {
 
   XormQuestion({this.id, this.title, this.hint, this.type});
 
-  Widget build();
+  Widget build({ String value });
 }
 
 class XormQuestionString extends XormQuestion {
@@ -131,7 +131,7 @@ class XormQuestionString extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderTextField(
       attribute: this.id,
@@ -159,7 +159,7 @@ class XormQuestionText extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderTextField(
       attribute: this.id,
@@ -187,9 +187,10 @@ class XormQuestionDate extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderDateTimePicker(
+      initialValue: DateTime.parse(value),
       attribute: this.id,
       inputType: InputType.date,
       format: DateFormat("yyyy-MM-dd"),
@@ -212,7 +213,7 @@ class XormQuestionTime extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderDateTimePicker(
       attribute: this.id,
@@ -238,9 +239,10 @@ class XormQuestionOptional extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderCheckbox(
+      initialValue: value.toLowerCase() == 'true',
       attribute: this.id,
       label: Text(this.title),
       
@@ -271,7 +273,7 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderDropdown(
       attribute: this.id,
