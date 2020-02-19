@@ -162,15 +162,44 @@ class _MyHomePageState extends State<MyHomePage> {
           },
         ),
         IconButton(
-          icon: Icon(Icons.refresh),
+          icon: Icon(Icons.edit),
           onPressed: () {
             print("Update Data $data.id");
           },
         ),
         IconButton(
           icon: Icon(Icons.delete),
-          onPressed: () {
-            print("Delete Data $data.id");
+          onPressed: () async {
+            bool isDeleted = await showDialog<bool>(
+              context: context,
+              barrierDismissible: false, // user must tap button for close dialog!
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Delete Data?'),
+                  content: const Text(
+                    'Are you sure you want to delete that data?'    
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: const Text('NO'),
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    FlatButton(
+                      child: const Text('YES'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    )
+                  ],
+                );
+              },
+            );
+
+            if (isDeleted) {
+              _dataCollectedBloc.add(DeleteDataCollected(data: data));
+            }
           },
         )
       ],
