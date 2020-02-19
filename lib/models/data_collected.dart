@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class DataCollected {
   int id;
   String remoteId;
@@ -10,7 +12,7 @@ class DataCollected {
   String dataLocation = 'local';
 
   String form;
-  Map<String, Map<String, dynamic>> values;
+  Map values;
 
   DataCollected({
     this.form,
@@ -23,42 +25,52 @@ class DataCollected {
     this.dataLocation,
   });
 
-  factory DataCollected.fromJson(Map<String, dynamic> parsedJson) => DataCollected(
-    form: parsedJson['form'],
-    values: parsedJson['values'],
-    id: parsedJson['id'],
-    remoteId: parsedJson['remoteId'],
-    savedRemotelyAt: parsedJson['savedRemotelyAt'],
-    createdAt: parsedJson['createdAt'],
-    provider: parsedJson['provider'],
-    dataLocation: parsedJson['dataLocation'],
-  );
+  factory DataCollected.fromJson(Map<String, dynamic> parsedJson) {
+    return DataCollected(
+      form: parsedJson['form'],
+      values: parsedJson['values'],
+      id: parsedJson['id'],
+      remoteId: parsedJson['remoteId'],
+      savedRemotelyAt: parsedJson['savedRemotelyAt'],
+      createdAt: DateTime.parse(parsedJson['createdAt'].toString()),
+      provider: parsedJson['provider'],
+      dataLocation: parsedJson['dataLocation'],
+    );
+  }
+
+  Map<String, dynamic> toSave() => {
+    "form": this.form,
+    "values": this.values,
+    "createdAt": DateTime.now().toString(),
+    "provider": "mobile",
+    "dataLocation": "local"
+  };
 
   Map<String, dynamic> toJson() => {
     "form": this.form,
     "values": this.values,
-    // "id": this.id,
-    // "remoteId": this.remoteId,
-    // "savedRemotelyAt": this.savedRemotelyAt,
-    // "createdAt": this.createdAt,
-    // "provider": this.provider,
-    // "dataLocation": this.dataLocation,
+    "id": this.id,
+    "remoteId": this.remoteId,
+    "savedRemotelyAt": this.savedRemotelyAt,
+    "createdAt": this.createdAt,
+    "provider": this.provider,
+    "dataLocation": this.dataLocation,
   };
 
 
-  @override
-  String toString() {
-    // TODO: implement toString
-    return """
-    "form": $form,
-    "values": $values,
-    "id": $id,
-    "remoteId": $remoteId,
-    "savedRemotelyAt": $savedRemotelyAt,
-    "createdAt": $createdAt,
-    "provider": $provider,
-    "dataLocation": $dataLocation,
-    ----------------------------------
-    """;
-  }
+  // @override
+  // String toString() {
+  //   // TODO: implement toString
+  //   return """
+  //   "form": $form,
+  //   "values": $values,
+  //   "id": $id,
+  //   "remoteId": $remoteId,
+  //   "savedRemotelyAt": $savedRemotelyAt,
+  //   "createdAt": $createdAt,
+  //   "provider": $provider,
+  //   "dataLocation": $dataLocation,
+  //   ----------------------------------
+  //   """;
+  // }
 }

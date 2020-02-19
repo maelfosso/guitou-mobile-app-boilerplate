@@ -30,6 +30,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
   }
 
   Stream<DataCollectedState> _reloadData() async* {
+    print("\nIN _RELOAD DATA\n");
     final datas = await _dataCollectedDao.getAllDatas();
       print("\nDATA COLLECTED BLOCK - _reloadData - $datas.length");
     yield DataCollectedLoaded(datas: datas);

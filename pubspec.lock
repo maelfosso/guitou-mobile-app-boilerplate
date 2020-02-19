@@ -165,13 +165,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
-  logging:
-    dependency: transitive
+  jiffy:
+    dependency: "direct main"
     description:
-      name: logging
+      name: jiffy
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.11.4"
+    version: "2.2.0"
   matcher:
     dependency: transitive
     description:
@@ -206,7 +206,7 @@ packages:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.0+1"
+    version: "1.6.0"
   pedantic:
     dependency: transitive
     description:
@@ -221,6 +221,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
+  platform:
+    dependency: transitive
+    description:
+      name: platform
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.2.1"
   provider:
     dependency: transitive
     description:
@@ -248,7 +255,7 @@ packages:
       name: sembast
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.17.2+2"
+    version: "2.1.3"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -310,6 +317,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.11"
+  timeago:
+    dependency: "direct main"
+    description:
+      name: timeago
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.26"
   typed_data:
     dependency: transitive
     description:

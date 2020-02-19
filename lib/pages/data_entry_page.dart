@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muitou/bloc/data_collected_bloc.dart';
@@ -29,7 +31,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   int currentPageViewPosition = 0;
 
-  Map<String, Map<String, dynamic>> data = {};
+  Map<String, Map<String, String>> data = {};
 
   @override
   void initState() {
@@ -99,9 +101,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
                 if (currentSection.sectionKey.currentState.saveAndValidate()) {
                   print(currentSection.sectionKey.currentState.value);
-                  currentSectionData = currentSection.sectionKey.currentState.value;
+                  currentSectionData = currentSection.sectionKey.currentState.value; //.cast<String, String>();
                   
-                  this.data[currentSectionKey] = currentSectionData;
+                  this.data[currentSectionKey] = currentSectionData.map((key, value) {
+                    return MapEntry(key, value.toString());
+                  });
                 }
 
                 if (isLastPage) {
