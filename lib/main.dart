@@ -143,13 +143,42 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: Text(data.id.toString()),
                 subtitle: Text(Jiffy(data.createdAt).fromNow()),
                 trailing: _buildActionButtons(data),
+                onTap: () => this._onOpenData(data),
               );
-            }
+            },
           );
         }
         
         return Container();
       },
+    );
+  }
+
+  void _onOpenData(DataCollected data) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DataViewPage(
+          id: data.id
+        )
+      ),
+    ).then((onValue) {
+      this._dataCollectedBloc.add(LoadDataCollected());
+    });
+  }
+
+  void _onUpdateData(DataCollected data) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DataEntryPage(
+          currentXorm: data.form, 
+          id: data.id,
+          values: data.values.map((key, vals) {
+            return MapEntry(key.toString(), Map<String, String>.from(vals));
+          })
+        )
+      ),
     );
   }
 
@@ -159,37 +188,11 @@ class _MyHomePageState extends State<MyHomePage> {
       children: <Widget>[
         IconButton(
           icon: Icon(Icons.visibility),
-          onPressed: () {
-            print("See Data " + data.id.toString());
-            print(data.toJson());
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DataViewPage(
-                  id: data.id
-                )
-              ),
-            ).then((onValue) {
-              this._dataCollectedBloc.add(LoadDataCollected());
-            });
-          },
+          onPressed: () => this._onOpenData(data),
         ),
         IconButton(
           icon: Icon(Icons.edit),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DataEntryPage(
-                  currentXorm: data.form, 
-                  id: data.id,
-                  values: data.values.map((key, vals) {
-                    return MapEntry(key.toString(), Map<String, String>.from(vals));
-                  })
-                )
-              ),
-            );
-          },
+          onPressed: () => this._onUpdateData(data)
         ),
         IconButton(
           icon: Icon(Icons.delete),
