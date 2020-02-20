@@ -26,13 +26,14 @@ class DataCollected {
   });
 
   factory DataCollected.fromJson(Map<String, dynamic> parsedJson) {
+    
     return DataCollected(
       form: parsedJson['form'],
       values: parsedJson['values'],
       id: parsedJson['id'],
       remoteId: parsedJson['remoteId'],
       savedRemotelyAt: parsedJson['savedRemotelyAt'],
-      createdAt: DateTime.parse(parsedJson['createdAt'].toString()),
+      createdAt: DateTime.tryParse(parsedJson['createdAt'].toString()),
       provider: parsedJson['provider'],
       dataLocation: parsedJson['dataLocation'],
     );
@@ -52,7 +53,7 @@ class DataCollected {
     "id": this.id,
     "remoteId": this.remoteId,
     "savedRemotelyAt": this.savedRemotelyAt,
-    "createdAt": this.createdAt,
+    "createdAt": this.createdAt, //.toString(),
     "provider": this.provider,
     "dataLocation": this.dataLocation,
   };

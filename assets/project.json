@@ -90,6 +90,25 @@
             "hint": ""
           }
         }
+      },
+      "section_final": {
+        "_params": {
+          "title": "Thank you for filling that form",
+          "description": "Please, sign here to confirm your data entry and then validate",
+          "key": "section_final"
+        },
+        "questions": {
+          "section_final__name": {
+            "type": "string",
+            "title": "Enter your name",
+            "hint": ""
+          },
+          "section_final__again": {
+            "type": "optional",
+            "title": "Are you going to enter another data?",
+            "hint": ""
+          }
+        }
       }
     }
   }

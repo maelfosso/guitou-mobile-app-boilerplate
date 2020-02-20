@@ -27,11 +27,38 @@ class XormDetails {
     final List<XormSection> sections = parsedJson.entries
       .map((entry) => XormSection.fromJson(entry.key, entry.value))
       .toList();
-    sections.add(finalSection);
+    // sections.add(finalSection);
 
     return new XormDetails(
       id: id,
       sections: sections
+    );
+  }
+
+  Widget view(Map data) {
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      itemBuilder: (context, index) {
+        final section = this.sections[index];
+        
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              Text(
+                section.params.title.trim(),
+                style: Theme.of(context).textTheme.title,
+              ),
+              Text(
+                section.params.description.trim(),
+                style: Theme.of(context).textTheme.subtitle,
+              ),
+              section.view(data[section.id])
+            ],
+          ),
+        );
+      },
+      itemCount: this.sections.length,
     );
   }
 }
@@ -81,11 +108,42 @@ class XormSection {
   Widget build({ Map<String, dynamic> data }) {
     return FormBuilder(
       key: _fbKey,
-      initialValue: data,
+      initialValue: data.map((key, value) {
+        XormQuestion q = this.questions.firstWhere((q) => q.id == key);
+        switch (q.type) {
+          case 'string':
+            return MapEntry(key, value);
+          case 'text':
+            return MapEntry(key, value);
+          case 'date':
+            return MapEntry(key, DateTime.tryParse(value));
+          case 'time':
+            return MapEntry(key, DateTime.tryParse(value));
+          case 'optional':
+            return MapEntry(key, value.toString().toLowerCase() == 'true');
+          case 'single_choice_select':
+            return MapEntry(key, value);
+          default:
+            return null; 
+        }
+      }),
       autovalidate: true,
       child: Column(
         children: this.questions.map((q) => q.build()).toList()
       )
+    );
+  }
+
+  Widget view(Map data) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      scrollDirection: Axis.vertical,
+      itemCount: this.questions.length,
+      itemBuilder: (context, index) {
+        final question = this.questions[index];
+        return question.view(data[question.id]);
+      }
     );
   }
 }
@@ -114,7 +172,16 @@ abstract class XormQuestion {
 
   XormQuestion({this.id, this.title, this.hint, this.type});
 
-  Widget build();
+  Widget build({ String value });
+
+  Widget view(String value) {
+    return ListTile(
+      title: Text(this.title),
+      subtitle: Text(value),
+      dense: true,
+    );
+  }
+
 }
 
 class XormQuestionString extends XormQuestion {
@@ -131,16 +198,12 @@ class XormQuestionString extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderTextField(
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
       maxLines: 1,
-      // validators: [
-      //   FormBuilderValidators.numeric(),
-      //   FormBuilderValidators.max(70),
-      // ],
     );
   }
 
@@ -159,16 +222,12 @@ class XormQuestionText extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderTextField(
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
       minLines: 3,
-      // validators: [
-      //   FormBuilderValidators.numeric(),
-      //   FormBuilderValidators.max(70),
-      // ],
     );
   }
 
@@ -187,8 +246,7 @@ class XormQuestionDate extends XormQuestion {
   }
 
   @override
-  Widget build() {
-    // TODO: implement build
+  Widget build({ String value }) {
     return FormBuilderDateTimePicker(
       attribute: this.id,
       inputType: InputType.date,
@@ -212,9 +270,10 @@ class XormQuestionTime extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderDateTimePicker(
+      // initialValue: value.isEmpty ? DateTime.parse(value) : "",
       attribute: this.id,
       inputType: InputType.time,
       format: DateFormat("HH:mm"),
@@ -238,18 +297,11 @@ class XormQuestionOptional extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderCheckbox(
       attribute: this.id,
       label: Text(this.title),
-      
-      // validators: [
-      //   // FormBuilderValidators.requiredTrue(
-      //   //   errorText: this.errorMessage
-      //   //       // "You must accept terms and conditions to continue",
-      //   // ),
-      // ],
     );
   }
 
@@ -271,19 +323,20 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
   }
 
   @override
-  Widget build() {
+  Widget build({ String value }) {
+    List<DropdownMenuItem> items = this.kv.entries
+        .map((entry) => DropdownMenuItem(
+            value: entry.key,
+            child: Text(entry.value)
+      )).toList();
+
     // TODO: implement build
     return FormBuilderDropdown(
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
-      // initialValue: 'Male',
+      initialValue: null,
       hint: Text('Select a choice'),
-      // validators: [FormBuilderValidators.required()],
-      items: this.kv.entries // ['Male', 'Female', 'Other']
-        .map((entry) => DropdownMenuItem(
-            value: entry.key,
-            child: Text(entry.value)
-      )).toList(),
+      items: items
     );
   }
 

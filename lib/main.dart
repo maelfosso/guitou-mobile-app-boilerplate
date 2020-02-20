@@ -11,6 +11,7 @@ import 'package:muitou/models/data_collected.dart';
 import 'package:muitou/models/project.dart';
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/pages/data_entry_page.dart';
+import 'package:muitou/pages/data_view_page.dart';
 
 Future<String> _loadProjectAsset() async {
   return await rootBundle.loadString('assets/project.json');
@@ -131,7 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         } 
         if (state is DataCollectedLoaded) {
-
           return ListView.builder(
             itemCount: state.datas.length,
             itemBuilder: (context, index) {
@@ -141,13 +141,42 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: Text(data.id.toString()),
                 subtitle: Text(Jiffy(data.createdAt).fromNow()),
                 trailing: _buildActionButtons(data),
+                onTap: () => this._onOpenData(data),
               );
-            }
+            },
           );
         }
         
         return Container();
       },
+    );
+  }
+
+  void _onOpenData(DataCollected data) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DataViewPage(
+          id: data.id
+        )
+      ),
+    ).then((onValue) {
+      this._dataCollectedBloc.add(LoadDataCollected());
+    });
+  }
+
+  void _onUpdateData(DataCollected data) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DataEntryPage(
+          currentXorm: data.form, 
+          id: data.id,
+          values: data.values.map((key, vals) {
+            return MapEntry(key.toString(), Map<String, String>.from(vals));
+          })
+        )
+      ),
     );
   }
 
@@ -157,20 +186,45 @@ class _MyHomePageState extends State<MyHomePage> {
       children: <Widget>[
         IconButton(
           icon: Icon(Icons.visibility),
-          onPressed: () {
-            print("See Data $data.id");
-          },
+          onPressed: () => this._onOpenData(data),
         ),
         IconButton(
-          icon: Icon(Icons.refresh),
-          onPressed: () {
-            print("Update Data $data.id");
-          },
+          icon: Icon(Icons.edit),
+          onPressed: () => this._onUpdateData(data)
         ),
         IconButton(
           icon: Icon(Icons.delete),
-          onPressed: () {
-            print("Delete Data $data.id");
+          onPressed: () async {
+            bool isDeleted = await showDialog<bool>(
+              context: context,
+              barrierDismissible: false, // user must tap button for close dialog!
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Delete Data?'),
+                  content: const Text(
+                    'Are you sure you want to delete that data?'    
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: const Text('NO'),
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                    ),
+                    FlatButton(
+                      child: const Text('YES'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    )
+                  ],
+                );
+              },
+            );
+
+            if (isDeleted) {
+              _dataCollectedBloc.add(DeleteDataCollected(data: data));
+            }
           },
         )
       ],
