@@ -53,4 +53,15 @@ class DataCollectedDao {
     }).toList();
   }
 
+  Future<DataCollected> query(int id) async {
+    print('\nGET ALL DATAS : $id');
+    final finder = Finder(filter: Filter.byKey(id));
+    final recordSnapshot = await _datasFolder.findFirst(await _db, finder: finder);
+    print(recordSnapshot);
+    final data = DataCollected.fromJson(recordSnapshot.value);
+    data.id = recordSnapshot.key;
+    print(data.toJson());
+    return data;
+  }
+
 }

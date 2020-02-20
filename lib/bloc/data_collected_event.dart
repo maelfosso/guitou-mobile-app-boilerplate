@@ -40,3 +40,13 @@ class DeleteDataCollected extends DataCollectedEvent {
   List<Object> get props => [this.data];
 }
 
+class QueryDataCollected extends DataCollectedEvent {
+  final int id;
+
+  const QueryDataCollected({@required this.id});
+
+  @override
+  List<Object> get props => [this.id];
+}
+
+

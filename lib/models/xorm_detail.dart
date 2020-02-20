@@ -34,6 +34,29 @@ class XormDetails {
       sections: sections
     );
   }
+
+  Widget view(Map data) {
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      itemBuilder: (context, index) {
+        final section = this.sections[index];
+        
+        return Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              Text(
+                section.params.title,
+                style: Theme.of(context).textTheme.headline,
+              ),
+              section.view(data[section.id])
+            ],
+          ),
+        );
+      },
+      itemCount: this.sections.length,
+    );
+  }
 }
 
 class XormSection {
@@ -107,6 +130,19 @@ class XormSection {
       )
     );
   }
+
+  Widget view(Map data) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      scrollDirection: Axis.vertical,
+      itemCount: this.questions.length,
+      itemBuilder: (context, index) {
+        final question = this.questions[index];
+        return question.view(data[question.id]);
+      }
+    );
+  }
 }
 
 class XormSectionParams {
@@ -134,6 +170,15 @@ abstract class XormQuestion {
   XormQuestion({this.id, this.title, this.hint, this.type});
 
   Widget build({ String value });
+
+  Widget view(String value) {
+    return ListTile(
+      title: Text(this.title),
+      subtitle: Text(value),
+      dense: true,
+    );
+  }
+
 }
 
 class XormQuestionString extends XormQuestion {

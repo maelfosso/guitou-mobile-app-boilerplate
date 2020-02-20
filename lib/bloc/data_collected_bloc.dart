@@ -26,6 +26,10 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
     } else if (event is DeleteDataCollected) {
       await _dataCollectedDao.delete(event.data);
       yield* _reloadData();
+    } else if (event is QueryDataCollected) {
+      print("\nDATA COLLECTED BLOCK - event is QueryDataCollected");
+      final data = await _dataCollectedDao.query(event.id);
+      yield DataCollectedLoaded(datas: [data]);
     }
   }
 

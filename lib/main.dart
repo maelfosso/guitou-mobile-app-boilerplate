@@ -11,6 +11,7 @@ import 'package:muitou/models/data_collected.dart';
 import 'package:muitou/models/project.dart';
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/pages/data_entry_page.dart';
+import 'package:muitou/pages/data_view_page.dart';
 
 Future<String> _loadProjectAsset() async {
   return await rootBundle.loadString('assets/project.json');
@@ -136,6 +137,8 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: state.datas.length,
             itemBuilder: (context, index) {
               final data = state.datas[index];
+              print("\nMain");
+              print(data.toJson());
 
               return ListTile(
                 title: Text(data.id.toString()),
@@ -158,7 +161,16 @@ class _MyHomePageState extends State<MyHomePage> {
         IconButton(
           icon: Icon(Icons.visibility),
           onPressed: () {
-            print("See Data $data.id");
+            print("See Data " + data.id.toString());
+            print(data.toJson());
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DataViewPage(
+                  id: data.id
+                )
+              ),
+            );
           },
         ),
         IconButton(
@@ -175,7 +187,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   values: data.values.map((key, vals) {
                     return MapEntry(key.toString(), Map<String, String>.from(vals));
                   })
-                  // Map<String, Map<String, String>>.from(json.encode(data.values))
                 )
               ),
             );
