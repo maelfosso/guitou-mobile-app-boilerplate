@@ -26,12 +26,7 @@ class DataCollected {
   });
 
   factory DataCollected.fromJson(Map<String, dynamic> parsedJson) {
-    print("\nIT'S ME");
-    print(parsedJson['createdAt']);
-    print(DateTime.tryParse(parsedJson['createdAt'].toString()));
-    print(Map.from(parsedJson['values']));
-    print("\nEND..");
-
+    
     return DataCollected(
       form: parsedJson['form'],
       values: parsedJson['values'],

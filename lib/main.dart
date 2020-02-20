@@ -136,8 +136,6 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: state.datas.length,
             itemBuilder: (context, index) {
               final data = state.datas[index];
-              print("\nMain");
-              print(data.toJson());
 
               return ListTile(
                 title: Text(data.id.toString()),

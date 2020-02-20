@@ -51,8 +51,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
     XormSection currentXormSection = this._currentXormDetails.sections[position];
 
     List<Widget> widgets = <Widget>[
-      Text(currentXormSection.params.title),
-      Text(currentXormSection.params.description),
+      Text(
+        currentXormSection.params.title,
+        style: Theme.of(context).textTheme.title,
+      ),
+      Text(
+        currentXormSection.params.description,
+        style: Theme.of(context).textTheme.subtitle,
+      ),
 
       currentXormSection.build(data: this.data.containsKey(currentXormSection.id) ? this.data[currentXormSection.id] : {} )
     ];
@@ -103,32 +109,21 @@ class _DataEntryPageState extends State<DataEntryPage> {
                 Map<String, dynamic> currentSectionData = new Map();
 
                 if (currentSection.sectionKey.currentState.saveAndValidate()) {
-                  print(currentSection.sectionKey.currentState.value);
                   currentSectionData = currentSection.sectionKey.currentState.value; //.cast<String, String>();
                   
                   if (currentSectionData.isEmpty) {
                     this.data[currentSectionKey] = {};
                   } else {
                     this.data[currentSectionKey] = currentSectionData.map((key, value) {
-                      print(key);
-                      print(value);
-                      print("\n");
-
                       return MapEntry(key, value != null ? value.toString() : "");
                     });
                   }
                 }
 
                 if (isLastPage) {
-                  print("\nIS LAST PAGE : \t" + widget.id.toString());
-                  print(this.data);
-                  print("\n");
-                  
                   if (widget.id == -1) {
-                    print("\nADD data : " + widget.id.toString());
                     this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
                   } else {
-                    print("\nUPDATE data : " + widget.id.toString());
                     this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
                   }
                   
@@ -173,7 +168,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
       body: BlocBuilder(
         bloc: _dataCollectedBloc,
         builder: (BuildContext context, DataCollectedState state) {
-          return buildPageView();
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 8.0
+            ),
+            child: buildPageView()
+          );
         }
       )
     );
