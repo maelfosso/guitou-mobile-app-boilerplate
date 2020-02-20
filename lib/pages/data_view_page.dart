@@ -26,9 +26,6 @@ class DataViewPage extends StatelessWidget {
     this._dataCollectedBloc = context.bloc<DataCollectedBloc>();
     this._dataCollectedBloc.add(QueryDataCollected(id: this.id));
 
-    print("\nBUILD ... DATACO BLOC");
-    print("\n");
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Data'),
@@ -36,20 +33,18 @@ class DataViewPage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.edit),
             onPressed: () {
-              print("\nUpdate Data " + this._data.id.toString());
-              print(this._data.toJson());
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) => DataEntryPage(
-              //       currentXorm: this._data.form, 
-              //       id: this._data.id,
-              //       values: this._data.values.map((key, vals) {
-              //         return MapEntry(key.toString(), Map<String, String>.from(vals));
-              //       })
-              //     )
-              //   ),
-              // );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DataEntryPage(
+                    currentXorm: this._data.form, 
+                    id: this._data.id,
+                    values: this._data.values.map((key, vals) {
+                      return MapEntry(key.toString(), Map<String, String>.from(vals));
+                    })
+                  )
+                ),
+              );
             },
           ),
           IconButton(
@@ -84,6 +79,7 @@ class DataViewPage extends StatelessWidget {
 
               if (isDeleted) {
                 _dataCollectedBloc.add(DeleteDataCollected(data: this._data));
+                Navigator.of(context).pop();
               }
             },
           )
@@ -97,26 +93,11 @@ class DataViewPage extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           } 
-          if (state is DataCollectedLoaded) {
-            this._data = state.datas.first;
-            print("\nAFTER STATE");
-            print(state.datas.length);
-            print(this._data);
-            
+          if (state is DataCollectedLoaded && state.datas.length == 1) {
+            this._data = state.datas.first;            
             this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == this._data.form);
 
-            print("\nIN DV PAGE");
-            print(this._data.values);
-            print("\n");
-
             return this._currentXormDetails.view(this._data.values);
-            // return SingleChildScrollView(
-            //   child: Column(
-            //     children: this._currentXormDetails.sections.map((section) {
-            //       return section.view(this._data.values[section.id]);
-            //     }).toList()
-            //   )
-            // );
           }
           
           return Container();

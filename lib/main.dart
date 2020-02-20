@@ -132,7 +132,6 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         } 
         if (state is DataCollectedLoaded) {
-
           return ListView.builder(
             itemCount: state.datas.length,
             itemBuilder: (context, index) {
@@ -170,14 +169,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   id: data.id
                 )
               ),
-            );
+            ).then((onValue) {
+              this._dataCollectedBloc.add(LoadDataCollected());
+            });
           },
         ),
         IconButton(
           icon: Icon(Icons.edit),
           onPressed: () {
-            print("\nUpdate Data $data.id");
-            print(data.toJson());
             Navigator.push(
               context,
               MaterialPageRoute(
