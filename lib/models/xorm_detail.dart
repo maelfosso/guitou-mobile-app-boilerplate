@@ -81,10 +81,29 @@ class XormSection {
   Widget build({ Map<String, dynamic> data }) {
     return FormBuilder(
       key: _fbKey,
-      initialValue: data,
+      initialValue: data.map((key, value) {
+        XormQuestion q = this.questions.firstWhere((q) => q.id == key);
+        switch (q.type) {
+          case 'string':
+            return MapEntry(key, value);
+          case 'text':
+            return MapEntry(key, value);
+          case 'date':
+            return MapEntry(key, DateTime.tryParse(value));
+          case 'time':
+            return MapEntry(key, DateTime.tryParse(value));
+          case 'optional':
+            return MapEntry(key, value.toString().toLowerCase() == 'true');
+          case 'single_choice_select':
+            return MapEntry(key, value);
+          default:
+            return null; 
+        }
+      }),
       autovalidate: true,
       child: Column(
-        children: this.questions.map((q) => q.build(value: data[q.id])).toList()
+        // children: this.questions.map((q) => q.build(value: data.isEmpty ? "" : data[q.id])).toList()
+        children: this.questions.map((q) => q.build()).toList()
       )
     );
   }
@@ -137,6 +156,7 @@ class XormQuestionString extends XormQuestion {
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
       maxLines: 1,
+      // initialValue: value,
       // validators: [
       //   FormBuilderValidators.numeric(),
       //   FormBuilderValidators.max(70),
@@ -165,6 +185,7 @@ class XormQuestionText extends XormQuestion {
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
       minLines: 3,
+      // initialValue: value,
       // validators: [
       //   FormBuilderValidators.numeric(),
       //   FormBuilderValidators.max(70),
@@ -188,14 +209,33 @@ class XormQuestionDate extends XormQuestion {
 
   @override
   Widget build({ String value }) {
+    // print("IN DATETIME");
+    // print("\nyy" + value + "xx");
+    // print(value.isEmpty);
+    // print(DateTime.tryParse(value));
+    // print("\n");
     // TODO: implement build
     return FormBuilderDateTimePicker(
-      initialValue: DateTime.parse(value),
       attribute: this.id,
       inputType: InputType.date,
       format: DateFormat("yyyy-MM-dd"),
       decoration: InputDecoration(labelText: this.title),
+      // initialValue: DateTime.tryParse(value)
     );
+    
+
+    // return value.isEmpty ? FormBuilderDateTimePicker(
+    //   attribute: this.id,
+    //   inputType: InputType.date,
+    //   format: DateFormat("yyyy-MM-dd"),
+    //   decoration: InputDecoration(labelText: this.title),
+    // ) : FormBuilderDateTimePicker(
+    //   initialValue: DateTime.parse(value), // DateTime.now(),
+    //   attribute: this.id,
+    //   inputType: InputType.date,
+    //   format: DateFormat("yyyy-MM-dd"),
+    //   decoration: InputDecoration(labelText: this.title),
+    // );
   }
 
 }
@@ -216,6 +256,7 @@ class XormQuestionTime extends XormQuestion {
   Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderDateTimePicker(
+      // initialValue: value.isEmpty ? DateTime.parse(value) : "",
       attribute: this.id,
       inputType: InputType.time,
       format: DateFormat("HH:mm"),
@@ -242,7 +283,7 @@ class XormQuestionOptional extends XormQuestion {
   Widget build({ String value }) {
     // TODO: implement build
     return FormBuilderCheckbox(
-      initialValue: value.toLowerCase() == 'true',
+      // initialValue: value.isEmpty ? false : value.toLowerCase() == 'true',
       attribute: this.id,
       label: Text(this.title),
       
@@ -274,18 +315,41 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
 
   @override
   Widget build({ String value }) {
-    // TODO: implement build
-    return FormBuilderDropdown(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      // initialValue: 'Male',
-      hint: Text('Select a choice'),
-      // validators: [FormBuilderValidators.required()],
-      items: this.kv.entries // ['Male', 'Female', 'Other']
+    List<DropdownMenuItem> items = this.kv.entries
         .map((entry) => DropdownMenuItem(
             value: entry.key,
             child: Text(entry.value)
-      )).toList(),
+      )).toList();
+
+    // print("IN SINGLE CHOICE");
+    // print("\nyy" + value + "xx");
+    // print(value.isEmpty);
+    // print(items == null || items.isEmpty || value == null);
+    // print(DateTime.tryParse(value));
+    // print("\n");
+
+    // dynamic r = items.where((DropdownMenuItem item) {
+    //   return item.value == value;
+    // });
+    // print(r);
+    // print(r.length);
+    // print('\n');
+    
+
+    // TODO: implement build
+    // return value.isEmpty ? FormBuilderDropdown(
+    //   attribute: this.id,
+    //   decoration: InputDecoration(labelText: this.title),
+    //   hint: Text('Select a choice'),
+    //   items: items
+    // ) : 
+    return FormBuilderDropdown(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      // initialValue: ,
+      hint: Text('Select a choice'),
+      items: items
     );
   }
 

@@ -164,13 +164,14 @@ class _MyHomePageState extends State<MyHomePage> {
         IconButton(
           icon: Icon(Icons.edit),
           onPressed: () {
-            print("Update Data $data.id");
-            print(json.encode(data.values));
+            print("\nUpdate Data $data.id");
+            print(data.toJson());
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => DataEntryPage(
                   currentXorm: data.form, 
+                  id: data.id,
                   values: data.values.map((key, vals) {
                     return MapEntry(key.toString(), Map<String, String>.from(vals));
                   })

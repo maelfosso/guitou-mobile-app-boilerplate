@@ -13,9 +13,10 @@ import '../models/xorm_detail.dart';
 import '../models/xorm_detail.dart';
 
 class DataEntryPage extends StatefulWidget {
-  DataEntryPage({Key key, this.currentXorm, this.values = const {} }) : super(key: key);
+  DataEntryPage({Key key, this.currentXorm, this.id = -1, this.values = const {} }) : super(key: key);
 
   final String currentXorm;
+  final int id;
   final Map<String, Map<String, String>> values;
 
   @override
@@ -39,7 +40,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
     super.initState();
 
     _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
-    this.data = widget.values;
+    this.data = Map<String, Map<String, String>>.from(widget.values);
 
     setState(() {
       currentPageViewPosition = 0;
@@ -105,17 +106,32 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   print(currentSection.sectionKey.currentState.value);
                   currentSectionData = currentSection.sectionKey.currentState.value; //.cast<String, String>();
                   
-                  this.data[currentSectionKey] = currentSectionData.map((key, value) {
-                    return MapEntry(key, value.toString());
-                  });
+                  if (currentSectionData.isEmpty) {
+                    this.data[currentSectionKey] = {};
+                  } else {
+                    this.data[currentSectionKey] = currentSectionData.map((key, value) {
+                      print(key);
+                      print(value);
+                      print("\n");
+
+                      return MapEntry(key, value != null ? value.toString() : "");
+                    });
+                  }
                 }
 
                 if (isLastPage) {
-                  print("\nIS LAST PAGE");
+                  print("\nIS LAST PAGE : \t" + widget.id.toString());
                   print(this.data);
                   print("\n");
                   
-                  this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
+                  if (widget.id == -1) {
+                    print("\nADD data : " + widget.id.toString());
+                    this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
+                  } else {
+                    print("\nUPDATE data : " + widget.id.toString());
+                    this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
+                  }
+                  
                   
                   Navigator.of(context).pop();
                 } else {               

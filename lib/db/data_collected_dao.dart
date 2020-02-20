@@ -20,7 +20,15 @@ class DataCollectedDao {
   }
 
   Future updateData(DataCollected data) async{
+    print("\nDATACOLLECT DAO");
+    print("\nUPDATE DATA");
+    print(data.toJson());
     final finder = Finder(filter: Filter.byKey(data.id));
+    print(finder);
+    final d = await _datasFolder.findFirst(await _db, finder: finder);
+    print(d);
+    print(d.toString());
+
     await _datasFolder.update(await _db, data.toJson(), finder: finder);
   }
 
@@ -30,10 +38,16 @@ class DataCollectedDao {
   }
 
   Future<List<DataCollected>> getAllDatas()async{
+    print('\nGET ALL DATAS');
+
     final recordSnapshot = await _datasFolder.find(await _db);
     return recordSnapshot.map((snapshot){
+      print(snapshot.value);
+      print('FROM JSON NOW\n');
+
       final data = DataCollected.fromJson(snapshot.value);
       data.id = snapshot.key;
+      print('NEXT... ' + data.id.toString());
 
       return data;
     }).toList();
