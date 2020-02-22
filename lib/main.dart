@@ -234,8 +234,26 @@ class _MyHomePageState extends State<MyHomePage> {
           if (this.datasToUpload.length == this.datasUploaded) {
             
             this._dataCollectedBloc.add(EndUploadingLocalData());
-
+            this.datasUploaded = 0;
             await this.pr.hide();
+
+            showDialog<void>(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Data uploaded'),
+                  content: const Text('All the data has been correctly uploaded.'),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text('Ok'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
           } else {
             this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
           }
