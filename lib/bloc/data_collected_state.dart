@@ -21,3 +21,24 @@ class DataCollectedLoaded extends DataCollectedState {
   @override
   List<Object> get props => [datas];
 }
+
+class StartUploadingLocalData extends DataCollectedState {
+  final List<DataCollected> datas;
+
+  const StartUploadingLocalData({@required this.datas});
+
+  @override
+  List<Object> get props => [datas];
+}
+
+class SuccessRemoteAddDataCollected extends DataCollectedState {
+  final DataCollected data;
+
+  const SuccessRemoteAddDataCollected({@required this.data});
+
+  @override
+  List<Object> get props => [this.data];
+}
+
+
+

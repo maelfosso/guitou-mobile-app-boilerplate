@@ -30,6 +30,10 @@ dependencies:
   equatable: ^1.1.0
   timeago: ^2.0.26
   jiffy: ^2.2.0
+  progress_dialog: ^1.2.1
+  http: ^0.12.0+4
+  # permission: ^0.1.5
+  permission_handler: ^4.2.0+hotfix.3
 
 dev_dependencies:
   flutter_test:

@@ -49,4 +49,26 @@ class QueryDataCollected extends DataCollectedEvent {
   List<Object> get props => [this.id];
 }
 
+class UploadDataCollected extends DataCollectedEvent {}
+
+class RemoteUpdateDataCollected extends DataCollectedEvent {
+  final DataCollected data;
+
+  const RemoteUpdateDataCollected({@required this.data});
+
+  @override
+  List<Object> get props => [this.data];
+}
+
+class RemoteAddDataCollected extends DataCollectedEvent {
+  final DataCollected data;
+
+  const RemoteAddDataCollected({@required this.data});
+
+  @override
+  List<Object> get props => [this.data];
+}
+
+class EndUploadingLocalData extends DataCollectedEvent {}
+
 

@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async' show Future;
-import 'package:flutter/services.dart'; // show rootBundle;
+import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:muitou/bloc/data_collected_bloc.dart';
 import 'package:muitou/bloc/data_collected_event.dart';
 import 'package:muitou/bloc/data_collected_state.dart';
+import 'package:muitou/db/data_collected_dao.dart';
 import 'package:muitou/models/data_collected.dart';
 import 'package:muitou/models/project.dart';
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/pages/data_entry_page.dart';
 import 'package:muitou/pages/data_view_page.dart';
+import 'package:muitou/repository/data_api_client.dart';
+import 'package:muitou/repository/data_repository.dart';
+// import 'package:permission/permission.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 Future<String> _loadProjectAsset() async {
   return await rootBundle.loadString('assets/project.json');
@@ -23,22 +30,66 @@ Future<Project> loadProject() async {
   return new Project.fromJson(jsonResponse);
 }
 
+// String message = '';
+
+// getPermissionsStatus() async {
+//   List<PermissionName> permissionNames = [];
+//   permissionNames.add(PermissionName.Internet);
+  
+//   message = '';
+//   List<Permissions> permissions = await Permission.getPermissionsStatus(permissionNames);
+//   permissions.forEach((permission) {
+//     message += '${permission.permissionName}: ${permission.permissionStatus}\n';
+//   });
+//   // setState(() {
+//   //   message;
+//   // });
+// }
+
+// getSinglePermissionStatus() async {
+//   var permissionStatus = await Permission.getSinglePermissionStatus(permissionName);
+//   // setState(() {
+//   //   message = permissionStatus.toString();
+//   // });
+// }
+
+// requestPermissions() async {
+//   List<PermissionName> permissionNames = [];
+//   permissionNames.add(PermissionName.Internet);
+  
+//   message = '';
+//   var permissions = await Permission.requestPermissions(permissionNames);
+//   permissions.forEach((permission) {
+//     message += '${permission.permissionName}: ${permission.permissionStatus}\n';
+//   });
+//   setState(() {});
+// }
+  
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setEnabledSystemUIOverlays([]);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await loadProject();
+
   runApp(MyApp());
 }
 
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  final DataRepository repository = DataRepository(
+    dataApiClient: DataApiClient(
+      httpClient: http.Client(),
+    ),
+    dataCollectedDao: DataCollectedDao()
+  );
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => DataCollectedBloc(),
+      create: (BuildContext context) => DataCollectedBloc(repository: repository),
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -79,6 +130,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   DataCollectedBloc _dataCollectedBloc;
+  List<DataCollected> datas = [];
+  List<DataCollected> datasToUpload = [];
+  int datasUploaded = 0;
+
+  ProgressDialog pr; 
 
   final List<Xorm> _xormsList = [
     Xorm(id:"all", title:"All")
@@ -102,6 +158,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _uploadLocalData() async {
+
+    this._dataCollectedBloc.add(UploadDataCollected());
+  }
+
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
     return await showDialog<String>(
       context: context,
@@ -123,21 +184,83 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildBody() {
-    return BlocBuilder(
-      bloc: _dataCollectedBloc,
-      builder: (BuildContext context, DataCollectedState state) {
-        if (state is DataCollectedLoading) {
-          return Center(
-            child: CircularProgressIndicator(),
+    return BlocListener<DataCollectedBloc, DataCollectedState>(
+      listener: (context, state) async {
+        print("\nIN LISTENER....");
+        if (state is StartUploadingLocalData) {
+          this.datasToUpload = state.datas;
+
+          if (this.datasToUpload.length == 0) {
+            final snackBar = SnackBar(content: Text('No data to upload!!'));
+            Scaffold.of(context).showSnackBar(snackBar);
+
+            return;
+          }
+
+          this.pr.style(
+            message: 'Uploading data...',
+            borderRadius: 10.0,
+            backgroundColor: Colors.white,
+            progressWidget: CircularProgressIndicator(),
+            elevation: 10.0,
+            insetAnimCurve: Curves.easeInOut,
+            progress: 0.0,
+            maxProgress: 100.0,
+            progressTextStyle: TextStyle(
+              color: Colors.black, 
+              fontSize: 13.0, 
+              fontWeight: FontWeight.w400
+            ),
+            messageTextStyle: TextStyle(
+              color: Colors.black, 
+              fontSize: 19.0, 
+              fontWeight: FontWeight.w600
+            )
           );
-        } 
-        if (state is DataCollectedLoaded) {
+          await this.pr.show();
+
+          this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
+        }
+
+        if (state is SuccessRemoteAddDataCollected) {
+          this.datasUploaded++; 
+          print('\nIN LISTENER --- SUCCESS-REMOTE-ADD ----- ${this.datasUploaded}');
+
+          Future.delayed(Duration(seconds: 0)).then((onvalue) {
+            print("\nUpdate to : " + this.datasUploaded.toString());
+            pr.update(progress: 100 * this.datasUploaded.toDouble()/this.datasToUpload.length, message: "Please wait...");
+          });
+
+          if (this.datasToUpload.length == this.datasUploaded) {
+            
+            this._dataCollectedBloc.add(EndUploadingLocalData());
+
+            await this.pr.hide();
+          } else {
+            this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
+          }
+          
+        }
+      },
+      child: BlocBuilder(
+        bloc: _dataCollectedBloc,
+        builder: (BuildContext context, DataCollectedState state) {
+          if (state is DataCollectedLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } 
+          if (state is DataCollectedLoaded) {
+            this.datas = state.datas;
+          }
+
           return ListView.builder(
-            itemCount: state.datas.length,
+            itemCount: this.datas.length,
             itemBuilder: (context, index) {
-              final data = state.datas[index];
+              final data = this.datas[index];
 
               return ListTile(
+
                 title: Text(data.id.toString()),
                 subtitle: Text(Jiffy(data.createdAt).fromNow()),
                 trailing: _buildActionButtons(data),
@@ -145,10 +268,8 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           );
-        }
-        
-        return Container();
-      },
+        },
+      )
     );
   }
 
@@ -184,9 +305,14 @@ class _MyHomePageState extends State<MyHomePage> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+
         IconButton(
-          icon: Icon(Icons.visibility),
-          onPressed: () => this._onOpenData(data),
+          icon: Icon(
+            Icons.cloud_done,
+            color: data.dataLocation == "remote" ? Colors.blue : null
+          ),
+          
+          onPressed: () {},
         ),
         IconButton(
           icon: Icon(Icons.edit),
@@ -226,16 +352,25 @@ class _MyHomePageState extends State<MyHomePage> {
               _dataCollectedBloc.add(DeleteDataCollected(data: data));
             }
           },
-        )
+        ),        
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    this.pr = ProgressDialog(context,
+      type: ProgressDialogType.Download, 
+      isDismissible: true, 
+      showLogs: true
+    );
+    
+
     if (this._xormsList.length == 1) {
       this._xormsList.addAll(Project.instance.xorms);
     }
+
+    // var permissionStatus = await _permissionHandler.checkPermissionStatus(PermissionGroup.location);
 
     // This method is rerun every time setState is called, for instance as done
     // by the _fillAXorm method above.
@@ -267,6 +402,10 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _fillAXorm
+          ),
+          IconButton(
+            icon: Icon(Icons.cloud_upload),
+            onPressed: _uploadLocalData
           ),
           PopupMenuButton<Xorm>(
             onSelected: (Xorm value) {
@@ -306,3 +445,42 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+
+
+    // print("_uploadLocalData");
+    // // final datasToUpload = this.datas.where((d) => d.dataLocation == 'local').toList();
+    // if (this.datasToUpload.length == 0) {
+    //   final snackBar = SnackBar(content: Text('No data to upload!!'));
+    //   Scaffold.of(context).showSnackBar(snackBar);
+
+    //   return;
+    // }
+
+    // this.pr.style(
+    //   message: 'Uploading data...',
+    //   borderRadius: 10.0,
+    //   backgroundColor: Colors.white,
+    //   progressWidget: CircularProgressIndicator(),
+    //   elevation: 10.0,
+    //   insetAnimCurve: Curves.easeInOut,
+    //   progress: 0.0,
+    //   maxProgress: datasToUpload.length.toDouble(),
+    //   progressTextStyle: TextStyle(
+    //     color: Colors.black, 
+    //     fontSize: 13.0, 
+    //     fontWeight: FontWeight.w400
+    //   ),
+    //   messageTextStyle: TextStyle(
+    //     color: Colors.black, 
+    //     fontSize: 19.0, 
+    //     fontWeight: FontWeight.w600
+    //   )
+    // );
+    // await this.pr.show();
+
+    // for (var data in datasToUpload) {
+    //   print(data.toJson());
+    //   this._dataCollectedBloc.add(RemoteAddDataCollected(data: data));
+    // }
+    // print("\nEVERYTHING UPDATED");
