@@ -10,10 +10,9 @@ import 'package:muitou/models/project.dart';
 
 import '../models/project.dart';
 import '../models/xorm_detail.dart';
-import '../models/xorm_detail.dart';
 
 class DataEntryPage extends StatefulWidget {
-  DataEntryPage({Key key, this.currentXorm, this.id = -1, this.values = const {} }) : super(key: key);
+  DataEntryPage({Key key, this.currentXorm, this.id = 0, this.values = const {} }) : super(key: key);
 
   final String currentXorm;
   final int id;
@@ -33,14 +32,25 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   int currentPageViewPosition = 0;
 
-  Map<String, Map<String, String>> data = {};
+  // Map<String, Map<String, String>> data = {};
+  DataCollected data;
 
   @override
   void initState() {
     super.initState();
 
-    _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
-    this.data = Map<String, Map<String, String>>.from(widget.values);
+    _dataCollectedBloc = context.bloc<DataCollectedBloc>();  
+    print("In IniitState()");
+    if (widget.id == 0) {
+      this.data = DataCollected(form: widget.currentXorm, values: {});
+      print("Init 0\n");
+      print(this.data.toJson());
+    } else {
+      print("Init ${widget.id}");
+      _dataCollectedBloc.add(QueryDataCollected(id: widget.id));
+    }
+    print("End InitState");
+
 
     setState(() {
       currentPageViewPosition = 0;
@@ -60,7 +70,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
         style: Theme.of(context).textTheme.subtitle,
       ),
 
-      currentXormSection.build(data: this.data.containsKey(currentXormSection.id) ? this.data[currentXormSection.id] : {} )
+      currentXormSection.build(data: this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {} )
     ];
 
     return ListView(
@@ -112,19 +122,26 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   currentSectionData = currentSection.sectionKey.currentState.value; //.cast<String, String>();
                   
                   if (currentSectionData.isEmpty) {
-                    this.data[currentSectionKey] = {};
+                    this.data.values[currentSectionKey] = {};
                   } else {
-                    this.data[currentSectionKey] = currentSectionData.map((key, value) {
+                    final ca = currentSectionData.map((key, value) {
                       return MapEntry(key, value != null ? value.toString() : "");
                     });
+                    // this.data.values[currentSectionKey] = ca;
+                    this.data.values.update(currentSectionKey, 
+                      (existingValue) => ca,
+                      ifAbsent: () => ca
+                    );
                   }
                 }
 
                 if (isLastPage) {
-                  if (widget.id == -1) {
-                    this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
+                  if (widget.id == 0) {
+                    // this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
+                    this._dataCollectedBloc.add(AddDataCollected(data: this.data));
                   } else {
-                    this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
+                    this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
+                    // this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
                   }
                   
                   
@@ -168,14 +185,32 @@ class _DataEntryPageState extends State<DataEntryPage> {
       body: BlocBuilder(
         bloc: _dataCollectedBloc,
         builder: (BuildContext context, DataCollectedState state) {
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-              top: 8.0
-            ),
-            child: buildPageView()
-          );
+          if (state is DataCollectedLoading) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } 
+          if (widget.id > 0 && state is DataCollectedLoaded && state.datas.length == 1) {
+            print("\nQUERY --- " + widget.id.toString() + " -- " + state.datas.length.toString());
+            print(state.datas.first.toJson());
+            print("\n");
+            if (state.datas.first == null) {
+              this.data = DataCollected(form: widget.currentXorm, values: {});
+            } else {
+              this.data = state.datas.first;            
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                top: 8.0
+              ),
+              child: buildPageView()
+            );
+          }
+
+          return Container();
         }
       )
     );

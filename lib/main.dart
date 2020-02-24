@@ -316,7 +316,9 @@ class _MyHomePageState extends State<MyHomePage> {
           })
         )
       ),
-    );
+    ).then((onValue) {
+      this._dataCollectedBloc.add(LoadDataCollected());
+    });
   }
 
   Widget _buildActionButtons(DataCollected data) {

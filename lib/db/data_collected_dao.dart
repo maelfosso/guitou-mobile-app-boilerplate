@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:muitou/db/app_database.dart';
 import 'package:muitou/models/data_collected.dart';
 import 'package:sembast/sembast.dart';
+import 'package:sembast/utils/value_utils.dart';
 
 class DataCollectedDao {
   static const String folderName = "Datas";
@@ -35,7 +36,7 @@ class DataCollectedDao {
     final recordSnapshot = await _datasFolder.find(await _db, finder: finder);
     return recordSnapshot.map((snapshot){
 
-      final data = DataCollected.fromJson(snapshot.value);
+      final data = DataCollected.fromJson(cloneMap(snapshot.value));
       data.id = snapshot.key;
 
       return data;
@@ -47,7 +48,7 @@ class DataCollectedDao {
     final recordSnapshot = await _datasFolder.find(await _db);
     return recordSnapshot.map((snapshot){
 
-      final data = DataCollected.fromJson(snapshot.value);
+      final data = DataCollected.fromJson(cloneMap(snapshot.value));
       data.id = snapshot.key;
 
       return data;
@@ -58,7 +59,7 @@ class DataCollectedDao {
     final finder = Finder(filter: Filter.byKey(id));
     final recordSnapshot = await _datasFolder.findFirst(await _db, finder: finder);
 
-    final data = DataCollected.fromJson(recordSnapshot.value);
+    final data = DataCollected.fromJson(cloneMap(recordSnapshot.value));
     data.id = recordSnapshot.key;
 
     return data;

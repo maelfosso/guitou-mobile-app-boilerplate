@@ -36,6 +36,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
       print("\nQUERY DATA COL");
       final data = await _dataCollectedDao.query(event.id);
       print(data.toJson());
+      print("\nEND DATA COOLL\n");
       yield DataCollectedLoaded(datas: [data]);
     } else if (event is UploadDataCollected) {
       final datas = await repository.getAllLocalDatas();
