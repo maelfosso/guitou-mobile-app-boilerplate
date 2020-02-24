@@ -10,4 +10,11 @@ class Xorm {
       title: json['title'] as String
     );
   }
+
+  Map<String, String> toJson() {
+    return {
+      "id": id,
+      "title": title
+    };
+  }
 }

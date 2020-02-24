@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
@@ -33,6 +35,18 @@ class XormDetails {
       id: id,
       sections: sections
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return Map.fromIterable(sections, 
+      key: (d) => d.id,
+      value: (d) => d.toJson()
+    );
+    // { id: sections };
+    // {
+    //   "id": id,
+    //   "sections": sections
+    // };
   }
 
   Widget view(Map data) {
@@ -94,7 +108,7 @@ class XormSection {
             case 'single_choice_select':
               return XormQuestionSingleChoiceSelect.fromJson(entry.key, entry.value);
             default:
-              return null; 
+              return XormQuestionString.fromJson(entry.key, entry.value); 
           }
         })
         .toList()
@@ -146,6 +160,24 @@ class XormSection {
       }
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "_params": params,
+      "questions": Map.fromIterable(questions, 
+        key: (d) => d.id,
+        value: (d) => d.toJson()
+      )
+    };
+    // {
+    //   "id": id,
+    //   "_params": params,
+    //   "questions": Map.fromIterable(questions, 
+    //     key: (d) => d.id,
+    //     value: (d) => d.sections
+    //   )
+    // };
+  }
 }
 
 class XormSectionParams {
@@ -161,6 +193,14 @@ class XormSectionParams {
       description: json['description'] as String,
       key: json['key'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "title": title,
+      "description": description,
+      "key": key
+    };
   }
 }
 
@@ -180,6 +220,15 @@ abstract class XormQuestion {
       subtitle: Text(value),
       dense: true,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
   }
 
 }
@@ -207,6 +256,15 @@ class XormQuestionString extends XormQuestion {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
 }
 
 class XormQuestionText extends XormQuestion {
@@ -231,6 +289,15 @@ class XormQuestionText extends XormQuestion {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
 }
 
 class XormQuestionDate extends XormQuestion {
@@ -253,6 +320,15 @@ class XormQuestionDate extends XormQuestion {
       format: DateFormat("yyyy-MM-dd"),
       decoration: InputDecoration(labelText: this.title),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
   }
 
 }
@@ -281,6 +357,15 @@ class XormQuestionTime extends XormQuestion {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
 }
 
 class XormQuestionOptional extends XormQuestion {
@@ -303,6 +388,15 @@ class XormQuestionOptional extends XormQuestion {
       attribute: this.id,
       label: Text(this.title),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
   }
 
 }
@@ -338,6 +432,16 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
       hint: Text('Select a choice'),
       items: items
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
   }
 
 }

@@ -203,7 +203,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
             );
           }
 
-          return Container();
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 8.0
+            ),
+            child: buildPageView()
+          );
         }
       )
     );

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async' show Future;
@@ -16,8 +18,8 @@ import 'package:muitou/pages/data_entry_page.dart';
 import 'package:muitou/pages/data_view_page.dart';
 import 'package:muitou/repository/data_api_client.dart';
 import 'package:muitou/repository/data_repository.dart';
-// import 'package:permission/permission.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:muitou/repository/project_api_client.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
 Future<String> _loadProjectAsset() async {
@@ -28,43 +30,7 @@ Future<Project> loadProject() async {
   String jsonString = await _loadProjectAsset();
   final jsonResponse = json.decode(jsonString);
   return new Project.fromJson(jsonResponse);
-}
-
-// String message = '';
-
-// getPermissionsStatus() async {
-//   List<PermissionName> permissionNames = [];
-//   permissionNames.add(PermissionName.Internet);
-  
-//   message = '';
-//   List<Permissions> permissions = await Permission.getPermissionsStatus(permissionNames);
-//   permissions.forEach((permission) {
-//     message += '${permission.permissionName}: ${permission.permissionStatus}\n';
-//   });
-//   // setState(() {
-//   //   message;
-//   // });
-// }
-
-// getSinglePermissionStatus() async {
-//   var permissionStatus = await Permission.getSinglePermissionStatus(permissionName);
-//   // setState(() {
-//   //   message = permissionStatus.toString();
-//   // });
-// }
-
-// requestPermissions() async {
-//   List<PermissionName> permissionNames = [];
-//   permissionNames.add(PermissionName.Internet);
-  
-//   message = '';
-//   var permissions = await Permission.requestPermissions(permissionNames);
-//   permissions.forEach((permission) {
-//     message += '${permission.permissionName}: ${permission.permissionStatus}\n';
-//   });
-//   setState(() {});
-// }
-  
+}  
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +38,25 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await loadProject();
+  print("\nLOAD PROJECT...\n");
+  print(json.encode(Project.instance.xormsDetails));
+  print("\nCHECK IT");
+
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File("${directory.path}/${Project.instance.id}.json");
+  print("\nDIRECTORY : ${directory.path}\n");
+
+  if (await file.exists()) {
+    print("\nTHE FILE EXISTS....");
+    final contents = await file.readAsString();
+    final parsedJson = json.decode(contents);
+
+    Project.object = Project.fromJson(parsedJson);
+    print(Project.instance.toJson());
+  } else {
+    print(json.encode(Project.instance.toJson()));
+    await file.writeAsString(json.encode(Project.instance.toJson()));
+  }
 
   runApp(MyApp());
 }
@@ -83,7 +68,10 @@ class MyApp extends StatelessWidget {
     dataApiClient: DataApiClient(
       httpClient: http.Client(),
     ),
-    dataCollectedDao: DataCollectedDao()
+    dataCollectedDao: DataCollectedDao(),
+    projectApiClient: ProjectApiClient(
+      httpClient: http.Client()
+    )
   );
 
   @override
@@ -134,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
   List<DataCollected> datasToUpload = [];
   int datasUploaded = 0;
 
-  ProgressDialog pr; 
+  ProgressDialog pr, prn; 
 
   final List<Xorm> _xormsList = [
     Xorm(id:"all", title:"All")
@@ -159,8 +147,35 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _uploadLocalData() async {
-
     this._dataCollectedBloc.add(UploadDataCollected());
+  }
+
+  void _downloadXorm() async {
+    this._dataCollectedBloc.add(DownloadProject());
+    this.prn.style(
+      message: 'Download update...',
+    );
+    await this.prn.show();
+  }
+
+  void _showEndOperationDialog(String title, String body) {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
@@ -187,6 +202,30 @@ class _MyHomePageState extends State<MyHomePage> {
     return BlocListener<DataCollectedBloc, DataCollectedState>(
       listener: (context, state) async {
         
+        if (state is DownloadProjectSuccess) {
+          print("BUILD BODY: DOWNLOAD PROJECT SUCCESSS");
+          await this.prn.hide();
+          _showEndOperationDialog("Download", "Successful");
+
+
+          return;
+        }
+
+        if (state is DownloadProjectFailed) {
+          print("BUILD BODY: DOWNLOAD PROJECT FAILED");
+
+          final snackBar = SnackBar(
+            content: Text('Error occured when downloading!'),
+            action: SnackBarAction(
+              label: 'Try again',
+              onPressed: () => _downloadXorm(),
+            ),
+          );
+          Scaffold.of(context).showSnackBar(snackBar);
+
+          return;
+        }
+
         if (state is StartUploadingLocalData) {
           this.datasToUpload = state.datas;
 
@@ -199,27 +238,17 @@ class _MyHomePageState extends State<MyHomePage> {
 
           this.pr.style(
             message: 'Uploading data...',
-            borderRadius: 10.0,
-            backgroundColor: Colors.white,
-            progressWidget: CircularProgressIndicator(),
-            elevation: 10.0,
-            insetAnimCurve: Curves.easeInOut,
             progress: 0.0,
             maxProgress: 100.0,
             progressTextStyle: TextStyle(
-              color: Colors.black, 
-              fontSize: 13.0, 
-              fontWeight: FontWeight.w400
-            ),
+              color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
             messageTextStyle: TextStyle(
-              color: Colors.black, 
-              fontSize: 19.0, 
-              fontWeight: FontWeight.w600
-            )
+              color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600)
           );
           await this.pr.show();
 
           this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
+          return;
         }
 
         if (state is SuccessRemoteAddDataCollected) {
@@ -235,27 +264,11 @@ class _MyHomePageState extends State<MyHomePage> {
             this.datasUploaded = 0;
             await this.pr.hide();
 
-            showDialog<void>(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Data uploaded'),
-                  content: const Text('All the data has been correctly uploaded.'),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text('Ok'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
+            _showEndOperationDialog("Data uploaded", 'All the data has been correctly uploaded.');
           } else {
             this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
           }
-          
+          return;
         }
       },
       child: BlocBuilder(
@@ -382,6 +395,11 @@ class _MyHomePageState extends State<MyHomePage> {
       isDismissible: true, 
       showLogs: true
     );
+    this.prn = ProgressDialog(context,
+      type: ProgressDialogType.Normal, 
+      isDismissible: true, 
+      showLogs: true
+    );
     
 
     if (this._xormsList.length == 1) {
@@ -417,6 +435,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.cloud_download),
+            onPressed: _downloadXorm
+          ),
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _fillAXorm
