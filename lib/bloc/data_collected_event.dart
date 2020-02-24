@@ -71,4 +71,4 @@ class RemoteAddDataCollected extends DataCollectedEvent {
 
 class EndUploadingLocalData extends DataCollectedEvent {}
 
-
+class DownloadProject extends DataCollectedEvent {}

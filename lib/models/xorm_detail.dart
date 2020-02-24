@@ -38,10 +38,15 @@ class XormDetails {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      "id": id,
-      "sections": json.encode(sections)
-    };
+    return Map.fromIterable(sections, 
+      key: (d) => d.id,
+      value: (d) => d.toJson()
+    );
+    // { id: sections };
+    // {
+    //   "id": id,
+    //   "sections": sections
+    // };
   }
 
   Widget view(Map data) {
@@ -158,10 +163,20 @@ class XormSection {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
-      "params": params,
-      "questions": json.encode(questions)
+      "_params": params,
+      "questions": Map.fromIterable(questions, 
+        key: (d) => d.id,
+        value: (d) => d.toJson()
+      )
     };
+    // {
+    //   "id": id,
+    //   "_params": params,
+    //   "questions": Map.fromIterable(questions, 
+    //     key: (d) => d.id,
+    //     value: (d) => d.sections
+    //   )
+    // };
   }
 }
 
@@ -209,7 +224,7 @@ abstract class XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type
@@ -243,7 +258,7 @@ class XormQuestionString extends XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type
@@ -276,7 +291,7 @@ class XormQuestionText extends XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type
@@ -309,7 +324,7 @@ class XormQuestionDate extends XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type
@@ -344,7 +359,7 @@ class XormQuestionTime extends XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type
@@ -377,7 +392,7 @@ class XormQuestionOptional extends XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type
@@ -421,11 +436,11 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      // "id": id,
       "title": title,
       "hint": hint,
       "type": type,
-      "kv": kv
+      "kv_full": kv
     };
   }
 

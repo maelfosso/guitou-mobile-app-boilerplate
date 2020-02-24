@@ -41,10 +41,13 @@ class Project {
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
+      "_id": id,
       "name": name,
       "xorms": xorms,
-      "xormsDetails": xormsDetails
+      "xormsDetails": Map.fromIterable(xormsDetails, 
+        key: (d) => d.id,
+        value: (d) => d.toJson()
+      )
     };
   }
 

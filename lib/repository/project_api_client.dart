@@ -23,7 +23,8 @@ class ProjectApiClient {
 
     final response = await this.httpClient.get(url);
     if (response.statusCode != 200) {
-      throw new Exception('error getting quotes');
+      // throw new Exception('error getting quotes');
+      return null;
     }
     final json = jsonDecode(response.body);
     return Project.fromJson(json);

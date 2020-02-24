@@ -47,6 +47,20 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
       yield DataCollectedLoading();
       yield* _reloadData();
     }
+
+    if (event is DownloadProject) {
+      print("BLOC... DOWNLOAD PROJECT...");
+      final project = await repository.downloadProject();
+      print(project.toJson());
+      print("DOWNLOADED PROJECT...");
+      if (project == null) {
+        print("DOWNLOADED PROJECT...FAILED");
+        yield DownloadProjectFailed();
+      } else {
+        print("DOWNLOADED PROJECT... SUCCESSSS");
+        yield DownloadProjectSuccess();
+      }
+    }
   }
 
   Stream<DataCollectedState> _reloadData() async* {

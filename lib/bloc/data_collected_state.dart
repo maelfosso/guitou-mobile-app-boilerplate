@@ -40,5 +40,5 @@ class SuccessRemoteAddDataCollected extends DataCollectedState {
   List<Object> get props => [this.data];
 }
 
-
-
+class DownloadProjectSuccess extends DataCollectedState {}
+class DownloadProjectFailed extends DataCollectedState {}
