@@ -186,7 +186,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
             );
           } 
           if (widget.id > 0 && state is DataCollectedLoaded && state.datas.length == 1) {
-            print("\nRESULT... DATACOLLECTED LOADED ....");
+            
             if (state.datas.first == null) {
               this.data = DataCollected(form: widget.currentXorm, values: {});
             } else {
@@ -203,7 +203,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
             );
           }
 
-          return Container();
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 8.0
+            ),
+            child: buildPageView()
+          );
         }
       )
     );
