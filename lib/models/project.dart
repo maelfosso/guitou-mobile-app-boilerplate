@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:muitou/models/xorm.dart';
 import 'package:muitou/models/xorm_detail.dart';
 
@@ -6,7 +8,7 @@ import 'xorm_detail.dart';
 class Project {
   Project._privateConstructor();
 
-  static final Project _instance = Project._privateConstructor();
+  static Project _instance = Project._privateConstructor();
 
   static Project get instance { return _instance;}
 
@@ -20,6 +22,7 @@ class Project {
     _instance.name = name;
     _instance.xorms = xorms;
     _instance.xormsDetails = xormsDetails;
+
     return _instance;
   }
 
@@ -34,6 +37,19 @@ class Project {
         .entries.map((entry) =>  XormDetails.fromJson(entry.key, entry.value))
         .toList()
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "xorms": xorms,
+      "xormsDetails": xormsDetails
+    };
+  }
+
+  static set object(Project project) {
+    _instance = project;
   }
   
 }

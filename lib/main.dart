@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async' show Future;
@@ -16,8 +18,7 @@ import 'package:muitou/pages/data_entry_page.dart';
 import 'package:muitou/pages/data_view_page.dart';
 import 'package:muitou/repository/data_api_client.dart';
 import 'package:muitou/repository/data_repository.dart';
-// import 'package:permission/permission.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
 Future<String> _loadProjectAsset() async {
@@ -28,43 +29,7 @@ Future<Project> loadProject() async {
   String jsonString = await _loadProjectAsset();
   final jsonResponse = json.decode(jsonString);
   return new Project.fromJson(jsonResponse);
-}
-
-// String message = '';
-
-// getPermissionsStatus() async {
-//   List<PermissionName> permissionNames = [];
-//   permissionNames.add(PermissionName.Internet);
-  
-//   message = '';
-//   List<Permissions> permissions = await Permission.getPermissionsStatus(permissionNames);
-//   permissions.forEach((permission) {
-//     message += '${permission.permissionName}: ${permission.permissionStatus}\n';
-//   });
-//   // setState(() {
-//   //   message;
-//   // });
-// }
-
-// getSinglePermissionStatus() async {
-//   var permissionStatus = await Permission.getSinglePermissionStatus(permissionName);
-//   // setState(() {
-//   //   message = permissionStatus.toString();
-//   // });
-// }
-
-// requestPermissions() async {
-//   List<PermissionName> permissionNames = [];
-//   permissionNames.add(PermissionName.Internet);
-  
-//   message = '';
-//   var permissions = await Permission.requestPermissions(permissionNames);
-//   permissions.forEach((permission) {
-//     message += '${permission.permissionName}: ${permission.permissionStatus}\n';
-//   });
-//   setState(() {});
-// }
-  
+}  
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,6 +37,25 @@ void main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await loadProject();
+  print("\nLOAD PROJECT...\n");
+  print(json.encode(Project.instance.xormsDetails));
+  print("\nCHECK IT");
+
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File("${directory.path}/${Project.instance.id}.json");
+  print("\nDIRECTORY : ${directory.path}\n");
+
+  if (await file.exists()) {
+    print("\nTHE FILE EXISTS....");
+    final contents = await file.readAsString();
+    final parsedJson = json.decode(contents);
+
+    Project.object = Project.fromJson(parsedJson);
+    print(Project.instance.toJson());
+  } else {
+    print(json.encode(Project.instance.toJson()));
+    await file.writeAsString(json.encode(Project.instance.toJson()));
+  }
 
   runApp(MyApp());
 }
@@ -159,8 +143,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _uploadLocalData() async {
-
     this._dataCollectedBloc.add(UploadDataCollected());
+  }
+
+  void _downloadXorm() async {
+
   }
 
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
@@ -417,6 +404,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.cloud_download),
+            onPressed: _downloadXorm
+          ),
           IconButton(
             icon: Icon(Icons.add),
             onPressed: _fillAXorm

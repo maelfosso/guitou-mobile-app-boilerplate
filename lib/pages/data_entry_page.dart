@@ -186,7 +186,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
             );
           } 
           if (widget.id > 0 && state is DataCollectedLoaded && state.datas.length == 1) {
-            
+            print("\nRESULT... DATACOLLECTED LOADED ....");
             if (state.datas.first == null) {
               this.data = DataCollected(form: widget.currentXorm, values: {});
             } else {
