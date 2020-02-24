@@ -108,7 +108,7 @@ class XormSection {
             case 'single_choice_select':
               return XormQuestionSingleChoiceSelect.fromJson(entry.key, entry.value);
             default:
-              return null; 
+              return XormQuestionString.fromJson(entry.key, entry.value); 
           }
         })
         .toList()

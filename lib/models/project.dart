@@ -45,8 +45,14 @@ class Project {
       "name": name,
       "xorms": xorms,
       "xormsDetails": Map.fromIterable(xormsDetails, 
-        key: (d) => d.id,
-        value: (d) => d.toJson()
+        key: (d) {
+          print(d.id);
+          return d.id;
+        },
+        value: (d) {
+          print(d.toJson());
+          return d.toJson();
+        }
       )
     };
   }

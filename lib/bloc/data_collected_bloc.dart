@@ -1,9 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:meta/meta.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muitou/bloc/data_collected_event.dart';
 import 'package:muitou/bloc/data_collected_state.dart';
 import 'package:muitou/db/data_collected_dao.dart';
+import 'package:muitou/models/project.dart';
 import 'package:muitou/repository/data_repository.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
   DataCollectedDao _dataCollectedDao = DataCollectedDao();
@@ -51,13 +56,21 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
     if (event is DownloadProject) {
       print("BLOC... DOWNLOAD PROJECT...");
       final project = await repository.downloadProject();
+      print("\nREPOSITORY .. PROJECT... ");
       print(project.toJson());
       print("DOWNLOADED PROJECT...");
       if (project == null) {
         print("DOWNLOADED PROJECT...FAILED");
         yield DownloadProjectFailed();
       } else {
+        final directory = await getApplicationDocumentsDirectory();
+        final file = File("${directory.path}/${Project.instance.id}.json");
+
+        Project.object = project;
+        await file.writeAsString(json.encode(Project.instance.toJson()));
+        
         print("DOWNLOADED PROJECT... SUCCESSSS");
+
         yield DownloadProjectSuccess();
       }
     }

@@ -155,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
     this.prn.style(
       message: 'Download update...',
     );
-    await this.pr.show();
+    await this.prn.show();
   }
 
   void _showEndOperationDialog(String title, String body) {
@@ -204,8 +204,11 @@ class _MyHomePageState extends State<MyHomePage> {
         
         if (state is DownloadProjectSuccess) {
           print("BUILD BODY: DOWNLOAD PROJECT SUCCESSS");
-          await this.pr.hide();
+          await this.prn.hide();
           _showEndOperationDialog("Download", "Successful");
+
+
+          return;
         }
 
         if (state is DownloadProjectFailed) {
@@ -245,6 +248,7 @@ class _MyHomePageState extends State<MyHomePage> {
           await this.pr.show();
 
           this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
+          return;
         }
 
         if (state is SuccessRemoteAddDataCollected) {
@@ -264,7 +268,7 @@ class _MyHomePageState extends State<MyHomePage> {
           } else {
             this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
           }
-          
+          return;
         }
       },
       child: BlocBuilder(
