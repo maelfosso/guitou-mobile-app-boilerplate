@@ -1,5 +1,4 @@
 import 'dart:core';
-import 'dart:convert';
 
 import 'package:muitou/db/app_database.dart';
 import 'package:muitou/models/data_collected.dart';
@@ -13,16 +12,11 @@ class DataCollectedDao {
   Future<Database> get  _db  async => await AppDatabase.instance.database;
 
   Future insertData(DataCollected data) async {
-    print("\nIN DATA - DAO - INSERT....");
-    print(data.toSave());
-    print(data.toJson());
     await  _datasFolder.add(await _db, data.toSave() );
   }
 
   Future updateData(DataCollected data) async{
     final finder = Finder(filter: Filter.byKey(data.id));
-    print("\nIN DATA - DAO ... " + finder.toString()); 
-    print(data.toJson());
     await _datasFolder.update(await _db, data.toJson(), finder: finder);
   }
 

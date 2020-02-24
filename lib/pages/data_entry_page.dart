@@ -40,17 +40,12 @@ class _DataEntryPageState extends State<DataEntryPage> {
     super.initState();
 
     _dataCollectedBloc = context.bloc<DataCollectedBloc>();  
-    print("In IniitState()");
+    
     if (widget.id == 0) {
       this.data = DataCollected(form: widget.currentXorm, values: {});
-      print("Init 0\n");
-      print(this.data.toJson());
     } else {
-      print("Init ${widget.id}");
       _dataCollectedBloc.add(QueryDataCollected(id: widget.id));
     }
-    print("End InitState");
-
 
     setState(() {
       currentPageViewPosition = 0;
@@ -191,9 +186,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
             );
           } 
           if (widget.id > 0 && state is DataCollectedLoaded && state.datas.length == 1) {
-            print("\nQUERY --- " + widget.id.toString() + " -- " + state.datas.length.toString());
-            print(state.datas.first.toJson());
-            print("\n");
+            
             if (state.datas.first == null) {
               this.data = DataCollected(form: widget.currentXorm, values: {});
             } else {

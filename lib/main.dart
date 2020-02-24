@@ -186,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildBody() {
     return BlocListener<DataCollectedBloc, DataCollectedState>(
       listener: (context, state) async {
-        print("\nIN LISTENER....");
+        
         if (state is StartUploadingLocalData) {
           this.datasToUpload = state.datas;
 
@@ -223,11 +223,9 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         if (state is SuccessRemoteAddDataCollected) {
-          this.datasUploaded++; 
-          print('\nIN LISTENER --- SUCCESS-REMOTE-ADD ----- ${this.datasUploaded}');
+          this.datasUploaded++;
 
           Future.delayed(Duration(seconds: 0)).then((onvalue) {
-            print("\nUpdate to : " + this.datasUploaded.toString());
             pr.update(progress: 100 * this.datasUploaded.toDouble()/this.datasToUpload.length, message: "Please wait...");
           });
 
@@ -465,42 +463,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-
-
-    // print("_uploadLocalData");
-    // // final datasToUpload = this.datas.where((d) => d.dataLocation == 'local').toList();
-    // if (this.datasToUpload.length == 0) {
-    //   final snackBar = SnackBar(content: Text('No data to upload!!'));
-    //   Scaffold.of(context).showSnackBar(snackBar);
-
-    //   return;
-    // }
-
-    // this.pr.style(
-    //   message: 'Uploading data...',
-    //   borderRadius: 10.0,
-    //   backgroundColor: Colors.white,
-    //   progressWidget: CircularProgressIndicator(),
-    //   elevation: 10.0,
-    //   insetAnimCurve: Curves.easeInOut,
-    //   progress: 0.0,
-    //   maxProgress: datasToUpload.length.toDouble(),
-    //   progressTextStyle: TextStyle(
-    //     color: Colors.black, 
-    //     fontSize: 13.0, 
-    //     fontWeight: FontWeight.w400
-    //   ),
-    //   messageTextStyle: TextStyle(
-    //     color: Colors.black, 
-    //     fontSize: 19.0, 
-    //     fontWeight: FontWeight.w600
-    //   )
-    // );
-    // await this.pr.show();
-
-    // for (var data in datasToUpload) {
-    //   print(data.toJson());
-    //   this._dataCollectedBloc.add(RemoteAddDataCollected(data: data));
-    // }
-    // print("\nEVERYTHING UPDATED");
