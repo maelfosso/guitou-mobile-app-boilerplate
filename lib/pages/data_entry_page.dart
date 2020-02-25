@@ -54,6 +54,9 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   Widget _buildPage(int position) {
     XormSection currentXormSection = this._currentXormDetails.sections[position];
+    print("\_BUILD PAGE.... ${currentXormSection.id}");
+    print(currentXormSection.toJson());
+    print("\nRETURN WIDGETS....");
 
     List<Widget> widgets = <Widget>[
       Text(
@@ -155,7 +158,13 @@ class _DataEntryPageState extends State<DataEntryPage> {
   @override
   Widget build(BuildContext context) {
     print("\nBUILD... ${widget.currentXorm}");
-    this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == widget.currentXorm);
+    // this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == widget.currentXorm);
+    print("\nIn CURRENTXORM DETAILS");
+    this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) {
+      print("${x.id}---${widget.currentXorm}---${x.id.trim() == widget.currentXorm.trim()}");
+      print("\n");
+      return  x.id == widget.currentXorm;
+    });
 
     String currentXormTitle = Project.instance.xorms.firstWhere((x) => x.id == widget.currentXorm).title;
 

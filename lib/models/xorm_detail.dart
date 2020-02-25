@@ -29,7 +29,7 @@ class XormDetails {
     final List<XormSection> sections = parsedJson.entries
       .map((entry) => XormSection.fromJson(entry.key, entry.value))
       .toList();
-    // sections.add(finalSection);
+    sections.add(finalSection);
 
     return new XormDetails(
       id: id,
@@ -130,12 +130,21 @@ class XormSection {
   }
 
   Widget build({ Map<String, dynamic> data }) {
+    print("\nBUILD.... \t ${id}");
+    print(data);
+    print("\n");
+    print(toJson());
+    print("\nNOW IS FORMBUILDER.... \n");
+
     return FormBuilder(
       key: _fbKey,
       initialValue: data.map((key, value) {
+        print("\nBUILDING INITIAL VIEW - ${key} - ${value}");
         XormQuestion q = this.questions.firstWhere((q) => q.id == key);
         switch (q.type) {
           case 'string':
+            return MapEntry(key, value);
+          case 'number':
             return MapEntry(key, value);
           case 'text':
             return MapEntry(key, value);
@@ -146,6 +155,14 @@ class XormSection {
           case 'optional':
             return MapEntry(key, value.toString().toLowerCase() == 'true');
           case 'single_choice_select':
+            return MapEntry(key, value);
+          case 'single_choice':
+            return MapEntry(key, value);
+          case 'yes-no':
+            return MapEntry(key, value);
+          case 'yes-no-dont':
+            return MapEntry(key, value);
+          case 'multiple_choice':
             return MapEntry(key, value);
           default:
             return null; 
@@ -655,3 +672,23 @@ class XormQuestionMultipleChoice extends XormQuestion {
 }
 
 
+// ,
+//       "section_final": {
+//         "_params": {
+//           "title": "Thank you for filling that form",
+//           "description": "Please, sign here to confirm your data entry and then validate",
+//           "key": "section_final"
+//         },
+//         "questions": {
+//           "section_final__name": {
+//             "type": "string",
+//             "title": "Enter your name",
+//             "hint": ""
+//           },
+//           "section_final__again": {
+//             "type": "optional",
+//             "title": "Are you going to enter another data?",
+//             "hint": ""
+//           }
+//         }
+//       }

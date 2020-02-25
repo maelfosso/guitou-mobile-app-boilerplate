@@ -140,10 +140,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _fillAXorm() async {
     String selectedXorm = await _asyncSelectXormDialog(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
-    );
+    if (selectedXorm != null && selectedXorm.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+      );
+    }
   }
 
   void _uploadLocalData() async {
@@ -185,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (BuildContext context) {
         return SimpleDialog(
           title: const Text('Select the xorm'),
-          children: this._xormsList.skip(1).map((Xorm xorm) {
+          children: Project.instance.xorms.map((Xorm xorm) {
             return SimpleDialogOption(
               onPressed: () {
                 Navigator.pop(context, xorm.id);
