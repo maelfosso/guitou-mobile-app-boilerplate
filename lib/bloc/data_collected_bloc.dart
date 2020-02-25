@@ -57,7 +57,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
       print("BLOC... DOWNLOAD PROJECT...");
       final project = await repository.downloadProject();
       print("\nREPOSITORY .. PROJECT... ");
-      print(project.toJson());
+      print(project);
       print("DOWNLOADED PROJECT...");
       if (project == null) {
         print("DOWNLOADED PROJECT...FAILED");

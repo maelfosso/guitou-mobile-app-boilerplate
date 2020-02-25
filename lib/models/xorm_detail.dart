@@ -97,6 +97,8 @@ class XormSection {
           switch (type) {
             case 'string':
               return XormQuestionString.fromJson(entry.key, entry.value);
+            case 'number':
+              return XormQuestionNumber.fromJson(entry.key, entry.value);
             case 'text':
               return XormQuestionText.fromJson(entry.key, entry.value);
             case 'date':
@@ -107,6 +109,14 @@ class XormSection {
               return XormQuestionOptional.fromJson(entry.key, entry.value);
             case 'single_choice_select':
               return XormQuestionSingleChoiceSelect.fromJson(entry.key, entry.value);
+            case 'single_choice':
+              return XormQuestionSingleChoice.fromJson(entry.key, entry.value);
+            case 'yes-no':
+              return XormQuestionYesNo.fromJson(entry.key, entry.value);
+            case 'yes-no-dont':
+              return XormQuestionYesNoDont.fromJson(entry.key, entry.value);
+            case 'multiple_choice':
+              return XormQuestionMultipleChoice.fromJson(entry.key, entry.value);
             default:
               return XormQuestionString.fromJson(entry.key, entry.value); 
           }
@@ -253,6 +263,43 @@ class XormQuestionString extends XormQuestion {
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
       maxLines: 1,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
+}
+
+class XormQuestionNumber extends XormQuestion {
+
+  XormQuestionNumber({String id, String title, String hint, String type}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionNumber.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionNumber(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type']
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    // TODO: implement build
+    return FormBuilderTextField(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      maxLines: 1,
+      validators: [
+        FormBuilderValidators.numeric(errorText: "You should enter a number")
+      ],
     );
   }
 
@@ -445,4 +492,166 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
   }
 
 }
+
+class XormQuestionSingleChoice extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionSingleChoice({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionSingleChoice.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionSingleChoice(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderRadio(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+class XormQuestionYesNo extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionYesNo({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionYesNo.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionYesNo(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderRadio(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+class XormQuestionYesNoDont extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionYesNoDont({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionYesNoDont.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionYesNoDont(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderRadio(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+class XormQuestionMultipleChoice extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionMultipleChoice({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionMultipleChoice.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionMultipleChoice(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderCheckboxList(
+      decoration: InputDecoration(
+        labelText: this.title
+      ),
+      attribute: this.id,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
 

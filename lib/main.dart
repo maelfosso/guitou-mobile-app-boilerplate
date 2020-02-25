@@ -204,26 +204,25 @@ class _MyHomePageState extends State<MyHomePage> {
         
         if (state is DownloadProjectSuccess) {
           print("BUILD BODY: DOWNLOAD PROJECT SUCCESSS");
-          await this.prn.hide();
-          _showEndOperationDialog("Download", "Successful");
-
-
-          return;
+          
+          return this.prn.hide().then((onValue) {
+            _showEndOperationDialog("Download", "Successful");
+          });
         }
 
         if (state is DownloadProjectFailed) {
           print("BUILD BODY: DOWNLOAD PROJECT FAILED");
 
-          final snackBar = SnackBar(
-            content: Text('Error occured when downloading!'),
-            action: SnackBarAction(
-              label: 'Try again',
-              onPressed: () => _downloadXorm(),
-            ),
-          );
-          Scaffold.of(context).showSnackBar(snackBar);
-
-          return;
+          return this.prn.hide().then((onValue) {
+            final snackBar = SnackBar(
+              content: Text('Error occured when downloading!'),
+              action: SnackBarAction(
+                label: 'Try again',
+                onPressed: () => _downloadXorm(),
+              ),
+            );
+            Scaffold.of(context).showSnackBar(snackBar);
+          });
         }
 
         if (state is StartUploadingLocalData) {
