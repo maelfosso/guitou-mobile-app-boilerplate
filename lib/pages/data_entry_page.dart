@@ -270,8 +270,17 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     // this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
                   }
                   
-                  
-                  Navigator.of(context).pop();
+                  if ((currentSectionData["section_final__again"] as bool)) {
+                    this.data = DataCollected(form: widget.currentXorm, values: {});
+                    
+                    setState(() {
+                      this.currentSectionPosition = 0;
+                      this.currentSectionDataPosition = 0;
+                      this.repeatIt = false;
+                    });
+                  } else {
+                    Navigator.of(context).pop();
+                  }                  
                 } else {        
                   XormSection currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition]; 
                   AlertDialog alert = AlertDialog(
@@ -388,6 +397,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       });
                     }
                   }
+                  
                   this.controller.nextPage(duration: _kDuration, curve: _kCurve);
                 }
               },
