@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:muitou/bloc/data_collected_bloc.dart';
 import 'package:muitou/bloc/data_collected_event.dart';
 import 'package:muitou/bloc/data_collected_state.dart';
@@ -30,7 +31,10 @@ class _DataEntryPageState extends State<DataEntryPage> {
   static const _kDuration = const Duration(milliseconds: 300);
   static const _kCurve = Curves.ease;
 
-  int currentPageViewPosition = 0;
+  XormSection currentXormSection;
+  GlobalKey<FormBuilderState> currentXormSectionKey;
+  int currentSectionPosition = 0;
+  bool repeatIt = false;
 
   // Map<String, Map<String, String>> data = {};
   DataCollected data;
@@ -48,15 +52,32 @@ class _DataEntryPageState extends State<DataEntryPage> {
     }
 
     setState(() {
-      currentPageViewPosition = 0;
+      currentSectionPosition = 0;
+      repeatIt = false;
     });
   }
 
   Widget _buildPage(int position) {
-    XormSection currentXormSection = this._currentXormDetails.sections[position];
+    this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
+    this.currentXormSectionKey = GlobalKey<FormBuilderState>();
+    
     print("\_BUILD PAGE.... ${currentXormSection.id}");
     print(currentXormSection.toJson());
     print("\nRETURN WIDGETS....");
+    print(this.data.values.containsKey(currentXormSection.id));
+    print(this.data.values[currentXormSection.id]);
+    print("\nWHAT ??");
+
+    Map<String, dynamic> initData;
+    if (this.currentXormSection.params.repeat) {
+      initData = {};
+    } else {
+      initData = this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {};
+    }
+    var formElts = currentXormSection.build(
+      globalKey: this.currentXormSectionKey, 
+      data: initData
+    );
 
     List<Widget> widgets = <Widget>[
       Text(
@@ -68,7 +89,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
         style: Theme.of(context).textTheme.subtitle,
       ),
 
-      currentXormSection.build(data: this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {} )
+      formElts
     ];
 
     return ListView(
@@ -78,7 +99,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
   }
 
   Widget buildPageView() {
-    bool isLastPage = this.currentPageViewPosition == this._currentXormDetails.sections.length - 1;
+    bool isLastPage = this.currentSectionPosition == this._currentXormDetails.sections.length - 1;
     
     return Column(
       children: <Widget>[
@@ -90,10 +111,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
               return _buildPage(position);
             },
             onPageChanged: (int page) {
-              setState(() {
-                this.currentPageViewPosition = page;
-              });
+              // setState(() {
+              //   this.currentSectionPosition = page;
+              // });
             },
+
           ),
           flex: 1,
         ),
@@ -105,19 +127,23 @@ class _DataEntryPageState extends State<DataEntryPage> {
               child: Text("Previous"),
               color: Colors.blue,
               onPressed: () {
+                setState(() {
+                  this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
+                });
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
               },
             ),
             FlatButton(
               child: Text(isLastPage ? "Save it" : "Next"),
               color: Colors.blue,
-              onPressed: () {
-                final XormSection currentSection = this._currentXormDetails.sections[this.currentPageViewPosition];
-                final String currentSectionKey = currentSection.id;
+              onPressed: () async {
+                // final XormSection currentSection = this._currentXormDetails.sections[this.currentSectionPosition];
+                final String currentSectionKey = this.currentXormSection.id;
                 Map<String, dynamic> currentSectionData = new Map();
 
-                if (currentSection.sectionKey.currentState.saveAndValidate()) {
-                  currentSectionData = currentSection.sectionKey.currentState.value; //.cast<String, String>();
+                // if (this.currentXormSection.sectionKey.currentState.saveAndValidate()) {
+                if (this.currentXormSectionKey.currentState.saveAndValidate()) {
+                  currentSectionData = this.currentXormSectionKey.currentState.value; //.cast<String, String>();
                   
                   if (currentSectionData.isEmpty) {
                     this.data.values[currentSectionKey] = {};
@@ -125,11 +151,31 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     final ca = currentSectionData.map((key, value) {
                       return MapEntry(key, value != null ? value.toString() : "");
                     });
-                    // this.data.values[currentSectionKey] = ca;
-                    this.data.values.update(currentSectionKey, 
-                      (existingValue) => ca,
-                      ifAbsent: () => ca
-                    );
+                    
+                    if (!this.currentXormSection.params.repeat) {
+                      // this.data.values[currentSectionKey] = ca;
+                      this.data.values.update(currentSectionKey, 
+                        (existingValue) => ca,
+                        ifAbsent: () => ca
+                      );
+                    } else {
+                      print("\n\nIT's REPEATED.... \n");
+                      if (!this.data.values.containsKey(currentSectionKey)) {
+                        this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
+                        print("\nWAS EMPTY INIT...");
+                      }
+                      
+                      // this.data.values.update(currentSectionKey, 
+                      //   (existingValue) => (existingValue as List).add(ca),
+                      //   ifAbsent: () => ca
+                      // );\
+                      (this.data.values[currentSectionKey] as List).add(ca);
+                      
+                      print("\nVALUE ADDED INTO");
+                      print(this.data.values[currentSectionKey]);
+                      print("\nIT'S OKK...");
+                    }
+                    
                   }
                 }
 
@@ -144,7 +190,60 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   
                   
                   Navigator.of(context).pop();
-                } else {               
+                } else {        
+                  XormSection currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];       
+                  if (currentXormSection.params.repeat && currentXormSection.params.repeatMaxTimes == -1) {
+                    // Ask whether or not he wants to repeat it again?
+                    AlertDialog alert = AlertDialog(
+                      title: Text("Repeat it"),
+                      content: Text("Do you want to repeat this section again?"),
+                      actions: [
+                        FlatButton(
+                          child: Text("Yes"),
+                          onPressed:  () {
+                            Navigator.of(context).pop(true);
+                          },
+                        ),
+                        FlatButton(
+                          child: Text("No"),
+                          onPressed:  () {
+                            Navigator.of(context).pop(false);
+                          },
+                        )
+                      ],
+                    );
+
+                    // show the dialog
+                    final answer = await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return alert;
+                      },
+                    );
+
+                    if (answer) {
+                      setState(() {
+                        this.repeatIt = answer;
+                      });
+                    } else {
+                      setState(() {
+                        this.repeatIt = false;
+                        this.currentSectionPosition += 1;
+                      });
+                    }
+                    
+                  } else {
+                    if (this.repeatIt) {
+                      setState(() {
+                        this.repeatIt = false;
+                        this.currentSectionPosition += 1;
+                      });
+                    } else {
+                      setState(() {
+                        this.currentSectionPosition += 1;
+                      });
+                    }
+                  }
                   this.controller.nextPage(duration: _kDuration, curve: _kCurve);
                 }
               },

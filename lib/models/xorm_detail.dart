@@ -129,7 +129,7 @@ class XormSection {
     return _fbKey;
   }
 
-  Widget build({ Map<String, dynamic> data }) {
+  Widget build({ @required GlobalKey<FormBuilderState> globalKey, Map<String, dynamic> data }) {
     print("\nBUILD.... \t ${id}");
     print(data);
     print("\n");
@@ -137,7 +137,7 @@ class XormSection {
     print("\nNOW IS FORMBUILDER.... \n");
 
     return FormBuilder(
-      key: _fbKey,
+      key: globalKey,
       initialValue: data.map((key, value) {
         print("\nBUILDING INITIAL VIEW - ${key} - ${value}");
         XormQuestion q = this.questions.firstWhere((q) => q.id == key);
@@ -211,14 +211,21 @@ class XormSectionParams {
   final String title;
   final String description;
   final String key;
+  final bool repeat;
+  final int repeatMaxTimes;
 
-  XormSectionParams({this.title, this.key, this.description});
+  XormSectionParams({this.title, this.key, this.description, this.repeat = false, this.repeatMaxTimes = 1});
 
   factory XormSectionParams.fromJson(Map<String, dynamic> json) {
+    print("\nIN XORMS SECTION PARAM");
+    print(json);
+
     return new XormSectionParams(
       title: json['title'] as String,
       description: json['description'] as String,
       key: json['key'] as String,
+      repeat: json['repeat'] as bool,
+      repeatMaxTimes: json['repeatMaxTimes'] as int,
     );
   }
 
@@ -226,7 +233,9 @@ class XormSectionParams {
     return {
       "title": title,
       "description": description,
-      "key": key
+      "key": key,
+      "repeat": repeat,
+      "repeatMaxTimes": repeatMaxTimes
     };
   }
 }

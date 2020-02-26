@@ -25,7 +25,9 @@
         "_params": {
           "title": "Identifiant de la radio communautaire",
           "description": "",
-          "key": "section_0"
+          "key": "section_0",
+          "repeat": false,
+          "repeatMaxTimes": -1
         },
         "questions": {
           "section_0__0": {

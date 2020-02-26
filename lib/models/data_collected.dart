@@ -12,7 +12,7 @@ class DataCollected {
   String dataLocation = 'local';
 
   String form;
-  Map values = {};
+  Map<String, Object> values = {};
 
   DataCollected({
     this.form,
