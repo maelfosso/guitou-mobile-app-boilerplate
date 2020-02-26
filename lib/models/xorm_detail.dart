@@ -67,7 +67,17 @@ class XormDetails {
                 section.params.description.trim(),
                 style: Theme.of(context).textTheme.subtitle,
               ),
+
               section.view(data[section.id])
+              // section.params.repeat ? Container(
+              //   child: SingleChildScrollView(
+              //     child: DataTable(
+              //       rows: (data[section.id] as List).map((data) {
+              //         return section.view(data);
+              //       }).cast<DataRow>().toList(),
+              //     ),
+              //   ),
+              // ) : section.view(data[section.id])
             ],
           ),
         );
@@ -175,17 +185,53 @@ class XormSection {
     );
   }
 
-  Widget view(Map data) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      scrollDirection: Axis.vertical,
-      itemCount: this.questions.length,
-      itemBuilder: (context, index) {
-        final question = this.questions[index];
-        return question.view(data[question.id]);
-      }
-    );
+  Widget view(Object data) {
+    print("\nVIEW SECTION .... ${id}\n");
+    print(this.params.toJson());
+    if (this.params.repeat) {
+      print("\nIS REPEATED.... \n");
+      return Container(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: questions.map((question) {
+                return DataColumn(
+                  label: Text(question.title)
+                );
+              })
+              .toList(),
+            rows: (data as List).map((datum) {
+              return DataRow(
+                selected: false,
+                cells: datum.entries.map((entry) {
+                  return DataCell(Text(entry.value));
+                }).cast<DataCell>().toList()
+              );
+            }).cast<DataRow>().toList(),
+          ),
+        )
+      );
+      // DataRow(
+      //   selected: false,
+      //   cells: data.entries.map((entry) {
+      //     return DataCell(Text(entry.value));
+      //   }).cast<DataCell>().toList()
+      // );
+    } else {
+      print("\nIS SIMPLET....\n");
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        itemCount: this.questions.length,
+        itemBuilder: (context, index) {
+          final question = this.questions[index];
+          return question.view((data as Map)[question.id]);
+        }
+      );
+    }
+    
   }
 
   Map<String, dynamic> toJson() {
