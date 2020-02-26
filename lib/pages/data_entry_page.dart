@@ -136,9 +136,32 @@ class _DataEntryPageState extends State<DataEntryPage> {
               child: Text("Previous"),
               color: Colors.blue,
               onPressed: () {
-                setState(() {
-                  this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
-                });
+                // if (this.currentXormSection.params.repeat) {
+                //   if (this.currentSectionDataPosition > 0) {
+                //     setState(() {
+                //       this.currentSectionDataPosition -= 1;
+                //     });
+                //   } else {
+                //     setState(() {
+                //       this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
+                //     });
+                //   }
+                // } else {
+                //   setState(() {
+                //     this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
+                //   });
+                // }
+
+                if (this.currentXormSection.params.repeat && this.currentSectionDataPosition > 0) {
+                  setState(() {
+                    this.currentSectionDataPosition -= 1;
+                  });
+                } else {
+                  setState(() {
+                    this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
+                  });
+                }
+                
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
               },
             ),
