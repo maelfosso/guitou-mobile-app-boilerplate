@@ -29,7 +29,10 @@ class XormDetails {
     final List<XormSection> sections = parsedJson.entries
       .map((entry) => XormSection.fromJson(entry.key, entry.value))
       .toList();
-    sections.add(finalSection);
+    if (sections.last.id != 'section_final') {
+      sections.add(finalSection);
+    }
+    
 
     return new XormDetails(
       id: id,

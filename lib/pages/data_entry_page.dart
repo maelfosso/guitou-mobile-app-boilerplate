@@ -109,6 +109,8 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   Widget buildPageView() {
     bool isLastPage = this.currentSectionPosition == this._currentXormDetails.sections.length - 1;
+    print("\nBUILD PAGE VIEW .... ${this.currentSectionPosition} --- ${this._currentXormDetails.sections.length - 1} - ${this._currentXormDetails.sections[this.currentSectionPosition].id} ---- $isLastPage\n");
+    // print(isLastPage);
     
     return Column(
       children: <Widget>[
@@ -339,6 +341,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
       return  x.id == widget.currentXorm;
     });
 
+    print("\nTHERE ARE .. ${_currentXormDetails.sections.length} SECTIONS....\n");
+    this._currentXormDetails.sections.forEach((section) {
+      print(section.id);
+    });
+    print("\n");
     String currentXormTitle = Project.instance.xorms.firstWhere((x) => x.id == widget.currentXorm).title;
 
 
