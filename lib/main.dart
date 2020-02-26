@@ -323,9 +323,9 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => DataEntryPage(
           currentXorm: data.form, 
           id: data.id,
-          values: data.values.map((key, vals) {
-            return MapEntry(key.toString(), Map<String, String>.from(vals));
-          })
+          // values: data.values.map((key, vals) {
+          //   return MapEntry(key.toString(), Map<String, String>.from(vals));
+          // })
         )
       ),
     ).then((onValue) {

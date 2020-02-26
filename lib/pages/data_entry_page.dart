@@ -13,11 +13,10 @@ import '../models/project.dart';
 import '../models/xorm_detail.dart';
 
 class DataEntryPage extends StatefulWidget {
-  DataEntryPage({Key key, this.currentXorm, this.id = 0, this.values = const {} }) : super(key: key);
+  DataEntryPage({Key key, this.currentXorm, this.id = 0 }) : super(key: key);
 
   final String currentXorm;
   final int id;
-  final Map<String, Map<String, String>> values;
 
   @override
   _DataEntryPageState createState() => _DataEntryPageState();
@@ -34,6 +33,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
   XormSection currentXormSection;
   GlobalKey<FormBuilderState> currentXormSectionKey;
   int currentSectionPosition = 0;
+  int currentSectionDataPosition = 0;
   bool repeatIt = false;
 
   // Map<String, Map<String, String>> data = {};
@@ -53,6 +53,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
     setState(() {
       currentSectionPosition = 0;
+      currentSectionDataPosition = 0;
       repeatIt = false;
     });
   }
@@ -70,7 +71,15 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
     Map<String, dynamic> initData;
     if (this.currentXormSection.params.repeat) {
-      initData = {};
+      if (widget.id > 0) {
+        if (this.repeatIt) {
+          initData = {};
+        } else {
+          initData = (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition];
+        }
+      } else {
+        initData = {};
+      }      
     } else {
       initData = this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {};
     }
@@ -160,20 +169,29 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       );
                     } else {
                       print("\n\nIT's REPEATED.... \n");
-                      if (!this.data.values.containsKey(currentSectionKey)) {
-                        this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
-                        print("\nWAS EMPTY INIT...");
+                      if (widget.id > 0) {
+                        if (this.repeatIt) { // new data added in this repeated section
+                          (this.data.values[currentSectionKey] as List).add(ca);
+                        } else {
+                          (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
+                        }
+                      } else {
+                        if (!this.data.values.containsKey(currentSectionKey)) {
+                          this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
+                          print("\nWAS EMPTY INIT...");
+                        }
+                        
+                        // this.data.values.update(currentSectionKey, 
+                        //   (existingValue) => (existingValue as List).add(ca),
+                        //   ifAbsent: () => ca
+                        // );\
+                        (this.data.values[currentSectionKey] as List).add(ca);
+                        
+                        print("\nVALUE ADDED INTO");
+                        print(this.data.values[currentSectionKey]);
+                        print("\nIT'S OKK...");
                       }
                       
-                      // this.data.values.update(currentSectionKey, 
-                      //   (existingValue) => (existingValue as List).add(ca),
-                      //   ifAbsent: () => ca
-                      // );\
-                      (this.data.values[currentSectionKey] as List).add(ca);
-                      
-                      print("\nVALUE ADDED INTO");
-                      print(this.data.values[currentSectionKey]);
-                      print("\nIT'S OKK...");
                     }
                     
                   }
@@ -191,48 +209,81 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   
                   Navigator.of(context).pop();
                 } else {        
-                  XormSection currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];       
+                  XormSection currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition]; 
+                  AlertDialog alert = AlertDialog(
+                    title: Text("Repeat it"),
+                    content: Text("Do you want to repeat this section again?"),
+                    actions: [
+                      FlatButton(
+                        child: Text("Yes"),
+                        onPressed:  () {
+                          Navigator.of(context).pop(true);
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("No"),
+                        onPressed:  () {
+                          Navigator.of(context).pop(false);
+                        },
+                      )
+                    ],
+                  );
+      
                   if (currentXormSection.params.repeat && currentXormSection.params.repeatMaxTimes == -1) {
                     // Ask whether or not he wants to repeat it again?
-                    AlertDialog alert = AlertDialog(
-                      title: Text("Repeat it"),
-                      content: Text("Do you want to repeat this section again?"),
-                      actions: [
-                        FlatButton(
-                          child: Text("Yes"),
-                          onPressed:  () {
-                            Navigator.of(context).pop(true);
+                    if (widget.id > 0) {
+                      if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
+                        
+                        final answer = await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return alert;
                           },
-                        ),
-                        FlatButton(
-                          child: Text("No"),
-                          onPressed:  () {
-                            Navigator.of(context).pop(false);
-                          },
-                        )
-                      ],
-                    );
+                        );
 
-                    // show the dialog
-                    final answer = await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return alert;
-                      },
-                    );
-
-                    if (answer) {
-                      setState(() {
-                        this.repeatIt = answer;
-                      });
+                        if (answer) {
+                          setState(() {
+                            this.repeatIt = true;
+                            this.currentSectionDataPosition += 1;
+                          });
+                        } else {
+                          setState(() {
+                            this.repeatIt = false;
+                            this.currentSectionPosition += 1;
+                            this.currentSectionDataPosition = 0;
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          this.repeatIt = false;
+                          this.currentSectionDataPosition += 1;
+                        });
+                      }
                     } else {
-                      setState(() {
-                        this.repeatIt = false;
-                        this.currentSectionPosition += 1;
-                      });
-                    }
-                    
+                      
+                      // show the dialog
+                      final answer = await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return alert;
+                        },
+                      );
+
+                      if (answer) {
+                        setState(() {
+                          this.repeatIt = true;
+                          this.currentSectionDataPosition += 1;
+                        });
+                      } else {
+                        setState(() {
+                          this.repeatIt = false;
+                          this.currentSectionPosition += 1;
+                          this.currentSectionDataPosition = 0;
+                        });
+                      }
+                    }                    
                   } else {
+                    // TODO : To review
                     if (this.repeatIt) {
                       setState(() {
                         this.repeatIt = false;

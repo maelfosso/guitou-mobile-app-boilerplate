@@ -38,10 +38,7 @@ class DataViewPage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => DataEntryPage(
                     currentXorm: this._data.form, 
-                    id: this._data.id,
-                    values: this._data.values.map((key, vals) {
-                      return MapEntry(key.toString(), Map<String, String>.from(vals));
-                    })
+                    id: this._data.id
                   )
                 ),
               );
