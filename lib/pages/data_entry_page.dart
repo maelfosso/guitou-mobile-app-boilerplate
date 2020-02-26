@@ -74,7 +74,12 @@ class _DataEntryPageState extends State<DataEntryPage> {
       if (this.repeatIt) {
         initData = {};
       } else {
-        initData = (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition];
+        if (this.data.values.containsKey(currentXormSection.id)) {
+          initData =  (this.data.values[currentXormSection.id] as List).length > 0 ? (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition] : {};
+        } else {
+          initData = {};
+        }
+        
       }
       // if (widget.id > 0) {
       //   if (this.repeatIt) {
@@ -212,28 +217,44 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       );
                     } else {
                       print("\n\nIT's REPEATED.... \n");
-                      if (widget.id > 0) {
-                        if (this.repeatIt) { // new data added in this repeated section
-                          (this.data.values[currentSectionKey] as List).add(ca);
-                        } else {
-                          (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
-                        }
-                      } else {
-                        if (!this.data.values.containsKey(currentSectionKey)) {
-                          this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
-                          print("\nWAS EMPTY INIT...");
-                        }
-                        
-                        // this.data.values.update(currentSectionKey, 
-                        //   (existingValue) => (existingValue as List).add(ca),
-                        //   ifAbsent: () => ca
-                        // );\
-                        (this.data.values[currentSectionKey] as List).add(ca);
-                        
-                        print("\nVALUE ADDED INTO");
-                        print(this.data.values[currentSectionKey]);
-                        print("\nIT'S OKK...");
+                      if (!this.data.values.containsKey(currentSectionKey)) {
+                        this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
+                        print("\nWAS EMPTY INIT...");
                       }
+
+                      if (this.currentSectionDataPosition == (this.data.values[currentSectionKey] as List).length) {
+                        print("\nVALUE ADDED INTO");
+                        (this.data.values[currentSectionKey] as List).add(ca);
+                      } else {
+                        print("\nVALUE UPDATED.. INTO");
+                        (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
+                      }
+                      
+                      print(this.data.values[currentSectionKey]);
+                      print("\nIT'S OKK...");
+
+                      // if (widget.id > 0) {
+                      //   if (this.repeatIt) { // new data added in this repeated section
+                      //     (this.data.values[currentSectionKey] as List).add(ca);
+                      //   } else {
+                      //     (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
+                      //   }
+                      // } else {
+                      //   if (!this.data.values.containsKey(currentSectionKey)) {
+                      //     this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
+                      //     print("\nWAS EMPTY INIT...");
+                      //   }
+                        
+                      //   // this.data.values.update(currentSectionKey, 
+                      //   //   (existingValue) => (existingValue as List).add(ca),
+                      //   //   ifAbsent: () => ca
+                      //   // );\
+                      //   (this.data.values[currentSectionKey] as List).add(ca);
+                        
+                      //   print("\nVALUE ADDED INTO");
+                      //   print(this.data.values[currentSectionKey]);
+                      //   print("\nIT'S OKK...");
+                      // }
                       
                     }
                     
@@ -273,38 +294,9 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   );
       
                   if (currentXormSection.params.repeat && currentXormSection.params.repeatMaxTimes == -1) {
-                    // Ask whether or not he wants to repeat it again?
-                    if (widget.id > 0) {
-                      if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
-                        
-                        final answer = await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return alert;
-                          },
-                        );
 
-                        if (answer) {
-                          setState(() {
-                            this.repeatIt = true;
-                            this.currentSectionDataPosition += 1;
-                          });
-                        } else {
-                          setState(() {
-                            this.repeatIt = false;
-                            this.currentSectionPosition += 1;
-                            this.currentSectionDataPosition = 0;
-                          });
-                        }
-                      } else {
-                        setState(() {
-                          this.repeatIt = false;
-                          this.currentSectionDataPosition += 1;
-                        });
-                      }
-                    } else {
-                      
-                      // show the dialog
+                    if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
+                        
                       final answer = await showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -312,7 +304,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                         },
                       );
 
-                      if (answer) {
+                      if (answer != null && answer == true) {
                         setState(() {
                           this.repeatIt = true;
                           this.currentSectionDataPosition += 1;
@@ -324,7 +316,65 @@ class _DataEntryPageState extends State<DataEntryPage> {
                           this.currentSectionDataPosition = 0;
                         });
                       }
-                    }                    
+                    } else {
+                      setState(() {
+                        this.repeatIt = false;
+                        this.currentSectionDataPosition += 1;
+                      });
+                    }
+
+                    // Ask whether or not he wants to repeat it again?
+                    // if (widget.id > 0) {
+                    //   if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
+                        
+                    //     final answer = await showDialog(
+                    //       context: context,
+                    //       builder: (BuildContext context) {
+                    //         return alert;
+                    //       },
+                    //     );
+
+                    //     if (answer != null && answer == true) {
+                    //       setState(() {
+                    //         this.repeatIt = true;
+                    //         this.currentSectionDataPosition += 1;
+                    //       });
+                    //     } else {
+                    //       setState(() {
+                    //         this.repeatIt = false;
+                    //         this.currentSectionPosition += 1;
+                    //         this.currentSectionDataPosition = 0;
+                    //       });
+                    //     }
+                    //   } else {
+                    //     setState(() {
+                    //       this.repeatIt = false;
+                    //       this.currentSectionDataPosition += 1;
+                    //     });
+                    //   }
+                    // } else {
+                      
+                    //   // show the dialog
+                    //   final answer = await showDialog(
+                    //     context: context,
+                    //     builder: (BuildContext context) {
+                    //       return alert;
+                    //     },
+                    //   );
+
+                    //   if (answer != null && answer == true) {
+                    //     setState(() {
+                    //       this.repeatIt = true;
+                    //       this.currentSectionDataPosition += 1;
+                    //     });
+                    //   } else {
+                    //     setState(() {
+                    //       this.repeatIt = false;
+                    //       this.currentSectionPosition += 1;
+                    //       this.currentSectionDataPosition = 0;
+                    //     });
+                    //   }
+                    // }                    
                   } else {
                     // TODO : To review
                     if (this.repeatIt) {
