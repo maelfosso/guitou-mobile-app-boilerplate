@@ -71,18 +71,25 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
     Map<String, dynamic> initData;
     if (this.currentXormSection.params.repeat) {
-      if (widget.id > 0) {
-        if (this.repeatIt) {
-          initData = {};
-        } else {
-          initData = (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition];
-        }
-      } else {
+      if (this.repeatIt) {
         initData = {};
-      }      
+      } else {
+        initData = (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition];
+      }
+      // if (widget.id > 0) {
+      //   if (this.repeatIt) {
+      //     initData = {};
+      //   } else {
+      //     initData = (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition];
+      //   }
+      // } else {
+      //   initData = {};
+      // }      
     } else {
       initData = this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {};
     }
+    print("\nDATA TO POPULATE \n");
+    print(initData);
     var formElts = currentXormSection.build(
       globalKey: this.currentXormSectionKey, 
       data: initData
@@ -138,31 +145,42 @@ class _DataEntryPageState extends State<DataEntryPage> {
               child: Text("Previous"),
               color: Colors.blue,
               onPressed: () {
-                // if (this.currentXormSection.params.repeat) {
-                //   if (this.currentSectionDataPosition > 0) {
-                //     setState(() {
-                //       this.currentSectionDataPosition -= 1;
-                //     });
-                //   } else {
-                //     setState(() {
-                //       this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
-                //     });
-                //   }
+                if (this.currentXormSection.params.repeat) {
+                  if (this.currentSectionDataPosition > 0) {
+                    setState(() {
+                      this.currentSectionDataPosition -= 1;
+                      this.repeatIt = false;
+                    });
+                  } else {
+                    setState(() {
+                      this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
+                      this.repeatIt = false;
+                    });
+                  }
+                } else {
+                  if (this.currentSectionPosition - 1 >= 0 && this._currentXormDetails.sections[this.currentSectionPosition - 1].params.repeat) {
+                    setState(() {
+                      this.currentSectionDataPosition = (this.data.values[this._currentXormDetails.sections[this.currentSectionPosition - 1].id] as List).length - 1;
+                      this.currentSectionPosition = currentSectionPosition - 1;
+                      this.repeatIt = false;
+                    });
+                  } else {
+                    setState(() {
+                      this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
+                      this.repeatIt = false;
+                    });
+                  }
+                }
+
+                // if (this.currentXormSection.params.repeat && this.currentSectionDataPosition > 0) {
+                //   setState(() {
+                //     this.currentSectionDataPosition -= 1;
+                //   });
                 // } else {
                 //   setState(() {
                 //     this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
                 //   });
                 // }
-
-                if (this.currentXormSection.params.repeat && this.currentSectionDataPosition > 0) {
-                  setState(() {
-                    this.currentSectionDataPosition -= 1;
-                  });
-                } else {
-                  setState(() {
-                    this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
-                  });
-                }
                 
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
               },
