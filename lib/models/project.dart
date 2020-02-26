@@ -58,6 +58,11 @@ class Project {
   }
 
   static set object(Project project) {
+    // for(int i=0; i < project.xormsDetails.length; i++) {
+
+    //   project.xormsDetails[i].sections.add();
+    // }
+    // project.xormsDetails[project.xormsDetails.length - 1].sections.add(_in)
     _instance = project;
   }
   

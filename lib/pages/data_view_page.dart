@@ -38,10 +38,7 @@ class DataViewPage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => DataEntryPage(
                     currentXorm: this._data.form, 
-                    id: this._data.id,
-                    values: this._data.values.map((key, vals) {
-                      return MapEntry(key.toString(), Map<String, String>.from(vals));
-                    })
+                    id: this._data.id
                   )
                 ),
               );
@@ -94,9 +91,12 @@ class DataViewPage extends StatelessWidget {
             );
           } 
           if (state is DataCollectedLoaded && state.datas.length == 1) {
+            print("\nDATA COLLECTED....\n");
             this._data = state.datas.first;            
+            print(this._data.toJson());
             this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == this._data.form);
-
+            print(this._currentXormDetails.toJson());
+            print("\n");
             return this._currentXormDetails.view(this._data.values);
           }
           

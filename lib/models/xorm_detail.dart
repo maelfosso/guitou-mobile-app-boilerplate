@@ -29,7 +29,10 @@ class XormDetails {
     final List<XormSection> sections = parsedJson.entries
       .map((entry) => XormSection.fromJson(entry.key, entry.value))
       .toList();
-    // sections.add(finalSection);
+    if (sections.last.id != 'section_final') {
+      sections.add(finalSection);
+    }
+    
 
     return new XormDetails(
       id: id,
@@ -67,7 +70,17 @@ class XormDetails {
                 section.params.description.trim(),
                 style: Theme.of(context).textTheme.subtitle,
               ),
+
               section.view(data[section.id])
+              // section.params.repeat ? Container(
+              //   child: SingleChildScrollView(
+              //     child: DataTable(
+              //       rows: (data[section.id] as List).map((data) {
+              //         return section.view(data);
+              //       }).cast<DataRow>().toList(),
+              //     ),
+              //   ),
+              // ) : section.view(data[section.id])
             ],
           ),
         );
@@ -97,6 +110,8 @@ class XormSection {
           switch (type) {
             case 'string':
               return XormQuestionString.fromJson(entry.key, entry.value);
+            case 'number':
+              return XormQuestionNumber.fromJson(entry.key, entry.value);
             case 'text':
               return XormQuestionText.fromJson(entry.key, entry.value);
             case 'date':
@@ -107,6 +122,14 @@ class XormSection {
               return XormQuestionOptional.fromJson(entry.key, entry.value);
             case 'single_choice_select':
               return XormQuestionSingleChoiceSelect.fromJson(entry.key, entry.value);
+            case 'single_choice':
+              return XormQuestionSingleChoice.fromJson(entry.key, entry.value);
+            case 'yes-no':
+              return XormQuestionYesNo.fromJson(entry.key, entry.value);
+            case 'yes-no-dont':
+              return XormQuestionYesNoDont.fromJson(entry.key, entry.value);
+            case 'multiple_choice':
+              return XormQuestionMultipleChoice.fromJson(entry.key, entry.value);
             default:
               return XormQuestionString.fromJson(entry.key, entry.value); 
           }
@@ -119,13 +142,22 @@ class XormSection {
     return _fbKey;
   }
 
-  Widget build({ Map<String, dynamic> data }) {
+  Widget build({ @required GlobalKey<FormBuilderState> globalKey, Map<String, dynamic> data }) {
+    print("\nBUILD.... \t ${id}");
+    print(data);
+    print("\n");
+    print(toJson());
+    print("\nNOW IS FORMBUILDER.... \n");
+
     return FormBuilder(
-      key: _fbKey,
+      key: globalKey,
       initialValue: data.map((key, value) {
+        print("\nBUILDING INITIAL VIEW - ${key} - ${value}");
         XormQuestion q = this.questions.firstWhere((q) => q.id == key);
         switch (q.type) {
           case 'string':
+            return MapEntry(key, value);
+          case 'number':
             return MapEntry(key, value);
           case 'text':
             return MapEntry(key, value);
@@ -136,6 +168,14 @@ class XormSection {
           case 'optional':
             return MapEntry(key, value.toString().toLowerCase() == 'true');
           case 'single_choice_select':
+            return MapEntry(key, value);
+          case 'single_choice':
+            return MapEntry(key, value);
+          case 'yes-no':
+            return MapEntry(key, value);
+          case 'yes-no-dont':
+            return MapEntry(key, value);
+          case 'multiple_choice':
             return MapEntry(key, value);
           default:
             return null; 
@@ -148,17 +188,53 @@ class XormSection {
     );
   }
 
-  Widget view(Map data) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      scrollDirection: Axis.vertical,
-      itemCount: this.questions.length,
-      itemBuilder: (context, index) {
-        final question = this.questions[index];
-        return question.view(data[question.id]);
-      }
-    );
+  Widget view(Object data) {
+    print("\nVIEW SECTION .... ${id}\n");
+    print(this.params.toJson());
+    if (this.params.repeat) {
+      print("\nIS REPEATED.... \n");
+      return Container(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: DataTable(
+            columns: questions.map((question) {
+                return DataColumn(
+                  label: Text(question.title)
+                );
+              })
+              .toList(),
+            rows: (data as List).map((datum) {
+              return DataRow(
+                selected: false,
+                cells: datum.entries.map((entry) {
+                  return DataCell(Text(entry.value));
+                }).cast<DataCell>().toList()
+              );
+            }).cast<DataRow>().toList(),
+          ),
+        )
+      );
+      // DataRow(
+      //   selected: false,
+      //   cells: data.entries.map((entry) {
+      //     return DataCell(Text(entry.value));
+      //   }).cast<DataCell>().toList()
+      // );
+    } else {
+      print("\nIS SIMPLET....\n");
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: ClampingScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        itemCount: this.questions.length,
+        itemBuilder: (context, index) {
+          final question = this.questions[index];
+          return question.view((data as Map)[question.id]);
+        }
+      );
+    }
+    
   }
 
   Map<String, dynamic> toJson() {
@@ -184,14 +260,21 @@ class XormSectionParams {
   final String title;
   final String description;
   final String key;
+  final bool repeat;
+  final int repeatMaxTimes;
 
-  XormSectionParams({this.title, this.key, this.description});
+  XormSectionParams({this.title, this.key, this.description, this.repeat = false, this.repeatMaxTimes = 1});
 
   factory XormSectionParams.fromJson(Map<String, dynamic> json) {
+    print("\nIN XORMS SECTION PARAM");
+    print(json);
+
     return new XormSectionParams(
       title: json['title'] as String,
       description: json['description'] as String,
       key: json['key'] as String,
+      repeat: json['repeat'] as bool,
+      repeatMaxTimes: json['repeatMaxTimes'] as int,
     );
   }
 
@@ -199,7 +282,9 @@ class XormSectionParams {
     return {
       "title": title,
       "description": description,
-      "key": key
+      "key": key,
+      "repeat": repeat,
+      "repeatMaxTimes": repeatMaxTimes
     };
   }
 }
@@ -253,6 +338,43 @@ class XormQuestionString extends XormQuestion {
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
       maxLines: 1,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
+}
+
+class XormQuestionNumber extends XormQuestion {
+
+  XormQuestionNumber({String id, String title, String hint, String type}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionNumber.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionNumber(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type']
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    // TODO: implement build
+    return FormBuilderTextField(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      maxLines: 1,
+      validators: [
+        FormBuilderValidators.numeric(errorText: "You should enter a number")
+      ],
     );
   }
 
@@ -446,3 +568,185 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
 
 }
 
+class XormQuestionSingleChoice extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionSingleChoice({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionSingleChoice.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionSingleChoice(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderRadio(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+class XormQuestionYesNo extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionYesNo({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionYesNo.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionYesNo(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderRadio(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+class XormQuestionYesNoDont extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionYesNoDont({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionYesNoDont.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionYesNoDont(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderRadio(
+      attribute: this.id,
+      decoration: InputDecoration(labelText: this.title),
+      initialValue: null,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+class XormQuestionMultipleChoice extends XormQuestion {
+  Map<String, String> kv;
+
+  XormQuestionMultipleChoice({ String id, String title, String hint, String type, this.kv}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionMultipleChoice.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionMultipleChoice(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      kv: Map<String, String>.from(parsedJson['kv_full'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<FormBuilderFieldOption> options = this.kv.entries
+        .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
+
+    return FormBuilderCheckboxList(
+      decoration: InputDecoration(
+        labelText: this.title
+      ),
+      attribute: this.id,
+      options: options,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "kv_full": kv
+    };
+  }
+
+}
+
+
+// ,
+//       "section_final": {
+//         "_params": {
+//           "title": "Thank you for filling that form",
+//           "description": "Please, sign here to confirm your data entry and then validate",
+//           "key": "section_final"
+//         },
+//         "questions": {
+//           "section_final__name": {
+//             "type": "string",
+//             "title": "Enter your name",
+//             "hint": ""
+//           },
+//           "section_final__again": {
+//             "type": "optional",
+//             "title": "Are you going to enter another data?",
+//             "hint": ""
+//           }
+//         }
+//       }

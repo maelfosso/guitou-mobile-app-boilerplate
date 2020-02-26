@@ -25,7 +25,9 @@
         "_params": {
           "title": "Identifiant de la radio communautaire",
           "description": "",
-          "key": "section_0"
+          "key": "section_0",
+          "repeat": false,
+          "repeatMaxTimes": -1
         },
         "questions": {
           "section_0__0": {
@@ -87,25 +89,6 @@
           "section_0__6": {
             "type": "string",
             "title": "Dimensions du batiment/de la piece abritant la radio communautaire",
-            "hint": ""
-          }
-        }
-      },
-      "section_final": {
-        "_params": {
-          "title": "Thank you for filling that form",
-          "description": "Please, sign here to confirm your data entry and then validate",
-          "key": "section_final"
-        },
-        "questions": {
-          "section_final__name": {
-            "type": "string",
-            "title": "Enter your name",
-            "hint": ""
-          },
-          "section_final__again": {
-            "type": "optional",
-            "title": "Are you going to enter another data?",
             "hint": ""
           }
         }

@@ -140,10 +140,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _fillAXorm() async {
     String selectedXorm = await _asyncSelectXormDialog(context);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
-    );
+    if (selectedXorm != null && selectedXorm.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+      );
+    }
   }
 
   void _uploadLocalData() async {
@@ -185,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (BuildContext context) {
         return SimpleDialog(
           title: const Text('Select the xorm'),
-          children: this._xormsList.skip(1).map((Xorm xorm) {
+          children: Project.instance.xorms.map((Xorm xorm) {
             return SimpleDialogOption(
               onPressed: () {
                 Navigator.pop(context, xorm.id);
@@ -204,26 +206,25 @@ class _MyHomePageState extends State<MyHomePage> {
         
         if (state is DownloadProjectSuccess) {
           print("BUILD BODY: DOWNLOAD PROJECT SUCCESSS");
-          await this.prn.hide();
-          _showEndOperationDialog("Download", "Successful");
-
-
-          return;
+          
+          return this.prn.hide().then((onValue) {
+            _showEndOperationDialog("Download", "Successful");
+          });
         }
 
         if (state is DownloadProjectFailed) {
           print("BUILD BODY: DOWNLOAD PROJECT FAILED");
 
-          final snackBar = SnackBar(
-            content: Text('Error occured when downloading!'),
-            action: SnackBarAction(
-              label: 'Try again',
-              onPressed: () => _downloadXorm(),
-            ),
-          );
-          Scaffold.of(context).showSnackBar(snackBar);
-
-          return;
+          return this.prn.hide().then((onValue) {
+            final snackBar = SnackBar(
+              content: Text('Error occured when downloading!'),
+              action: SnackBarAction(
+                label: 'Try again',
+                onPressed: () => _downloadXorm(),
+              ),
+            );
+            Scaffold.of(context).showSnackBar(snackBar);
+          });
         }
 
         if (state is StartUploadingLocalData) {
@@ -322,9 +323,9 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context) => DataEntryPage(
           currentXorm: data.form, 
           id: data.id,
-          values: data.values.map((key, vals) {
-            return MapEntry(key.toString(), Map<String, String>.from(vals));
-          })
+          // values: data.values.map((key, vals) {
+          //   return MapEntry(key.toString(), Map<String, String>.from(vals));
+          // })
         )
       ),
     ).then((onValue) {
