@@ -130,6 +130,8 @@ class XormSection {
               return XormQuestionYesNoDont.fromJson(entry.key, entry.value);
             case 'multiple_choice':
               return XormQuestionMultipleChoice.fromJson(entry.key, entry.value);
+            case 'datatable':
+              return XormQuestionDatatable.fromJson(entry.key, entry.value);            
             default:
               return XormQuestionString.fromJson(entry.key, entry.value); 
           }
@@ -214,12 +216,6 @@ class XormSection {
           ),
         )
       );
-      // DataRow(
-      //   selected: false,
-      //   cells: data.entries.map((entry) {
-      //     return DataCell(Text(entry.value));
-      //   }).cast<DataCell>().toList()
-      // );
     } else {
       print("\nIS SIMPLET....\n");
 
@@ -744,24 +740,85 @@ class XormQuestionMultipleChoice extends XormQuestion {
 
 }
 
+class XormQuestionDatatable extends XormQuestion {
+  List<String> rows;
+  List<String> cols;
 
-// ,
-//       "section_final": {
-//         "_params": {
-//           "title": "Thank you for filling that form",
-//           "description": "Please, sign here to confirm your data entry and then validate",
-//           "key": "section_final"
-//         },
-//         "questions": {
-//           "section_final__name": {
-//             "type": "string",
-//             "title": "Enter your name",
-//             "hint": ""
-//           },
-//           "section_final__again": {
-//             "type": "optional",
-//             "title": "Are you going to enter another data?",
-//             "hint": ""
-//           }
-//         }
-//       }
+  XormQuestionDatatable({ 
+    String id, String title, String hint, String type, 
+    @required this.rows, 
+    @required this.cols}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionDatatable.fromJson(String id, Map<String, dynamic> parsedJson) {
+    print("\nXormQuestionDataTable... ${id}");
+    print(parsedJson);
+    print(parsedJson["rows"]);
+
+    return new XormQuestionDatatable(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      rows: (parsedJson['rows'] as List<dynamic>).map((r) {
+        return (r as Map)['text'].toString();
+      }).toList(),
+      cols: (parsedJson['cols'] as List<dynamic>).map((r) {
+        return (r as Map)['text'].toString();
+      }).toList(), //List<String>.from(parsedJson['cols']['text'])
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<String> fullCols = [""];
+    fullCols.addAll(cols);
+
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child:  DataTable(
+          columns: fullCols.map((col) {
+            return DataColumn(label: Text(col));
+          }).toList(),
+          rows: rows.asMap().entries.map((row) {
+            List<String> fullRow = [row.value];
+            fullRow.addAll(List(cols.length).map((c) => ""));
+
+            return DataRow(
+              selected: false,
+              cells: fullRow.asMap().entries.map((entry) {
+                if (entry.key == 0) {
+                  return DataCell(
+                    Text(entry.value)
+                  );
+                } else {
+                  return DataCell(
+                    FormBuilderTextField(
+                      attribute: "${this.id}__row_${row.key}__col_${entry.key}",
+                      
+                      // decoration: InputDecoration(labelText: this.title),
+                      // minLines: 3,
+                    )
+                  );
+                }
+                
+              }).cast<DataCell>().toList()
+            );
+          }).toList(),
+        )
+      )
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "rows": rows,
+      "cols": cols
+    };
+  }
+
+}
