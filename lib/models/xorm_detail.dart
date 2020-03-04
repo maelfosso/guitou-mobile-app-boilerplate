@@ -261,9 +261,18 @@ class XormSectionParams {
   final String description;
   final String key;
   final bool repeat;
-  final int repeatMaxTimes;
+  final String repeatMaxTimes; // Inner - Unlimitted - Fixed - Variable
+  final String repeatMaxTimesInner;
+  final String repeatMaxTimesVariable;
+  final int repeatMaxTimesFixed;
 
-  XormSectionParams({this.title, this.key, this.description, this.repeat = false, this.repeatMaxTimes = 1});
+  XormSectionParams({
+    @required this.title, 
+    @required this.key, 
+    @required this.description, 
+    this.repeat = false, this.repeatMaxTimes,
+    this.repeatMaxTimesInner, this.repeatMaxTimesFixed, this.repeatMaxTimesVariable
+  });
 
   factory XormSectionParams.fromJson(Map<String, dynamic> json) {
     print("\nIN XORMS SECTION PARAM");
@@ -274,7 +283,10 @@ class XormSectionParams {
       description: json['description'] as String,
       key: json['key'] as String,
       repeat: json['repeat'] as bool,
-      repeatMaxTimes: json['repeatMaxTimes'] as int,
+      repeatMaxTimes: json['repeat_max_times'] as String,
+      repeatMaxTimesInner: json['repeat_max_times_inner'] as String,
+      repeatMaxTimesFixed: json['repeat_max_times_fixed'] as int,
+      repeatMaxTimesVariable: json['repeat_max_times_variable'] as String,
     );
   }
 

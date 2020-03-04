@@ -301,8 +301,46 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       )
                     ],
                   );
-      
-                  if (currentXormSection.params.repeat && currentXormSection.params.repeatMaxTimes == -1) {
+
+                  /**
+                   * nextRepeat = Unlimitted || fixed & length < fixedValue || inner & length < innerValue
+                   */
+                  bool nextRepeat = false;
+                  if (currentXormSection.params.repeat) {
+                    switch (currentXormSection.params.repeatMaxTimes) {
+                      case "Unlimitted":
+                        nextRepeat = true;
+                        break;
+                      case "Fixed":
+                        if (currentXormSection.params.repeatMaxTimesFixed > (this.data.values[this.currentXormSection.id] as List).length) {
+                          nextRepeat = true;
+                        }
+
+                        break;
+                      case "Inner":
+                        int innerValue = ((this.data.values[this.currentXormSection.id + "_inner"] as Map)["inner"] as int);
+                        if (innerValue > (this.data.values[this.currentXormSection.id] as List).length) {
+                          nextRepeat = true;
+                        }
+
+                        break;
+                      case "Variable":
+                        List<String> split = currentXormSection.params.repeatMaxTimesVariable.split("__");
+                        String section = split[0];
+                        String variable = split[1];
+
+                        int variableValue = ((this.data.values[section] as Map)[variable] as int);
+                        if (variableValue > (this.data.values[this.currentXormSection.id] as List).length) {
+                          nextRepeat = true;
+                        }
+
+                        break;
+                      default:
+                        nextRepeat = false;
+                    }
+                  }
+                  
+                  if (currentXormSection.params.repeat && nextRepeat) {
 
                     if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
                         
