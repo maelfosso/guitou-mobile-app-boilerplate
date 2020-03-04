@@ -95,6 +95,55 @@ class _DataEntryPageState extends State<DataEntryPage> {
     }
     print("\nDATA TO POPULATE \n");
     print(initData);
+
+    if (currentXormSection.params.repeat && 
+      currentXormSection.params.repeatMaxTimes == "Inner" || currentXormSection.params.repeatMaxTimes == "Fixed") {
+
+      var repeatValue;
+
+      repeatValue = showDialog<String>(
+        context: context,
+        barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('How many times repeat it'),
+            content: new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: new TextField(
+                    autofocus: true,
+                    decoration: new InputDecoration(
+                      labelText: currentXormSection.params.repeatMaxTimes == "Inner" ? currentXormSection.params.repeatMaxTimesInner : null, 
+                    ),
+                    onChanged: (value) {
+                      repeatValue = value;
+                    },
+                  )
+                )
+              ],
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop(repeatValue);
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      print("\nREPEAT VALUE GET... ${repeatValue}");
+      if (currentXormSection.params.repeatMaxTimes == "Inner") { // INNER
+        (this.data.values[this.currentXormSection.id + "__inner"] as Map)["inner"] = repeatValue; // + (currentXormSection.params.repeatMaxTimes == "Inner" ? )
+      } else { // FIXED
+        currentXormSection.params.repeatMaxTimesFixed = (repeatValue as int);
+      }
+      
+    }
+    
+
     var formElts = currentXormSection.build(
       globalKey: this.currentXormSectionKey, 
       data: initData

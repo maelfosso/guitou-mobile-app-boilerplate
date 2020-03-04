@@ -264,7 +264,7 @@ class XormSectionParams {
   final String repeatMaxTimes; // Inner - Unlimitted - Fixed - Variable
   final String repeatMaxTimesInner;
   final String repeatMaxTimesVariable;
-  final int repeatMaxTimesFixed;
+  int repeatMaxTimesFixed;
 
   XormSectionParams({
     @required this.title, 
