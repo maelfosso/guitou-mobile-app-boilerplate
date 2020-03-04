@@ -239,7 +239,7 @@ class XormSection {
 
   Map<String, dynamic> toJson() {
     return {
-      "_params": params,
+      "_params": params.toJson(),
       "questions": Map.fromIterable(questions, 
         key: (d) => d.id,
         value: (d) => d.toJson()
@@ -296,7 +296,10 @@ class XormSectionParams {
       "description": description,
       "key": key,
       "repeat": repeat,
-      "repeatMaxTimes": repeatMaxTimes
+      "repeat_max_times": repeatMaxTimes,
+      "repeat_max_times_inner": repeatMaxTimesInner,
+      "repeat_max_times_fixed": repeatMaxTimesFixed,
+      "repeat_max_times_variable": repeatMaxTimesVariable,
     };
   }
 }
