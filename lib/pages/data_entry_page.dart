@@ -51,6 +51,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
       _dataCollectedBloc.add(QueryDataCollected(id: widget.id));
     }
 
+    
     setState(() {
       currentSectionPosition = 0;
       currentSectionDataPosition = 0;
@@ -58,8 +59,45 @@ class _DataEntryPageState extends State<DataEntryPage> {
     });
   }
 
+  Future<String> _asyncInputDialog(BuildContext context) async {
+    String repeatValue = '';
+
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('How many times repeat it'),
+          content: new Row(
+            children: <Widget>[
+              new Expanded(
+                child: new TextField(
+                  autofocus: true,
+                  decoration: new InputDecoration(
+                    labelText: currentXormSection.params.repeatMaxTimes == "inner" ? currentXormSection.params.repeatMaxTimesInner : null, 
+                  ),
+                  onChanged: (value) {
+                    repeatValue = value;
+                  },
+                )
+              )
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop(repeatValue);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildPage(int position) {
-    this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
+    // this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
     this.currentXormSectionKey = GlobalKey<FormBuilderState>();
     
     print("\_BUILD PAGE.... ${currentXormSection.id}");
@@ -70,7 +108,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
     print("\nWHAT ??");
 
     Map<String, dynamic> initData;
-    if (this.currentXormSection.params.repeat) {
+    if (this.currentXormSection.params.repeat ?? false) {
       if (this.repeatIt) {
         initData = {};
       } else {
@@ -95,6 +133,29 @@ class _DataEntryPageState extends State<DataEntryPage> {
     }
     print("\nDATA TO POPULATE \n");
     print(initData);
+
+    print("\nDIALOG OR NOT ... ${this.currentXormSection.params.repeat} ... ${this.currentXormSection.params.repeat ?? false}");
+    print(currentXormSection.params.repeatMaxTimes);
+    print("\n");
+
+    // if ((this.currentXormSection.params.repeat ?? false) && 
+    //   (currentXormSection.params.repeatMaxTimes == "inner" || currentXormSection.params.repeatMaxTimes == "fixed")) {
+
+    //   print("\nDISPLAY DIALOG");
+    //   var repeatValue;
+
+    //   // repeatValue = await _asyncInputDialog(context);
+
+    //   // print("\nREPEAT VALUE GET... ${repeatValue}");
+    //   if (currentXormSection.params.repeatMaxTimes == "inner") { // INNER
+    //     (this.data.values[this.currentXormSection.id + "__inner"] as Map)["inner"] = repeatValue; // + (currentXormSection.params.repeatMaxTimes == "inner" ? )
+    //   } else { // FIXED
+    //     currentXormSection.params.repeatMaxTimesFixed = (repeatValue as int);
+    //   }
+      
+    // }
+    
+
     var formElts = currentXormSection.build(
       globalKey: this.currentXormSectionKey, 
       data: initData
@@ -117,6 +178,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
       children: widgets,
       scrollDirection: Axis.vertical,
     );
+
   }
 
   Widget buildPageView() {
@@ -130,13 +192,41 @@ class _DataEntryPageState extends State<DataEntryPage> {
           child: 
           PageView.builder(
             controller: controller,
-            itemBuilder: (context, position) {
+            itemBuilder: (context, position)  {
               return _buildPage(position);
             },
-            onPageChanged: (int page) {
-              // setState(() {
-              //   this.currentSectionPosition = page;
-              // });
+
+            onPageChanged: (int page) async {
+              print('\nON PAGE CHANGES ... ${page} ... ${this.currentSectionPosition}');
+              this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
+
+              if (this.repeatIt) {
+                return;
+              }
+
+              if ((this.currentXormSection.params.repeat ?? false) && 
+                (currentXormSection.params.repeatMaxTimes == "inner" || currentXormSection.params.repeatMaxTimes == "fixed")) {
+
+                print("\nDISPLAY DIALOG");
+                var repeatValue = await _asyncInputDialog(context);
+                print("\nON PAGE CHANGES ... REPEAT ... ${repeatValue}");
+
+                // print("\nREPEAT VALUE GET... ${repeatValue}");
+                if (currentXormSection.params.repeatMaxTimes == "inner") { // INNER
+                  if (this.data.values.containsKey(this.currentXormSection.id + "__inner")) {
+                    (this.data.values[this.currentXormSection.id + "_inner"] as Map).update("inner", (existing) => repeatValue, ifAbsent: () => repeatValue); //["inner"] = repeatValue; // + (currentXormSection.params.repeatMaxTimes == "inner" ? )
+                  } else {
+                    this.data.values[this.currentXormSection.id + "_inner"] = {
+                      "inner" : repeatValue
+                    };
+                  }
+                  
+                } else { // FIXED
+                  currentXormSection.params.repeatMaxTimesFixed = (repeatValue as int);
+                }
+                
+              }
+
             },
 
           ),
@@ -209,14 +299,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       return MapEntry(key, value != null ? value.toString() : "");
                     });
                     
-                    if (!this.currentXormSection.params.repeat) {
+                    if (!(this.currentXormSection.params.repeat ?? false)) {
                       // this.data.values[currentSectionKey] = ca;
                       this.data.values.update(currentSectionKey, 
                         (existingValue) => ca,
                         ifAbsent: () => ca
                       );
                     } else {
-                      print("\n\nIT's REPEATED.... \n");
+                      print("\n\nIT's REPEATED.... ${this.currentSectionDataPosition} ... \n");
                       if (!this.data.values.containsKey(currentSectionKey)) {
                         this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
                         print("\nWAS EMPTY INIT...");
@@ -231,31 +321,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       }
                       
                       print(this.data.values[currentSectionKey]);
-                      print("\nIT'S OKK...");
-
-                      // if (widget.id > 0) {
-                      //   if (this.repeatIt) { // new data added in this repeated section
-                      //     (this.data.values[currentSectionKey] as List).add(ca);
-                      //   } else {
-                      //     (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
-                      //   }
-                      // } else {
-                      //   if (!this.data.values.containsKey(currentSectionKey)) {
-                      //     this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
-                      //     print("\nWAS EMPTY INIT...");
-                      //   }
-                        
-                      //   // this.data.values.update(currentSectionKey, 
-                      //   //   (existingValue) => (existingValue as List).add(ca),
-                      //   //   ifAbsent: () => ca
-                      //   // );\
-                      //   (this.data.values[currentSectionKey] as List).add(ca);
-                        
-                      //   print("\nVALUE ADDED INTO");
-                      //   print(this.data.values[currentSectionKey]);
-                      //   print("\nIT'S OKK...");
-                      // }
-                      
+                      print("\nIT'S OKK...");                      
                     }
                     
                   }
@@ -301,8 +367,48 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       )
                     ],
                   );
-      
-                  if (currentXormSection.params.repeat && currentXormSection.params.repeatMaxTimes == -1) {
+
+                  /**
+                   * nextRepeat = Unlimitted || fixed & length < fixedValue || inner & length < innerValue
+                   */
+                  bool nextRepeat = false;
+                  if (this.currentXormSection.params.repeat ?? false) {
+                    switch (currentXormSection.params.repeatMaxTimes) {
+                      case "unlimitted":
+                        nextRepeat = true;
+                        break;
+                      case "Fixed":
+                        if (currentXormSection.params.repeatMaxTimesFixed > (this.data.values[this.currentXormSection.id] as List).length) {
+                          nextRepeat = true;
+                        }
+
+                        break;
+                      case "inner":
+                        print("\nINNER... ");
+                        print(this.data.values[this.currentXormSection.id + "_inner"]);
+                        int innerValue = int.parse((this.data.values[this.currentXormSection.id + "_inner"] as Map)["inner"]);
+                        if (innerValue > (this.data.values[this.currentXormSection.id] as List).length) {
+                          nextRepeat = true;
+                        }
+
+                        break;
+                      case "variable":
+                        List<String> split = currentXormSection.params.repeatMaxTimesVariable.split("__");
+                        String section = split[0];
+                        String variable = split[1];
+
+                        int variableValue = ((this.data.values[section] as Map)[variable] as int);
+                        if (variableValue > (this.data.values[this.currentXormSection.id] as List).length) {
+                          nextRepeat = true;
+                        }
+
+                        break;
+                      default:
+                        nextRepeat = false;
+                    }
+                  }
+                  
+                  if ((this.currentXormSection.params.repeat ?? false) && nextRepeat) {
 
                     if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
                         
@@ -330,70 +436,19 @@ class _DataEntryPageState extends State<DataEntryPage> {
                         this.repeatIt = false;
                         this.currentSectionDataPosition += 1;
                       });
-                    }
-
-                    // Ask whether or not he wants to repeat it again?
-                    // if (widget.id > 0) {
-                    //   if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
-                        
-                    //     final answer = await showDialog(
-                    //       context: context,
-                    //       builder: (BuildContext context) {
-                    //         return alert;
-                    //       },
-                    //     );
-
-                    //     if (answer != null && answer == true) {
-                    //       setState(() {
-                    //         this.repeatIt = true;
-                    //         this.currentSectionDataPosition += 1;
-                    //       });
-                    //     } else {
-                    //       setState(() {
-                    //         this.repeatIt = false;
-                    //         this.currentSectionPosition += 1;
-                    //         this.currentSectionDataPosition = 0;
-                    //       });
-                    //     }
-                    //   } else {
-                    //     setState(() {
-                    //       this.repeatIt = false;
-                    //       this.currentSectionDataPosition += 1;
-                    //     });
-                    //   }
-                    // } else {
-                      
-                    //   // show the dialog
-                    //   final answer = await showDialog(
-                    //     context: context,
-                    //     builder: (BuildContext context) {
-                    //       return alert;
-                    //     },
-                    //   );
-
-                    //   if (answer != null && answer == true) {
-                    //     setState(() {
-                    //       this.repeatIt = true;
-                    //       this.currentSectionDataPosition += 1;
-                    //     });
-                    //   } else {
-                    //     setState(() {
-                    //       this.repeatIt = false;
-                    //       this.currentSectionPosition += 1;
-                    //       this.currentSectionDataPosition = 0;
-                    //     });
-                    //   }
-                    // }                    
+                    }                
                   } else {
                     // TODO : To review
                     if (this.repeatIt) {
                       setState(() {
                         this.repeatIt = false;
                         this.currentSectionPosition += 1;
+                        this.currentSectionDataPosition = 0;
                       });
                     } else {
                       setState(() {
                         this.currentSectionPosition += 1;
+                        this.currentSectionDataPosition = 0;
                       });
                     }
                   }
@@ -425,7 +480,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
     });
     print("\n");
     String currentXormTitle = Project.instance.xorms.firstWhere((x) => x.id == widget.currentXorm).title;
-
+    this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
 
     return Scaffold(
       appBar: AppBar(
@@ -484,3 +539,57 @@ class _DataEntryPageState extends State<DataEntryPage> {
     );
   }
 }
+
+
+                    // Ask whether or not he wants to repeat it again?
+                    // if (widget.id > 0) {
+                    //   if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
+                        
+                    //     final answer = await showDialog(
+                    //       context: context,
+                    //       builder: (BuildContext context) {
+                    //         return alert;
+                    //       },
+                    //     );
+
+                    //     if (answer != null && answer == true) {
+                    //       setState(() {
+                    //         this.repeatIt = true;
+                    //         this.currentSectionDataPosition += 1;
+                    //       });
+                    //     } else {
+                    //       setState(() {
+                    //         this.repeatIt = false;
+                    //         this.currentSectionPosition += 1;
+                    //         this.currentSectionDataPosition = 0;
+                    //       });
+                    //     }
+                    //   } else {
+                    //     setState(() {
+                    //       this.repeatIt = false;
+                    //       this.currentSectionDataPosition += 1;
+                    //     });
+                    //   }
+                    // } else {
+                      
+                    //   // show the dialog
+                    //   final answer = await showDialog(
+                    //     context: context,
+                    //     builder: (BuildContext context) {
+                    //       return alert;
+                    //     },
+                    //   );
+
+                    //   if (answer != null && answer == true) {
+                    //     setState(() {
+                    //       this.repeatIt = true;
+                    //       this.currentSectionDataPosition += 1;
+                    //     });
+                    //   } else {
+                    //     setState(() {
+                    //       this.repeatIt = false;
+                    //       this.currentSectionPosition += 1;
+                    //       this.currentSectionDataPosition = 0;
+                    //     });
+                    //   }
+                    // }    

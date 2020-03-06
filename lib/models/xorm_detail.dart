@@ -72,15 +72,6 @@ class XormDetails {
               ),
 
               section.view(data[section.id])
-              // section.params.repeat ? Container(
-              //   child: SingleChildScrollView(
-              //     child: DataTable(
-              //       rows: (data[section.id] as List).map((data) {
-              //         return section.view(data);
-              //       }).cast<DataRow>().toList(),
-              //     ),
-              //   ),
-              // ) : section.view(data[section.id])
             ],
           ),
         );
@@ -130,6 +121,10 @@ class XormSection {
               return XormQuestionYesNoDont.fromJson(entry.key, entry.value);
             case 'multiple_choice':
               return XormQuestionMultipleChoice.fromJson(entry.key, entry.value);
+            case 'tidesc':
+              return XormQuestionTitleDesc.fromJson(entry.key, entry.value);     
+            case 'datatable':
+              return XormQuestionDatatable.fromJson(entry.key, entry.value);            
             default:
               return XormQuestionString.fromJson(entry.key, entry.value); 
           }
@@ -153,7 +148,10 @@ class XormSection {
       key: globalKey,
       initialValue: data.map((key, value) {
         print("\nBUILDING INITIAL VIEW - ${key} - ${value}");
-        XormQuestion q = this.questions.firstWhere((q) => q.id == key);
+        XormQuestion q = this.questions.firstWhere(
+          (q) => q.id == key || key.startsWith(q.id),
+          orElse: () => null
+        );
         switch (q.type) {
           case 'string':
             return MapEntry(key, value);
@@ -177,8 +175,10 @@ class XormSection {
             return MapEntry(key, value);
           case 'multiple_choice':
             return MapEntry(key, value);
+          // case 'datatable':
+          //   return ;
           default:
-            return null; 
+            return MapEntry(key, ""); 
         }
       }),
       autovalidate: true,
@@ -191,7 +191,7 @@ class XormSection {
   Widget view(Object data) {
     print("\nVIEW SECTION .... ${id}\n");
     print(this.params.toJson());
-    if (this.params.repeat) {
+    if (this.params.repeat ?? false) {
       print("\nIS REPEATED.... \n");
       return Container(
         child: SingleChildScrollView(
@@ -214,15 +214,10 @@ class XormSection {
           ),
         )
       );
-      // DataRow(
-      //   selected: false,
-      //   cells: data.entries.map((entry) {
-      //     return DataCell(Text(entry.value));
-      //   }).cast<DataCell>().toList()
-      // );
     } else {
       print("\nIS SIMPLET....\n");
 
+      
       return ListView.builder(
         shrinkWrap: true,
         physics: ClampingScrollPhysics(),
@@ -230,7 +225,19 @@ class XormSection {
         itemCount: this.questions.length,
         itemBuilder: (context, index) {
           final question = this.questions[index];
-          return question.view((data as Map)[question.id]);
+          if (question.type == 'datatable') {
+            Map<String, String> values = Map.from(data as Map);
+            values.removeWhere((k, v) => !k.toString().startsWith(question.id));
+              // .cast<Map<String, String>>();
+            // Map.from(data)
+              // .removeWhere((k, v) => k.toString().startsWith(question.id))
+              // .map((k) => MapEntry<String, String>(k, (data as Map)[k]));
+              // .cast<String, String>();
+            return (question as XormQuestionDatatable).view(values);
+          } else {
+            return question.view((data as Map)[question.id]);
+          }
+          
         }
       );
     }
@@ -239,7 +246,7 @@ class XormSection {
 
   Map<String, dynamic> toJson() {
     return {
-      "_params": params,
+      "_params": params.toJson(),
       "questions": Map.fromIterable(questions, 
         key: (d) => d.id,
         value: (d) => d.toJson()
@@ -261,9 +268,18 @@ class XormSectionParams {
   final String description;
   final String key;
   final bool repeat;
-  final int repeatMaxTimes;
+  final String repeatMaxTimes; // Inner - Unlimitted - Fixed - Variable
+  final String repeatMaxTimesInner;
+  final String repeatMaxTimesVariable;
+  int repeatMaxTimesFixed;
 
-  XormSectionParams({this.title, this.key, this.description, this.repeat = false, this.repeatMaxTimes = 1});
+  XormSectionParams({
+    @required this.title, 
+    @required this.key, 
+    @required this.description, 
+    this.repeat = false, this.repeatMaxTimes,
+    this.repeatMaxTimesInner, this.repeatMaxTimesFixed, this.repeatMaxTimesVariable
+  });
 
   factory XormSectionParams.fromJson(Map<String, dynamic> json) {
     print("\nIN XORMS SECTION PARAM");
@@ -274,7 +290,10 @@ class XormSectionParams {
       description: json['description'] as String,
       key: json['key'] as String,
       repeat: json['repeat'] as bool,
-      repeatMaxTimes: json['repeatMaxTimes'] as int,
+      repeatMaxTimes: json['repeat_max_times'] as String,
+      repeatMaxTimesInner: json['repeat_max_times_inner'] as String,
+      repeatMaxTimesFixed: json['repeat_max_times_fixed'] as int,
+      repeatMaxTimesVariable: json['repeat_max_times_variable'] as String,
     );
   }
 
@@ -284,7 +303,10 @@ class XormSectionParams {
       "description": description,
       "key": key,
       "repeat": repeat,
-      "repeatMaxTimes": repeatMaxTimes
+      "repeat_max_times": repeatMaxTimes,
+      "repeat_max_times_inner": repeatMaxTimesInner,
+      "repeat_max_times_fixed": repeatMaxTimesFixed,
+      "repeat_max_times_variable": repeatMaxTimesVariable,
     };
   }
 }
@@ -300,11 +322,55 @@ abstract class XormQuestion {
   Widget build({ String value });
 
   Widget view(String value) {
+    print("\n QUESTION... Views... ${id}");
+    print("${title} -- ${type}");
+    print(value);
+    
     return ListTile(
       title: Text(this.title),
       subtitle: Text(value),
       dense: true,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
+}
+
+class XormQuestionTitleDesc extends XormQuestion {
+
+  XormQuestionTitleDesc({String id, String title, String hint, String type}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionTitleDesc.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionTitleDesc(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type']
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    // TODO: implement build
+    return Text(title);
+  }
+
+  @override
+  Widget view(String value) {
+    return Text(title);
+    // ListTile(
+    //   title: Text(this.title),
+    //   subtitle: Text(value),
+    //   dense: true,
+    // );
   }
 
   Map<String, dynamic> toJson() {
@@ -729,24 +795,132 @@ class XormQuestionMultipleChoice extends XormQuestion {
 
 }
 
+class XormQuestionDatatable extends XormQuestion {
+  List<String> rows;
+  List<String> cols;
 
-// ,
-//       "section_final": {
-//         "_params": {
-//           "title": "Thank you for filling that form",
-//           "description": "Please, sign here to confirm your data entry and then validate",
-//           "key": "section_final"
-//         },
-//         "questions": {
-//           "section_final__name": {
-//             "type": "string",
-//             "title": "Enter your name",
-//             "hint": ""
-//           },
-//           "section_final__again": {
-//             "type": "optional",
-//             "title": "Are you going to enter another data?",
-//             "hint": ""
-//           }
-//         }
-//       }
+  XormQuestionDatatable({ 
+    String id, String title, String hint, String type, 
+    @required this.rows, 
+    @required this.cols}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionDatatable.fromJson(String id, Map<String, dynamic> parsedJson) {
+    print("\nXormQuestionDataTable... ${id}");
+    print(parsedJson);
+    print(parsedJson["rows"]);
+
+    return new XormQuestionDatatable(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type'],
+      rows: (parsedJson['rows'] as List<dynamic>).map((r) {
+        print("\nDATA TABLE PARSING... ");
+        print(r);
+        return (r as Map)['text'].toString();
+      }).toList(),
+      cols: (parsedJson['cols'] as List<dynamic>).map((r) {
+        return (r as Map)['text'].toString();
+      }).toList(),
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    List<String> fullCols = [""];
+    fullCols.addAll(cols);
+
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child:  DataTable(
+          columns: fullCols.map((col) {
+            return DataColumn(label: Text(col));
+          }).toList(),
+          rows: rows.asMap().entries.map((row) {
+            List<String> fullRow = [row.value];
+            fullRow.addAll(List(cols.length).map((c) => ""));
+            
+            return DataRow(
+              selected: false,
+              cells: fullRow.asMap().entries.map((entry) {
+                if (entry.key == 0) {
+                  return DataCell(
+                    Text(entry.value)
+                  );
+                } else {
+                  return DataCell(
+                    FormBuilderTextField(
+                      attribute: "${this.id}__row_${row.key}__col_${entry.key}",
+                      
+                      // decoration: InputDecoration(labelText: this.title),
+                      // minLines: 3,
+                    )
+                  );
+                }
+                
+              }).cast<DataCell>().toList()
+            );
+          }).toList(),
+        )
+      )
+    );
+  }
+
+  @override
+  Widget view(Object values) {
+    print("\nDATA TABLE VIEWS...");
+    print(values);
+    List<String> fullCols = [""];
+    fullCols.addAll(cols);
+
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child:  DataTable(
+          columns: fullCols.map((col) {
+            return DataColumn(label: Text(col));
+          }).toList(),
+          rows: rows.asMap().entries.map((row) {
+            List<String> fullRow = [row.value];
+            fullRow.addAll(List(cols.length).map((c) => ""));
+            
+            return DataRow(
+              selected: false,
+              cells: fullRow.asMap().entries.map((entry) {
+                if (entry.key == 0) {
+                  return DataCell(
+                    Text(entry.value)
+                  );
+                } else {
+                  var id = "${this.id}__row_${row.key}__col_${entry.key}";
+                  return DataCell(
+                    Text((values as Map)[id].toString())
+                  );  
+                }
+                              
+              }).cast<DataCell>().toList()
+            );
+          }).toList(),
+        )
+      )
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type,
+      "rows": rows.map((r) {
+        Map obj = {
+          "text": r
+        };
+        return obj;
+      }).toList(),
+      "cols": cols
+    };
+  }
+
+}
