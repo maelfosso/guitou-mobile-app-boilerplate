@@ -148,7 +148,10 @@ class XormSection {
       key: globalKey,
       initialValue: data.map((key, value) {
         print("\nBUILDING INITIAL VIEW - ${key} - ${value}");
-        XormQuestion q = this.questions.firstWhere((q) => q.id == key);
+        XormQuestion q = this.questions.firstWhere(
+          (q) => q.id == key || key.startsWith(q.id),
+          orElse: () => null
+        );
         switch (q.type) {
           case 'string':
             return MapEntry(key, value);
@@ -172,8 +175,10 @@ class XormSection {
             return MapEntry(key, value);
           case 'multiple_choice':
             return MapEntry(key, value);
+          // case 'datatable':
+          //   return ;
           default:
-            return null; 
+            return MapEntry(key, ""); 
         }
       }),
       autovalidate: true,
@@ -317,6 +322,10 @@ abstract class XormQuestion {
   Widget build({ String value });
 
   Widget view(String value) {
+    print("\n QUESTION... Views... ${id}");
+    print("${title} -- ${type}");
+    print(value);
+    
     return ListTile(
       title: Text(this.title),
       subtitle: Text(value),
@@ -352,10 +361,15 @@ class XormQuestionTitleDesc extends XormQuestion {
   Widget build({ String value }) {
     // TODO: implement build
     return Text(title);
-    // Column(
-    //   children: <Widget>[
-    //     Text
-    //   ],
+  }
+
+  @override
+  Widget view(String value) {
+    return Text(title);
+    // ListTile(
+    //   title: Text(this.title),
+    //   subtitle: Text(value),
+    //   dense: true,
     // );
   }
 
@@ -801,6 +815,8 @@ class XormQuestionDatatable extends XormQuestion {
       hint: parsedJson['hint'],
       type: parsedJson['type'],
       rows: (parsedJson['rows'] as List<dynamic>).map((r) {
+        print("\nDATA TABLE PARSING... ");
+        print(r);
         return (r as Map)['text'].toString();
       }).toList(),
       cols: (parsedJson['cols'] as List<dynamic>).map((r) {
@@ -897,7 +913,12 @@ class XormQuestionDatatable extends XormQuestion {
       "title": title,
       "hint": hint,
       "type": type,
-      "rows": rows,
+      "rows": rows.map((r) {
+        Map obj = {
+          "text": r
+        };
+        return obj;
+      }).toList(),
       "cols": cols
     };
   }
