@@ -72,15 +72,6 @@ class XormDetails {
               ),
 
               section.view(data[section.id])
-              // section.params.repeat ? Container(
-              //   child: SingleChildScrollView(
-              //     child: DataTable(
-              //       rows: (data[section.id] as List).map((data) {
-              //         return section.view(data);
-              //       }).cast<DataRow>().toList(),
-              //     ),
-              //   ),
-              // ) : section.view(data[section.id])
             ],
           ),
         );
@@ -130,6 +121,8 @@ class XormSection {
               return XormQuestionYesNoDont.fromJson(entry.key, entry.value);
             case 'multiple_choice':
               return XormQuestionMultipleChoice.fromJson(entry.key, entry.value);
+            case 'tidesc':
+              return XormQuestionTitleDesc.fromJson(entry.key, entry.value);     
             case 'datatable':
               return XormQuestionDatatable.fromJson(entry.key, entry.value);            
             default:
@@ -193,7 +186,7 @@ class XormSection {
   Widget view(Object data) {
     print("\nVIEW SECTION .... ${id}\n");
     print(this.params.toJson());
-    if (this.params.repeat) {
+    if (this.params.repeat ?? false) {
       print("\nIS REPEATED.... \n");
       return Container(
         child: SingleChildScrollView(
@@ -219,6 +212,7 @@ class XormSection {
     } else {
       print("\nIS SIMPLET....\n");
 
+      
       return ListView.builder(
         shrinkWrap: true,
         physics: ClampingScrollPhysics(),
@@ -226,7 +220,19 @@ class XormSection {
         itemCount: this.questions.length,
         itemBuilder: (context, index) {
           final question = this.questions[index];
-          return question.view((data as Map)[question.id]);
+          if (question.type == 'datatable') {
+            Map<String, String> values = Map.from(data as Map);
+            values.removeWhere((k, v) => !k.toString().startsWith(question.id));
+              // .cast<Map<String, String>>();
+            // Map.from(data)
+              // .removeWhere((k, v) => k.toString().startsWith(question.id))
+              // .map((k) => MapEntry<String, String>(k, (data as Map)[k]));
+              // .cast<String, String>();
+            return (question as XormQuestionDatatable).view(values);
+          } else {
+            return question.view((data as Map)[question.id]);
+          }
+          
         }
       );
     }
@@ -316,6 +322,41 @@ abstract class XormQuestion {
       subtitle: Text(value),
       dense: true,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // "id": id,
+      "title": title,
+      "hint": hint,
+      "type": type
+    };
+  }
+
+}
+
+class XormQuestionTitleDesc extends XormQuestion {
+
+  XormQuestionTitleDesc({String id, String title, String hint, String type}) : super(id: id, title:title, hint:hint, type:type);
+
+  factory XormQuestionTitleDesc.fromJson(String id, Map<String, dynamic> parsedJson) {
+    return new XormQuestionTitleDesc(
+      id: id,
+      title: parsedJson['title'],
+      hint: parsedJson['hint'],
+      type: parsedJson['type']
+    );
+  }
+
+  @override
+  Widget build({ String value }) {
+    // TODO: implement build
+    return Text(title);
+    // Column(
+    //   children: <Widget>[
+    //     Text
+    //   ],
+    // );
   }
 
   Map<String, dynamic> toJson() {
@@ -764,7 +805,7 @@ class XormQuestionDatatable extends XormQuestion {
       }).toList(),
       cols: (parsedJson['cols'] as List<dynamic>).map((r) {
         return (r as Map)['text'].toString();
-      }).toList(), //List<String>.from(parsedJson['cols']['text'])
+      }).toList(),
     );
   }
 
@@ -783,7 +824,7 @@ class XormQuestionDatatable extends XormQuestion {
           rows: rows.asMap().entries.map((row) {
             List<String> fullRow = [row.value];
             fullRow.addAll(List(cols.length).map((c) => ""));
-
+            
             return DataRow(
               selected: false,
               cells: fullRow.asMap().entries.map((entry) {
@@ -802,6 +843,46 @@ class XormQuestionDatatable extends XormQuestion {
                   );
                 }
                 
+              }).cast<DataCell>().toList()
+            );
+          }).toList(),
+        )
+      )
+    );
+  }
+
+  @override
+  Widget view(Object values) {
+    print("\nDATA TABLE VIEWS...");
+    print(values);
+    List<String> fullCols = [""];
+    fullCols.addAll(cols);
+
+    return Container(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child:  DataTable(
+          columns: fullCols.map((col) {
+            return DataColumn(label: Text(col));
+          }).toList(),
+          rows: rows.asMap().entries.map((row) {
+            List<String> fullRow = [row.value];
+            fullRow.addAll(List(cols.length).map((c) => ""));
+            
+            return DataRow(
+              selected: false,
+              cells: fullRow.asMap().entries.map((entry) {
+                if (entry.key == 0) {
+                  return DataCell(
+                    Text(entry.value)
+                  );
+                } else {
+                  var id = "${this.id}__row_${row.key}__col_${entry.key}";
+                  return DataCell(
+                    Text((values as Map)[id].toString())
+                  );  
+                }
+                              
               }).cast<DataCell>().toList()
             );
           }).toList(),

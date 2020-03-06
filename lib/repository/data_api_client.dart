@@ -6,7 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:muitou/models/data_collected.dart';
 
 class DataApiClient {
-  final _baseUrl =  'http://ef76c6d0.ngrok.io/api'; // 'http://192.168.8.100:3000/api';
+  final _baseUrl =  'http://192.168.8.100:3000/api'; // 'http://268.ngrok.io/api'; // 
   final http.Client httpClient;
 
   DataApiClient({
