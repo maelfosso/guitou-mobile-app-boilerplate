@@ -3,18 +3,19 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-import 'package:muitou/models/data_collected.dart';
+import 'package:guitou/models/data_collected.dart';
 
 class DataApiClient {
-  final _baseUrl =  'http://192.168.8.100:3000/api'; // 'http://268.ngrok.io/api'; // 
+  final String baseUrl;
   final http.Client httpClient;
 
   DataApiClient({
+    @required this.baseUrl,
     @required this.httpClient,
   }) : assert(httpClient != null);
 
   Future<DataCollected> postData(DataCollected data) async {
-    final url = '$_baseUrl/forms/${data.form}/data';
+    final url = '$baseUrl/forms/${data.form}/data';
 
     var headers = {
       "Content-Type": "application/json; charset=utf-8",

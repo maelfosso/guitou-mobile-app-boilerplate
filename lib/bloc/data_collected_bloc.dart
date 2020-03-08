@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:meta/meta.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:muitou/bloc/data_collected_event.dart';
-import 'package:muitou/bloc/data_collected_state.dart';
-import 'package:muitou/db/data_collected_dao.dart';
-import 'package:muitou/models/project.dart';
-import 'package:muitou/repository/data_repository.dart';
+import 'package:guitou/bloc/data_collected_event.dart';
+import 'package:guitou/bloc/data_collected_state.dart';
+import 'package:guitou/db/data_collected_dao.dart';
+import 'package:guitou/models/project.dart';
+import 'package:guitou/repository/data_repository.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {

@@ -1,7 +1,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:muitou/models/data_collected.dart';
+import 'package:guitou/models/data_collected.dart';
 
 @immutable
 abstract class DataCollectedState extends Equatable {

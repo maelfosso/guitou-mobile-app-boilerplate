@@ -1,4 +1,4 @@
-package com.example.muitou
+package cm.guitou.android.xorms
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
