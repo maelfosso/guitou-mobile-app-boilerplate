@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:muitou/models/xorm.dart';
-import 'package:muitou/models/xorm_detail.dart';
+import 'package:guitou/models/xorm.dart';
+import 'package:guitou/models/xorm_detail.dart';
 
 import 'xorm_detail.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:core';
 
-import 'package:muitou/db/app_database.dart';
-import 'package:muitou/models/data_collected.dart';
+import 'package:guitou/db/app_database.dart';
+import 'package:guitou/models/data_collected.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/utils/value_utils.dart';
 

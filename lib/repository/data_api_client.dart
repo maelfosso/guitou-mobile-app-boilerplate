@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-import 'package:muitou/models/data_collected.dart';
+import 'package:guitou/models/data_collected.dart';
 
 class DataApiClient {
   final String baseUrl;

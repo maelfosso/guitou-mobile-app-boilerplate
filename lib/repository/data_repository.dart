@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:meta/meta.dart';
-import 'package:muitou/db/data_collected_dao.dart';
-import 'package:muitou/models/data_collected.dart';
-import 'package:muitou/models/project.dart';
-import 'package:muitou/repository/data_api_client.dart';
-import 'package:muitou/repository/project_api_client.dart';
+import 'package:guitou/db/data_collected_dao.dart';
+import 'package:guitou/models/data_collected.dart';
+import 'package:guitou/models/project.dart';
+import 'package:guitou/repository/data_api_client.dart';
+import 'package:guitou/repository/project_api_client.dart';
 
 
 class DataRepository {

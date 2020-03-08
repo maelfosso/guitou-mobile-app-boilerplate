@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:muitou/bloc/data_collected_bloc.dart';
-import 'package:muitou/bloc/data_collected_event.dart';
-import 'package:muitou/bloc/data_collected_state.dart';
-import 'package:muitou/models/data_collected.dart';
-import 'package:muitou/models/project.dart';
+import 'package:guitou/bloc/data_collected_bloc.dart';
+import 'package:guitou/bloc/data_collected_event.dart';
+import 'package:guitou/bloc/data_collected_state.dart';
+import 'package:guitou/models/data_collected.dart';
+import 'package:guitou/models/project.dart';
 
 import '../models/project.dart';
 import '../models/xorm_detail.dart';

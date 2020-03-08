@@ -1,6 +1,6 @@
 
 import 'package:flutter/widgets.dart';
-import 'package:muitou/app_config.dart';
+import 'package:guitou/app_config.dart';
 
 import 'main.dart';
 

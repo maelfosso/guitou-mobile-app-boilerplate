@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'dart:async' show Future;
 import 'package:flutter/services.dart';
-import 'package:muitou/app.dart';
-import 'package:muitou/models/project.dart';
+import 'package:guitou/app.dart';
+import 'package:guitou/models/project.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<String> _loadProjectAsset() async {

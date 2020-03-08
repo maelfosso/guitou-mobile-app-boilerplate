@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-import 'package:muitou/models/project.dart';
+import 'package:guitou/models/project.dart';
 
 class ProjectApiClient {
   final String baseUrl;

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:muitou/models/project.dart';
+import 'package:guitou/models/project.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
 import 'package:jiffy/jiffy.dart';
 
-import 'package:muitou/bloc/data_collected_bloc.dart';
-import 'package:muitou/bloc/data_collected_event.dart';
-import 'package:muitou/bloc/data_collected_state.dart';
+import 'package:guitou/bloc/data_collected_bloc.dart';
+import 'package:guitou/bloc/data_collected_event.dart';
+import 'package:guitou/bloc/data_collected_state.dart';
 
-import 'package:muitou/models/data_collected.dart';
-import 'package:muitou/models/xorm.dart';
+import 'package:guitou/models/data_collected.dart';
+import 'package:guitou/models/xorm.dart';
 
 
-import 'package:muitou/pages/data_entry_page.dart';
-import 'package:muitou/pages/data_view_page.dart';
+import 'package:guitou/pages/data_entry_page.dart';
+import 'package:guitou/pages/data_view_page.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);

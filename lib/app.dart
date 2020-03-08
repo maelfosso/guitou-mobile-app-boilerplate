@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:muitou/app_config.dart';
-import 'package:muitou/bloc/data_collected_bloc.dart';
-import 'package:muitou/db/data_collected_dao.dart';
-import 'package:muitou/pages/home_page.dart';
-import 'package:muitou/repository/data_api_client.dart';
-import 'package:muitou/repository/data_repository.dart';
-import 'package:muitou/repository/project_api_client.dart';
+import 'package:guitou/app_config.dart';
+import 'package:guitou/bloc/data_collected_bloc.dart';
+import 'package:guitou/db/data_collected_dao.dart';
+import 'package:guitou/pages/home_page.dart';
+import 'package:guitou/repository/data_api_client.dart';
+import 'package:guitou/repository/data_repository.dart';
+import 'package:guitou/repository/project_api_client.dart';
 
 class GuitouApp extends StatelessWidget {
   // This widget is the root of your application.
