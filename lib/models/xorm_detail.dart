@@ -808,6 +808,7 @@ class XormQuestionDatatable extends XormQuestion {
     print("\nXormQuestionDataTable... ${id}");
     print(parsedJson);
     print(parsedJson["rows"]);
+    print(parsedJson["cols"]);
 
     return new XormQuestionDatatable(
       id: id,
@@ -815,12 +816,14 @@ class XormQuestionDatatable extends XormQuestion {
       hint: parsedJson['hint'],
       type: parsedJson['type'],
       rows: (parsedJson['rows'] as List<dynamic>).map((r) {
-        print("\nDATA TABLE PARSING... ");
-        print(r);
+        // print("\nDATA TABLE PARSING... ");
+        // print(r);
         return (r as Map)['text'].toString();
       }).toList(),
-      cols: (parsedJson['cols'] as List<dynamic>).map((r) {
-        return (r as Map)['text'].toString();
+      cols: (parsedJson['cols'] as List) //.map((c) => c.toString())
+      .map((c) {
+        print("\nDATA TABLE COLDD ---- ${c.toString()}");
+        return (c as Map)['text'].toString();
       }).toList(),
     );
   }
@@ -919,7 +922,12 @@ class XormQuestionDatatable extends XormQuestion {
         };
         return obj;
       }).toList(),
-      "cols": cols
+      "cols": cols.map((c) {
+        Map obj = {
+          "text": c
+        };
+        return obj;
+      }).toList(),
     };
   }
 

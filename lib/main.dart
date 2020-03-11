@@ -20,7 +20,7 @@ Future<Project> loadProject() async {
 
 Future<Widget> start() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await SystemChrome.setEnabledSystemUIOverlays([]);
+  // await SystemChrome.setEnabledSystemUIOverlays([]);
   // await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await loadProject();
