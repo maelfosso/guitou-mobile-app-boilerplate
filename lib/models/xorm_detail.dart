@@ -185,7 +185,10 @@ class XormSection {
       autovalidate: true,
       child: Column(
         children: this.questions.map((q) => q.build(context: context)).toList()
-      )
+      ),
+      onChanged: (values) {
+
+      },
     );
   }
 
@@ -270,6 +273,7 @@ class XormSectionParams {
   final String key;
   final bool repeat;
   final String repeatMaxTimes; // Inner - Unlimitted - Fixed - Variable
+  final String repeatMaxTimesIDInner;
   final String repeatMaxTimesInner;
   final String repeatMaxTimesVariable;
   int repeatMaxTimesFixed;
@@ -279,7 +283,7 @@ class XormSectionParams {
     @required this.key, 
     @required this.description, 
     this.repeat = false, this.repeatMaxTimes,
-    this.repeatMaxTimesInner, this.repeatMaxTimesFixed, this.repeatMaxTimesVariable
+    this.repeatMaxTimesInner, this.repeatMaxTimesIDInner, this.repeatMaxTimesFixed, this.repeatMaxTimesVariable
   });
 
   factory XormSectionParams.fromJson(Map<String, dynamic> json) {
@@ -292,6 +296,7 @@ class XormSectionParams {
       key: json['key'] as String,
       repeat: json['repeat'] as bool,
       repeatMaxTimes: json['repeat_max_times'] as String,
+      repeatMaxTimesIDInner: json['repeat_max_times_idinner'] as String,
       repeatMaxTimesInner: json['repeat_max_times_inner'] as String,
       repeatMaxTimesFixed: json['repeat_max_times_fixed'] as int,
       repeatMaxTimesVariable: json['repeat_max_times_variable'] as String,
@@ -305,6 +310,7 @@ class XormSectionParams {
       "key": key,
       "repeat": repeat,
       "repeat_max_times": repeatMaxTimes,
+      "repeat_max_times_idinner": repeatMaxTimesIDInner,
       "repeat_max_times_inner": repeatMaxTimesInner,
       "repeat_max_times_fixed": repeatMaxTimesFixed,
       "repeat_max_times_variable": repeatMaxTimesVariable,
@@ -1003,6 +1009,7 @@ class XormQuestionMultipleChoice extends XormQuestion {
             ),
             attribute: this.id,
             options: options,
+            // onChanged: ,
           )
         ]
       )

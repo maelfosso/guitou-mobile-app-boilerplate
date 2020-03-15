@@ -192,6 +192,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
         Expanded(
           child: 
           PageView.builder(
+            physics:new NeverScrollableScrollPhysics(),
             controller: controller,
             itemBuilder: (context, position)  {
               return _buildPage(position);

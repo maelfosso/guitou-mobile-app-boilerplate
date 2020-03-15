@@ -206,12 +206,31 @@ class _HomePageState extends State<HomePage> {
             itemCount: this.datas.length,
             itemBuilder: (context, index) {
               final data = this.datas[index];
+              final first = data.values.values.first;
+              final form = Project.instance.xorms.firstWhere((x) => x.id == data.form).title;
 
               return ListTile(
 
-                title: Text(data.id.toString()),
-                subtitle: Text(Jiffy(data.createdAt).fromNow()),
-                trailing: _buildActionButtons(data),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          (first as Map)["Q00"].toString(),
+                          style: Theme.of(context).textTheme.title
+                        ), //data.id.toString()),
+                        Text(Jiffy(data.createdAt).fromNow())
+                      ],
+                    ),
+                    // Text((first as Map)["Q00"].toString()), //data.id.toString()),
+                    Chip(label: Text(form)),
+                    _buildActionButtons(data),
+                  ]
+                ),
+                // subtitle: Text(Jiffy(data.createdAt).fromNow()),
+                // trailing: _buildActionButtons(data),
                 onTap: () => this._onOpenData(data),
               );
             },
