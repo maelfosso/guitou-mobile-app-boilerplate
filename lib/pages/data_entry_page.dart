@@ -157,6 +157,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
     
 
     var formElts = currentXormSection.build(
+      context: context,
       globalKey: this.currentXormSectionKey, 
       data: initData
     );
@@ -336,7 +337,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     // this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
                   }
                   
-                  if ((currentSectionData["section_final__again"] as bool)) {
+                  if ( (currentSectionData["section_final__again"] as bool)?? false ) {
                     this.data = DataCollected(form: widget.currentXorm, values: {});
                     
                     setState(() {

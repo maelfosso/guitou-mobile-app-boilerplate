@@ -21,8 +21,9 @@ class XormDetails {
         description: "Please, sign here to confirm your data entry and then validate"
       ),
       questions: <XormQuestion>[
-        XormQuestionString(id: "section_final__name", title: "Enter your name", hint: "", type: "string"),
-        XormQuestionOptional(id: "section_final__again", title: "Are you going to enter another data?", hint: "", type: "optional")
+        XormQuestionString(id: "section_final__name", title: "Your name", hint: "", type: "string"),
+        XormQuestionText(id: "section_final__obs", title: "Your observations", hint: "", type: "text"),
+        XormQuestionOptional(id: "section_final__again", title: "Are you going to enter another data?", hint: "", type: "optional"),
       ]
     );
 
@@ -137,7 +138,7 @@ class XormSection {
     return _fbKey;
   }
 
-  Widget build({ @required GlobalKey<FormBuilderState> globalKey, Map<String, dynamic> data }) {
+  Widget build({ @required BuildContext context, @required GlobalKey<FormBuilderState> globalKey, Map<String, dynamic> data }) {
     print("\nBUILD.... \t ${id}");
     print(data);
     print("\n");
@@ -183,7 +184,7 @@ class XormSection {
       }),
       autovalidate: true,
       child: Column(
-        children: this.questions.map((q) => q.build()).toList()
+        children: this.questions.map((q) => q.build(context: context)).toList()
       )
     );
   }
@@ -319,7 +320,7 @@ abstract class XormQuestion {
 
   XormQuestion({this.id, this.title, this.hint, this.type});
 
-  Widget build({ String value });
+  Widget build({ @required BuildContext context, String value });
 
   Widget view(String value) {
     print("\n QUESTION... Views... ${id}");
@@ -358,19 +359,26 @@ class XormQuestionTitleDesc extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
-    // TODO: implement build
-    return Text(title);
+  Widget build({ @required BuildContext context,  String value }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          Text(
+            title,
+            textAlign: TextAlign.left,
+          )
+        ]
+      )
+    );
   }
 
   @override
   Widget view(String value) {
     return Text(title);
-    // ListTile(
-    //   title: Text(this.title),
-    //   subtitle: Text(value),
-    //   dense: true,
-    // );
   }
 
   Map<String, dynamic> toJson() {
@@ -398,12 +406,32 @@ class XormQuestionString extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     // TODO: implement build
-    return FormBuilderTextField(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      maxLines: 1,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderTextField(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            maxLines: 1,
+          ),
+        ]
+      )
     );
   }
 
@@ -432,16 +460,36 @@ class XormQuestionNumber extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
-    // TODO: implement build
-    return FormBuilderTextField(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      maxLines: 1,
-      validators: [
-        FormBuilderValidators.numeric(errorText: "You should enter a number")
-      ],
+  Widget build({ @required BuildContext context,  String value }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderTextField(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            maxLines: 1,
+            validators: [
+              FormBuilderValidators.numeric(errorText: "You should enter a number")
+            ],
+          )
+        ]
+      )
     );
+    
   }
 
   Map<String, dynamic> toJson() {
@@ -468,13 +516,33 @@ class XormQuestionText extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
-    // TODO: implement build
-    return FormBuilderTextField(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      minLines: 3,
+  Widget build({ @required BuildContext context,  String value }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderTextField(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            minLines: 5,
+          )
+        ]
+      )
     );
+    
   }
 
   Map<String, dynamic> toJson() {
@@ -501,12 +569,32 @@ class XormQuestionDate extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
-    return FormBuilderDateTimePicker(
-      attribute: this.id,
-      inputType: InputType.date,
-      format: DateFormat("yyyy-MM-dd"),
-      decoration: InputDecoration(labelText: this.title),
+  Widget build({ @required BuildContext context,  String value }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderDateTimePicker(
+            attribute: this.id,
+            inputType: InputType.date,
+            format: DateFormat("yyyy-MM-dd"),
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            )
+          )
+        ]
+      )
     );
   }
 
@@ -534,14 +622,32 @@ class XormQuestionTime extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
-    // TODO: implement build
-    return FormBuilderDateTimePicker(
-      // initialValue: value.isEmpty ? DateTime.parse(value) : "",
-      attribute: this.id,
-      inputType: InputType.time,
-      format: DateFormat("HH:mm"),
-      decoration: InputDecoration(labelText: this.title),
+  Widget build({ @required BuildContext context,  String value }) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderDateTimePicker(
+            attribute: this.id,
+            inputType: InputType.time,
+            format: DateFormat("HH:mm"),
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            )
+          )
+        ]
+      )
     );
   }
 
@@ -570,11 +676,32 @@ class XormQuestionOptional extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     // TODO: implement build
-    return FormBuilderCheckbox(
-      attribute: this.id,
-      label: Text(this.title),
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderCheckbox(
+            attribute: this.id,
+            label: Text(this.title),
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            )
+          )
+        ]
+      )
     );
   }
 
@@ -605,20 +732,39 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     List<DropdownMenuItem> items = this.kv.entries
         .map((entry) => DropdownMenuItem(
             value: entry.key,
             child: Text(entry.value)
       )).toList();
 
-    // TODO: implement build
-    return FormBuilderDropdown(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      initialValue: null,
-      hint: Text('Select a choice'),
-      items: items
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderDropdown(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            initialValue: null,
+            hint: Text('Select a choice'),
+            items: items
+          )
+        ]
+      )
     );
   }
 
@@ -650,16 +796,37 @@ class XormQuestionSingleChoice extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     List<FormBuilderFieldOption> options = this.kv.entries
         .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
 
-    return FormBuilderRadio(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      initialValue: null,
-      options: options,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderRadio(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            initialValue: null,
+            options: options,
+          )
+        ]
+      )
     );
+    
   }
 
   Map<String, dynamic> toJson() {
@@ -690,16 +857,37 @@ class XormQuestionYesNo extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     List<FormBuilderFieldOption> options = this.kv.entries
         .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
 
-    return FormBuilderRadio(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      initialValue: null,
-      options: options,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderRadio(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            initialValue: null,
+            options: options,
+          )
+        ]
+      )
     );
+    
   }
 
   Map<String, dynamic> toJson() {
@@ -730,15 +918,35 @@ class XormQuestionYesNoDont extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     List<FormBuilderFieldOption> options = this.kv.entries
         .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
 
-    return FormBuilderRadio(
-      attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
-      initialValue: null,
-      options: options,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderRadio(
+            attribute: this.id,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            initialValue: null,
+            options: options,
+          )
+        ]
+      )
     );
   }
 
@@ -770,16 +978,34 @@ class XormQuestionMultipleChoice extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context,  String value }) {
     List<FormBuilderFieldOption> options = this.kv.entries
         .map((entry) => FormBuilderFieldOption(value: entry.value)).toList();
 
-    return FormBuilderCheckboxList(
-      decoration: InputDecoration(
-        labelText: this.title
-      ),
-      attribute: this.id,
-      options: options,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          FormBuilderCheckboxList(
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+              hasFloatingPlaceholder: false,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(0)),
+                gapPadding: 0.0
+              )
+            ),
+            attribute: this.id,
+            options: options,
+          )
+        ]
+      )
     );
   }
 
@@ -829,43 +1055,71 @@ class XormQuestionDatatable extends XormQuestion {
   }
 
   @override
-  Widget build({ String value }) {
+  Widget build({ @required BuildContext context, String value }) {
     List<String> fullCols = [""];
     fullCols.addAll(cols);
 
     return Container(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child:  DataTable(
-          columns: fullCols.map((col) {
-            return DataColumn(label: Text(col));
-          }).toList(),
-          rows: rows.asMap().entries.map((row) {
-            List<String> fullRow = [row.value];
-            fullRow.addAll(List(cols.length).map((c) => ""));
-            
-            return DataRow(
-              selected: false,
-              cells: fullRow.asMap().entries.map((entry) {
-                if (entry.key == 0) {
-                  return DataCell(
-                    Text(entry.value)
-                  );
-                } else {
-                  return DataCell(
-                    FormBuilderTextField(
-                      attribute: "${this.id}__row_${row.key}__col_${entry.key}",
-                      
-                      // decoration: InputDecoration(labelText: this.title),
-                      // minLines: 3,
-                    )
-                  );
-                }
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            this.id + ".  " + this.title,
+            style: Theme.of(context).inputDecorationTheme.labelStyle,
+          ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all()
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child:  DataTable(
+              columns: fullCols.map((col) {
+                return DataColumn(
+                  label: Text(col),
+
+                );
+              }).toList(),
+              rows: rows.asMap().entries.map((row) {
+                List<String> fullRow = [row.value];
+                fullRow.addAll(List(cols.length).map((c) => ""));
                 
-              }).cast<DataCell>().toList()
-            );
-          }).toList(),
-        )
+                return DataRow(
+                  selected: false,
+
+                  cells: fullRow.asMap().entries.map((entry) {
+                    if (entry.key == 0) {
+                      return DataCell(
+                        Text(entry.value)
+                      );
+                    } else {
+                      return DataCell(
+                        Container(
+                          width: 100, //SET width
+                          child: FormBuilderTextField(
+                            attribute: "${this.id}__row_${row.key}__col_${entry.key}",
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+                              hasFloatingPlaceholder: false,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(0)),
+                                gapPadding: 0.0
+                              )
+                            ),
+                          )
+                        )
+                      );
+                    }
+                    
+                  }).cast<DataCell>().toList()
+                );
+              }).toList(),
+            )
+            )
+          )
+        ]
       )
     );
   }
