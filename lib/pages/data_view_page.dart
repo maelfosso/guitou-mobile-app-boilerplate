@@ -91,12 +91,8 @@ class DataViewPage extends StatelessWidget {
             );
           } 
           if (state is DataCollectedLoaded && state.datas.length == 1) {
-            print("\nDATA COLLECTED....\n");
             this._data = state.datas.first;            
-            print(this._data.toJson());
             this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == this._data.form);
-            print(this._currentXormDetails.toJson());
-            print("\n");
             return this._currentXormDetails.view(this._data.values);
           }
           

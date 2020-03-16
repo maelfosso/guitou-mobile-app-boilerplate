@@ -71,11 +71,9 @@ class _HomePageState extends State<HomePage> {
     final PermissionStatus statusFuture = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.storage);
 
-    print("\nCheck permission status...");
-    print(statusFuture);
-    
     if (statusFuture == PermissionStatus.granted) {
       _allowWriteFile = true;
+
       return;
     }
 
@@ -83,9 +81,7 @@ class _HomePageState extends State<HomePage> {
         await PermissionHandler().requestPermissions(permissions);
 
     setState(() {
-      print(permissionRequestResult);
       _allowWriteFile = permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
-      print(_allowWriteFile);
     });
   }
 
@@ -98,13 +94,9 @@ class _HomePageState extends State<HomePage> {
     final externalPublicDirectory = await ExtStorage.getExternalStorageDirectory();
     var folder = Directory("$externalPublicDirectory/Guitou/Exports");
     if (await folder.exists()) {
-      print("\nTHE FOLDER EXISTS");
-      print(folder.path);
       return folder.path;
     } else {
       folder = await folder.create(recursive: true);
-      print("\nCreated FOLDER");
-      print(folder.path);
       return folder.path;
     }
  
@@ -113,7 +105,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future _writeToFile(String filename, String text) async {
-    print("write To File - $filename");
 
     if (!_allowWriteFile) {
       return null;
@@ -203,7 +194,6 @@ class _HomePageState extends State<HomePage> {
       listener: (context, state) async {
         
         if (state is DownloadProjectSuccess) {
-          print("BUILD BODY: DOWNLOAD PROJECT SUCCESSS");
           
           return this.prn.hide().then((onValue) {
             _showEndOperationDialog("Download", "Successful");
@@ -211,7 +201,6 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (state is DownloadProjectFailed) {
-          print("BUILD BODY: DOWNLOAD PROJECT FAILED");
 
           return this.prn.hide().then((onValue) {
             final snackBar = SnackBar(

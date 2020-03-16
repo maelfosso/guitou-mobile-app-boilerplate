@@ -98,13 +98,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
   Widget _buildPage(int position) {
     this.currentXormSectionKey = GlobalKey<FormBuilderState>();
     
-    print("\_BUILD PAGE.... ${currentXormSection.id}");
-    print(currentXormSection.toJson());
-    print("\nRETURN WIDGETS....");
-    print(this.data.values.containsKey(currentXormSection.id));
-    print(this.data.values[currentXormSection.id]);
-    print("\nWHAT ??");
-
     Map<String, dynamic> initData;
     if (this.currentXormSection.params.repeat ?? false) {
       if (this.repeatIt) {
@@ -119,13 +112,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
     } else {
       initData = this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {};
     }
-    print("\nDATA TO POPULATE \n");
-    print(initData);
-
-    print("\nDIALOG OR NOT ... ${this.currentXormSection.params.repeat} ... ${this.currentXormSection.params.repeat ?? false}");
-    print(currentXormSection.params.repeatMaxTimes);
-    print("\n");
-    
 
     var formElts = currentXormSection.build(
       context: context,
@@ -155,7 +141,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   Widget buildPageView() {
     bool isLastPage = this.currentSectionPosition == this._currentXormDetails.sections.length - 1;
-    print("\nBUILD PAGE VIEW .... ${this.currentSectionPosition} --- ${this._currentXormDetails.sections.length - 1} - ${this._currentXormDetails.sections[this.currentSectionPosition].id} ---- $isLastPage\n");
     
     return Column(
       children: <Widget>[
@@ -169,7 +154,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
             },
 
             onPageChanged: (int page) async {
-              print('\nON PAGE CHANGES ... ${page} ... ${this.currentSectionPosition}');
               this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
 
               if (this.repeatIt) {
@@ -179,9 +163,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
               if ((this.currentXormSection.params.repeat ?? false) && 
                 (currentXormSection.params.repeatMaxTimes == "inner" || currentXormSection.params.repeatMaxTimes == "fixed")) {
 
-                print("\nDISPLAY DIALOG");
                 var repeatValue = await _asyncInputDialog(context);
-                print("\nON PAGE CHANGES ... REPEAT ... ${repeatValue}");
 
                 if (currentXormSection.params.repeatMaxTimes == "inner") { // INNER
                   if (this.data.values.containsKey(this.currentXormSection.id + "__inner")) {
@@ -255,7 +237,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                 Map<String, dynamic> currentSectionData = new Map();
 
                 if (this.currentXormSectionKey.currentState.saveAndValidate()) {
-                  currentSectionData = this.currentXormSectionKey.currentState.value; //.cast<String, String>();
+                  currentSectionData = this.currentXormSectionKey.currentState.value;
                   
                   if (currentSectionData.isEmpty) {
                     this.data.values[currentSectionKey] = {};
@@ -270,22 +252,17 @@ class _DataEntryPageState extends State<DataEntryPage> {
                         ifAbsent: () => ca
                       );
                     } else {
-                      print("\n\nIT's REPEATED.... ${this.currentSectionDataPosition} ... \n");
                       if (!this.data.values.containsKey(currentSectionKey)) {
                         this.data.values[currentSectionKey] = [];
-                        print("\nWAS EMPTY INIT...");
                       }
 
                       if (this.currentSectionDataPosition == (this.data.values[currentSectionKey] as List).length) {
-                        print("\nVALUE ADDED INTO");
                         (this.data.values[currentSectionKey] as List).add(ca);
                       } else {
-                        print("\nVALUE UPDATED.. INTO");
                         (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
                       }
                       
                       print(this.data.values[currentSectionKey]);
-                      print("\nIT'S OKK...");                      
                     }
                     
                   }
@@ -346,8 +323,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
                         break;
                       case "inner":
-                        print("\nINNER... ");
-                        print(this.data.values[this.currentXormSection.id + "_inner"]);
                         int innerValue = int.parse((this.data.values[this.currentXormSection.id + "_inner"] as Map)["inner"]);
                         if (innerValue > (this.data.values[this.currentXormSection.id] as List).length) {
                           nextRepeat = true;
@@ -426,19 +401,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("\nBUILD... ${widget.currentXorm}");
-    print("\nIn CURRENTXORM DETAILS");
     this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) {
-      print("${x.id}---${widget.currentXorm}---${x.id.trim() == widget.currentXorm.trim()}");
-      print("\n");
       return  x.id == widget.currentXorm;
     });
 
-    print("\nTHERE ARE .. ${_currentXormDetails.sections.length} SECTIONS....\n");
-    this._currentXormDetails.sections.forEach((section) {
-      print(section.id);
-    });
-    print("\n");
+    
     String currentXormTitle = Project.instance.xorms.firstWhere((x) => x.id == widget.currentXorm).title;
     this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
 

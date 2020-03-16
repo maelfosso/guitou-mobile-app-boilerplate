@@ -12,12 +12,12 @@ import 'package:permission_handler/permission_handler.dart';
 requestWritePermission() async {
   final List<PermissionGroup> permissions = <PermissionGroup>[PermissionGroup.storage];
 
-  // ServiceStatus serviceStatus 
   final PermissionStatus statusFuture = await PermissionHandler()
-      .checkPermissionStatus(PermissionGroup.storage);
-
-  print("\nCheck permission status...");
-  print(statusFuture);
+      .checkPermissionStatus(PermissionGroup.storage); 
+  
+  if (statusFuture == PermissionStatus.granted) {
+    return;
+  }
 
   final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
       await PermissionHandler().requestPermissions(permissions);
@@ -45,17 +45,13 @@ Future<Widget> start() async {
 
   final directory = await getApplicationDocumentsDirectory();
   final file = File("${directory.path}/${Project.instance.id}.json");
-  print("\nDIRECTORY : ${directory.path}\n");
 
   if (await file.exists()) {
-    print("\nTHE FILE EXISTS....");
     final contents = await file.readAsString();
     final parsedJson = json.decode(contents);
 
     Project.object = Project.fromJson(parsedJson);
-    print(Project.instance.toJson());
   } else {
-    print(json.encode(Project.instance.toJson()));
     await file.writeAsString(json.encode(Project.instance.toJson()));
   }
 
