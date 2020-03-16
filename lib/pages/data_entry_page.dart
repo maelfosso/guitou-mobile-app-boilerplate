@@ -36,7 +36,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
   int currentSectionDataPosition = 0;
   bool repeatIt = false;
 
-  // Map<String, Map<String, String>> data = {};
   DataCollected data;
 
   @override
@@ -64,7 +63,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
     return await showDialog<String>(
       context: context,
-      barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('How many times repeat it'),
@@ -97,7 +96,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
   }
 
   Widget _buildPage(int position) {
-    // this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
     this.currentXormSectionKey = GlobalKey<FormBuilderState>();
     
     print("\_BUILD PAGE.... ${currentXormSection.id}");
@@ -117,17 +115,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
         } else {
           initData = {};
         }
-        
       }
-      // if (widget.id > 0) {
-      //   if (this.repeatIt) {
-      //     initData = {};
-      //   } else {
-      //     initData = (this.data.values[currentXormSection.id] as List)[currentSectionDataPosition];
-      //   }
-      // } else {
-      //   initData = {};
-      // }      
     } else {
       initData = this.data.values.containsKey(currentXormSection.id) ? this.data.values[currentXormSection.id] : {};
     }
@@ -137,23 +125,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
     print("\nDIALOG OR NOT ... ${this.currentXormSection.params.repeat} ... ${this.currentXormSection.params.repeat ?? false}");
     print(currentXormSection.params.repeatMaxTimes);
     print("\n");
-
-    // if ((this.currentXormSection.params.repeat ?? false) && 
-    //   (currentXormSection.params.repeatMaxTimes == "inner" || currentXormSection.params.repeatMaxTimes == "fixed")) {
-
-    //   print("\nDISPLAY DIALOG");
-    //   var repeatValue;
-
-    //   // repeatValue = await _asyncInputDialog(context);
-
-    //   // print("\nREPEAT VALUE GET... ${repeatValue}");
-    //   if (currentXormSection.params.repeatMaxTimes == "inner") { // INNER
-    //     (this.data.values[this.currentXormSection.id + "__inner"] as Map)["inner"] = repeatValue; // + (currentXormSection.params.repeatMaxTimes == "inner" ? )
-    //   } else { // FIXED
-    //     currentXormSection.params.repeatMaxTimesFixed = (repeatValue as int);
-    //   }
-      
-    // }
     
 
     var formElts = currentXormSection.build(
@@ -185,7 +156,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
   Widget buildPageView() {
     bool isLastPage = this.currentSectionPosition == this._currentXormDetails.sections.length - 1;
     print("\nBUILD PAGE VIEW .... ${this.currentSectionPosition} --- ${this._currentXormDetails.sections.length - 1} - ${this._currentXormDetails.sections[this.currentSectionPosition].id} ---- $isLastPage\n");
-    // print(isLastPage);
     
     return Column(
       children: <Widget>[
@@ -213,7 +183,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
                 var repeatValue = await _asyncInputDialog(context);
                 print("\nON PAGE CHANGES ... REPEAT ... ${repeatValue}");
 
-                // print("\nREPEAT VALUE GET... ${repeatValue}");
                 if (currentXormSection.params.repeatMaxTimes == "inner") { // INNER
                   if (this.data.values.containsKey(this.currentXormSection.id + "__inner")) {
                     (this.data.values[this.currentXormSection.id + "_inner"] as Map).update("inner", (existing) => repeatValue, ifAbsent: () => repeatValue); //["inner"] = repeatValue; // + (currentXormSection.params.repeatMaxTimes == "inner" ? )
@@ -239,7 +208,10 @@ class _DataEntryPageState extends State<DataEntryPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             FlatButton(
-              child: Text("Previous"),
+              child: Text(
+                "Previous",
+                style: TextStyle(color: Colors.white)
+              ),
               color: Colors.blue,
               onPressed: () {
                 if (this.currentXormSection.params.repeat ?? false) {
@@ -268,29 +240,20 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     });
                   }
                 }
-
-                // if (this.currentXormSection.params.repeat && this.currentSectionDataPosition > 0) {
-                //   setState(() {
-                //     this.currentSectionDataPosition -= 1;
-                //   });
-                // } else {
-                //   setState(() {
-                //     this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
-                //   });
-                // }
                 
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
               },
             ),
             FlatButton(
-              child: Text(isLastPage ? "Save it" : "Next"),
+              child: Text(
+                isLastPage ? "Save it" : "Next",
+                style: TextStyle(color: Colors.white)
+              ),
               color: Colors.blue,
               onPressed: () async {
-                // final XormSection currentSection = this._currentXormDetails.sections[this.currentSectionPosition];
                 final String currentSectionKey = this.currentXormSection.id;
                 Map<String, dynamic> currentSectionData = new Map();
 
-                // if (this.currentXormSection.sectionKey.currentState.saveAndValidate()) {
                 if (this.currentXormSectionKey.currentState.saveAndValidate()) {
                   currentSectionData = this.currentXormSectionKey.currentState.value; //.cast<String, String>();
                   
@@ -302,7 +265,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     });
                     
                     if (!(this.currentXormSection.params.repeat ?? false)) {
-                      // this.data.values[currentSectionKey] = ca;
                       this.data.values.update(currentSectionKey, 
                         (existingValue) => ca,
                         ifAbsent: () => ca
@@ -310,7 +272,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     } else {
                       print("\n\nIT's REPEATED.... ${this.currentSectionDataPosition} ... \n");
                       if (!this.data.values.containsKey(currentSectionKey)) {
-                        this.data.values[currentSectionKey] = []; //.cast<List<Map<String, String>>>();
+                        this.data.values[currentSectionKey] = [];
                         print("\nWAS EMPTY INIT...");
                       }
 
@@ -331,11 +293,9 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
                 if (isLastPage) {
                   if (widget.id == 0) {
-                    // this._dataCollectedBloc.add(AddDataCollected(data: new DataCollected(values: this.data, form: _currentXormDetails.id)));
                     this._dataCollectedBloc.add(AddDataCollected(data: this.data));
                   } else {
                     this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
-                    // this._dataCollectedBloc.add(UpdateDataCollected(data: new DataCollected(values: this.data, id: widget.id, form: widget.currentXorm)));
                   }
                   
                   if ( (currentSectionData["section_final__again"] as bool)?? false ) {
@@ -440,7 +400,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       });
                     }                
                   } else {
-                    // TODO : To review
                     if (this.repeatIt) {
                       setState(() {
                         this.repeatIt = false;
@@ -468,7 +427,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
   @override
   Widget build(BuildContext context) {
     print("\nBUILD... ${widget.currentXorm}");
-    // this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == widget.currentXorm);
     print("\nIn CURRENTXORM DETAILS");
     this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) {
       print("${x.id}---${widget.currentXorm}---${x.id.trim() == widget.currentXorm.trim()}");
@@ -541,57 +499,3 @@ class _DataEntryPageState extends State<DataEntryPage> {
     );
   }
 }
-
-
-                    // Ask whether or not he wants to repeat it again?
-                    // if (widget.id > 0) {
-                    //   if (this.currentSectionDataPosition == (this.data.values[this.currentXormSection.id] as List).length - 1) {
-                        
-                    //     final answer = await showDialog(
-                    //       context: context,
-                    //       builder: (BuildContext context) {
-                    //         return alert;
-                    //       },
-                    //     );
-
-                    //     if (answer != null && answer == true) {
-                    //       setState(() {
-                    //         this.repeatIt = true;
-                    //         this.currentSectionDataPosition += 1;
-                    //       });
-                    //     } else {
-                    //       setState(() {
-                    //         this.repeatIt = false;
-                    //         this.currentSectionPosition += 1;
-                    //         this.currentSectionDataPosition = 0;
-                    //       });
-                    //     }
-                    //   } else {
-                    //     setState(() {
-                    //       this.repeatIt = false;
-                    //       this.currentSectionDataPosition += 1;
-                    //     });
-                    //   }
-                    // } else {
-                      
-                    //   // show the dialog
-                    //   final answer = await showDialog(
-                    //     context: context,
-                    //     builder: (BuildContext context) {
-                    //       return alert;
-                    //     },
-                    //   );
-
-                    //   if (answer != null && answer == true) {
-                    //     setState(() {
-                    //       this.repeatIt = true;
-                    //       this.currentSectionDataPosition += 1;
-                    //     });
-                    //   } else {
-                    //     setState(() {
-                    //       this.repeatIt = false;
-                    //       this.currentSectionPosition += 1;
-                    //       this.currentSectionDataPosition = 0;
-                    //     });
-                    //   }
-                    // }    

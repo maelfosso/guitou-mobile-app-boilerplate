@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     requestWritePermission();
 
-    _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
+    _dataCollectedBloc = context.bloc<DataCollectedBloc>();
     _dataCollectedBloc.add(LoadDataCollected());  
   }
 
@@ -71,10 +71,6 @@ class _HomePageState extends State<HomePage> {
     final PermissionStatus statusFuture = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.storage);
 
-    // final SnackBar snackBar =
-    //       SnackBar(content: Text(statusFuture.toString()));
-
-    // Scaffold.of(context).showSnackBar(snackBar);
     print("\nCheck permission status...");
     print(statusFuture);
     
@@ -82,13 +78,6 @@ class _HomePageState extends State<HomePage> {
       _allowWriteFile = true;
       return;
     }
-
-    //     .then((ServiceStatus serviceStatus) {
-    //   final SnackBar snackBar =
-    //       SnackBar(content: Text(serviceStatus.toString()));
-
-    //   Scaffold.of(context).showSnackBar(snackBar);
-    // });
 
     final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
         await PermissionHandler().requestPermissions(permissions);
@@ -121,15 +110,7 @@ class _HomePageState extends State<HomePage> {
  
     // Application temporary directory: /data/user/0/{package_name}/cache
     // final tempDirectory = await getTemporaryDirectory();
- 
-    // return externalDirectory.path; // applicationDirectory.path;
   }
-
-  // Future get _localFile async {
-  //   final path = await _localPath;
- 
-  //   return File('$path/file-name.txt');
-  // }
 
   Future _writeToFile(String filename, String text) async {
     print("write To File - $filename");
@@ -147,10 +128,6 @@ class _HomePageState extends State<HomePage> {
     } else {
       print("Successfully writing to file");
       print(result);
-
-      // print("Reading the content of file");
-      // String readResult = await _readFile();
-      // print("readResult: " + readResult.toString());
     }
   }
 
@@ -323,11 +300,10 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           (first as Map)["Q00"].toString(),
                           style: Theme.of(context).textTheme.title
-                        ), //data.id.toString()),
+                        ),
                         Text(Jiffy(data.createdAt).fromNow())
                       ],
                     ),
-                    // Text((first as Map)["Q00"].toString()), //data.id.toString()),
                     Chip(
                       label: Text(form),
                       labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
@@ -335,8 +311,6 @@ class _HomePageState extends State<HomePage> {
                     _buildActionButtons(data),
                   ]
                 ),
-                // subtitle: Text(Jiffy(data.createdAt).fromNow()),
-                // trailing: _buildActionButtons(data),
                 onTap: () => this._onOpenData(data),
               );
             },
@@ -366,9 +340,6 @@ class _HomePageState extends State<HomePage> {
         builder: (context) => DataEntryPage(
           currentXorm: data.form, 
           id: data.id,
-          // values: data.values.map((key, vals) {
-          //   return MapEntry(key.toString(), Map<String, String>.from(vals));
-          // })
         )
       ),
     ).then((onValue) {
@@ -450,8 +421,6 @@ class _HomePageState extends State<HomePage> {
       this._xormsList.addAll(Project.instance.xorms);
     }
 
-    // var permissionStatus = await _permissionHandler.checkPermissionStatus(PermissionGroup.location);
-
     // This method is rerun every time setState is called, for instance as done
     // by the _fillAXorm method above.
     //
@@ -529,7 +498,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: _fillAXorm,
         tooltip: 'Increment',
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

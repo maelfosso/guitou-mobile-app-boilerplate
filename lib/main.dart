@@ -16,33 +16,12 @@ requestWritePermission() async {
   final PermissionStatus statusFuture = await PermissionHandler()
       .checkPermissionStatus(PermissionGroup.storage);
 
-  // final SnackBar snackBar =
-  //       SnackBar(content: Text(statusFuture.toString()));
-
-  // Scaffold.of(context).showSnackBar(snackBar);
   print("\nCheck permission status...");
   print(statusFuture);
-  
-  // if (statusFuture == PermissionStatus.granted) {
-  //   _allowWriteFile = true;
-  //   return;
-  // }
-
-  //     .then((ServiceStatus serviceStatus) {
-  //   final SnackBar snackBar =
-  //       SnackBar(content: Text(serviceStatus.toString()));
-
-  //   Scaffold.of(context).showSnackBar(snackBar);
-  // });
 
   final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
       await PermissionHandler().requestPermissions(permissions);
 
-  // setState(() {
-  //   print(permissionRequestResult);
-  //   _allowWriteFile = permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
-  //   print(_allowWriteFile);
-  // });
 }
 
 
@@ -58,8 +37,6 @@ Future<Project> loadProject() async {
 
 Future<Widget> start() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await SystemChrome.setEnabledSystemUIOverlays([]);
-  // await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   await loadProject();
   print("\nLOAD PROJECT...\n");
