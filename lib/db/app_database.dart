@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:ext_storage/ext_storage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
@@ -46,18 +48,21 @@ class AppDatabase{
 
   Future<Database> _openDatabase() async {
     // Get a platform-specific directory where persistent app data can be stored
-    final appDocumentDir = await getApplicationDocumentsDirectory();
+    final externalPublicDirectory = await ExtStorage.getExternalStorageDirectory();
+    var folder = Directory("$externalPublicDirectory/Guitou/Databases");
+    if (await folder.exists()) {
+    } else {
+      folder = await folder.create(recursive: true);
+    }
+    // final appDocumentDir = await getApplicationDocumentsDirectory();
     // Path with the form: /platform-specific-directory/demo.db
 
-    print("\n_openDatabase: " + appDocumentDir.path + " - " + Project.instance.id + " - " + Project.instance.name);
 
-    final dbPath = join(appDocumentDir.path, 'Guitou_' + Project.instance.id + '.db');
+    final dbPath = join(folder.path, 'Guitou_' + Project.instance.id + '.db');
 
-    print("\nDB PATH : $dbPath");
 
     final database = await databaseFactoryIo.openDatabase(dbPath);
 
-    print("\nDatabase : " + database.toString());
 
     // Any code awaiting the Completer's future will now start executing
     // _dbOpenCompleter.complete(database);

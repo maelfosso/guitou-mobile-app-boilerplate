@@ -7,6 +7,44 @@ import 'package:flutter/services.dart';
 import 'package:guitou/app.dart';
 import 'package:guitou/models/project.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+requestWritePermission() async {
+  final List<PermissionGroup> permissions = <PermissionGroup>[PermissionGroup.storage];
+
+  // ServiceStatus serviceStatus 
+  final PermissionStatus statusFuture = await PermissionHandler()
+      .checkPermissionStatus(PermissionGroup.storage);
+
+  // final SnackBar snackBar =
+  //       SnackBar(content: Text(statusFuture.toString()));
+
+  // Scaffold.of(context).showSnackBar(snackBar);
+  print("\nCheck permission status...");
+  print(statusFuture);
+  
+  // if (statusFuture == PermissionStatus.granted) {
+  //   _allowWriteFile = true;
+  //   return;
+  // }
+
+  //     .then((ServiceStatus serviceStatus) {
+  //   final SnackBar snackBar =
+  //       SnackBar(content: Text(serviceStatus.toString()));
+
+  //   Scaffold.of(context).showSnackBar(snackBar);
+  // });
+
+  final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
+      await PermissionHandler().requestPermissions(permissions);
+
+  // setState(() {
+  //   print(permissionRequestResult);
+  //   _allowWriteFile = permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
+  //   print(_allowWriteFile);
+  // });
+}
+
 
 Future<String> _loadProjectAsset() async {
   return await rootBundle.loadString('assets/project.json');

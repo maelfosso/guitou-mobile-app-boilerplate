@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
     // External storage directory: /storage/emulated/0
     // final externalDirectory = await getExternalStorageDirectory();
     final externalPublicDirectory = await ExtStorage.getExternalStorageDirectory();
-    var folder = Directory("$externalPublicDirectory/Guitou/");
+    var folder = Directory("$externalPublicDirectory/Guitou/Exports");
     if (await folder.exists()) {
       print("\nTHE FOLDER EXISTS");
       print(folder.path);
