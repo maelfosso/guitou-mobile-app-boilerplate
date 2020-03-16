@@ -242,7 +242,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
               child: Text("Previous"),
               color: Colors.blue,
               onPressed: () {
-                if (this.currentXormSection.params.repeat) {
+                if (this.currentXormSection.params.repeat ?? false) {
                   if (this.currentSectionDataPosition > 0) {
                     setState(() {
                       this.currentSectionDataPosition -= 1;
@@ -255,7 +255,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     });
                   }
                 } else {
-                  if (this.currentSectionPosition - 1 >= 0 && this._currentXormDetails.sections[this.currentSectionPosition - 1].params.repeat) {
+                  if (this.currentSectionPosition - 1 >= 0 && (this._currentXormDetails.sections[this.currentSectionPosition - 1].params.repeat ?? false) ) {
                     setState(() {
                       this.currentSectionDataPosition = (this.data.values[this._currentXormDetails.sections[this.currentSectionPosition - 1].id] as List).length - 1;
                       this.currentSectionPosition = currentSectionPosition - 1;
