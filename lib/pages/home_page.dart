@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guitou/models/project.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 
 import 'package:jiffy/jiffy.dart';
@@ -15,6 +20,7 @@ import 'package:guitou/models/xorm.dart';
 
 import 'package:guitou/pages/data_entry_page.dart';
 import 'package:guitou/pages/data_view_page.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -47,13 +53,105 @@ class _HomePageState extends State<HomePage> {
   ];
 
   Xorm _currentlySelectedXorm = Xorm(id:"all", title:"All");
+  bool _allowWriteFile = false;
 
   @override
   void initState() {
     super.initState();
+    requestWritePermission();
 
     _dataCollectedBloc = context.bloc<DataCollectedBloc>();  //BlocProvider.of<DataCollectedBloc>(context);
     _dataCollectedBloc.add(LoadDataCollected());  
+  }
+
+  requestWritePermission() async {
+    final List<PermissionGroup> permissions = <PermissionGroup>[PermissionGroup.storage];
+
+    // ServiceStatus serviceStatus 
+    final PermissionStatus statusFuture = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
+
+    // final SnackBar snackBar =
+    //       SnackBar(content: Text(statusFuture.toString()));
+
+    // Scaffold.of(context).showSnackBar(snackBar);
+    print("\nCheck permission status...");
+    print(statusFuture);
+    
+    if (statusFuture == PermissionStatus.granted) {
+      _allowWriteFile = true;
+      return;
+    }
+
+    //     .then((ServiceStatus serviceStatus) {
+    //   final SnackBar snackBar =
+    //       SnackBar(content: Text(serviceStatus.toString()));
+
+    //   Scaffold.of(context).showSnackBar(snackBar);
+    // });
+
+    final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
+        await PermissionHandler().requestPermissions(permissions);
+
+    setState(() {
+      print(permissionRequestResult);
+      _allowWriteFile = permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
+      print(_allowWriteFile);
+    });
+  }
+
+  Future get _localPath async {
+    // Application documents directory: /data/user/0/{package_name}/{app_name}
+    // final applicationDirectory = await getApplicationDocumentsDirectory();
+ 
+    // External storage directory: /storage/emulated/0
+    // final externalDirectory = await getExternalStorageDirectory();
+    final externalPublicDirectory = await ExtStorage.getExternalStorageDirectory();
+    var folder = Directory("$externalPublicDirectory/Guitou/");
+    if (await folder.exists()) {
+      print("\nTHE FOLDER EXISTS");
+      print(folder.path);
+      return folder.path;
+    } else {
+      folder = await folder.create(recursive: true);
+      print("\nCreated FOLDER");
+      print(folder.path);
+      return folder.path;
+    }
+ 
+    // Application temporary directory: /data/user/0/{package_name}/cache
+    // final tempDirectory = await getTemporaryDirectory();
+ 
+    // return externalDirectory.path; // applicationDirectory.path;
+  }
+
+  // Future get _localFile async {
+  //   final path = await _localPath;
+ 
+  //   return File('$path/file-name.txt');
+  // }
+
+  Future _writeToFile(String filename, String text) async {
+    print("write To File - $filename");
+
+    if (!_allowWriteFile) {
+      return null;
+    }
+    final path = await _localPath;
+    final file = await File('$path/$filename');
+ 
+    // Write the file
+    File result = await file.writeAsString('$text');
+    if (result == null ) {
+      print("Writing to file failed");
+    } else {
+      print("Successfully writing to file");
+      print(result);
+
+      // print("Reading the content of file");
+      // String readResult = await _readFile();
+      // print("readResult: " + readResult.toString());
+    }
   }
 
   void _fillAXorm() async {
@@ -76,6 +174,11 @@ class _HomePageState extends State<HomePage> {
       message: 'Download update...',
     );
     await this.prn.show();
+  }
+
+  void _saveCSV() async {
+    print(jsonEncode(this.datas));
+    _writeToFile(Project.instance.id + '_' + DateTime.now().toString() + '.json', jsonEncode(this.datas));
   }
 
   void _showEndOperationDialog(String title, String body) {
@@ -225,7 +328,10 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     // Text((first as Map)["Q00"].toString()), //data.id.toString()),
-                    Chip(label: Text(form)),
+                    Chip(
+                      label: Text(form),
+                      labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+                    ),
                     _buildActionButtons(data),
                   ]
                 ),
@@ -376,6 +482,10 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.cloud_download),
             onPressed: _downloadXorm
+          ),
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _saveCSV,
           ),
           IconButton(
             icon: Icon(Icons.add),
