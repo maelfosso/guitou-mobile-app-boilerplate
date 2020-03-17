@@ -290,6 +290,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   if (widget.id == 0) {
                     this._dataCollectedBloc.add(AddDataCollected(data: this.data));
                   } else {
+                    this.data.dataLocation = "local";
                     this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
                   }
                   
