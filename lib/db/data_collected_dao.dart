@@ -21,6 +21,7 @@ class DataCollectedDao {
   }
 
   Future delete(DataCollected data) async{
+    data.dataLocation = "local";
     final finder = Finder(filter: Filter.byKey(data.id) );
     await _datasFolder.delete(await _db, finder: finder);
   }

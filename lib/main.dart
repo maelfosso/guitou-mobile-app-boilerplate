@@ -24,8 +24,6 @@ Future<bool> requestWritePermission() async {
     return permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
   }
 
-  
-
 }
 
 
