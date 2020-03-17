@@ -337,6 +337,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildActionButtons(DataCollected data) {
+    print("\nBUILD ACTION BUTTONS");
+    print(data.toJson());
+    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[

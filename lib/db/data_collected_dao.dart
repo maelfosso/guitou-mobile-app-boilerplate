@@ -16,6 +16,7 @@ class DataCollectedDao {
   }
 
   Future updateData(DataCollected data) async{
+    
     final finder = Finder(filter: Filter.byKey(data.id));
     await _datasFolder.update(await _db, data.toJson(), finder: finder);
   }

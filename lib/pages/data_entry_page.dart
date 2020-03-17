@@ -35,6 +35,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
   int currentSectionPosition = 0;
   int currentSectionDataPosition = 0;
   bool repeatIt = false;
+  bool isPrevious = false;
 
   DataCollected data;
 
@@ -55,10 +56,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
       currentSectionPosition = 0;
       currentSectionDataPosition = 0;
       repeatIt = false;
+      isPrevious = false;
     });
   }
 
-  Future<String> _asyncInputDialog(BuildContext context) async {
+  Future<String> _asyncInputDialog(BuildContext context, num defaultValue) async {
     String repeatValue = '';
 
     return await showDialog<String>(
@@ -70,8 +72,9 @@ class _DataEntryPageState extends State<DataEntryPage> {
           content: new Row(
             children: <Widget>[
               new Expanded(
-                child: new TextField(
+                child: new TextFormField(
                   autofocus: true,
+                  initialValue: defaultValue == 0 ? "" : defaultValue,
                   decoration: new InputDecoration(
                     labelText: currentXormSection.params.repeatMaxTimes == "inner" ? currentXormSection.params.repeatMaxTimesInner : null, 
                   ),
@@ -160,14 +163,26 @@ class _DataEntryPageState extends State<DataEntryPage> {
                 return;
               }
 
+              if (this.isPrevious) {
+                return;
+              }
+
               if ((this.currentXormSection.params.repeat ?? false) && 
                 (currentXormSection.params.repeatMaxTimes == "inner" || currentXormSection.params.repeatMaxTimes == "fixed")) {
+                
+                print("\nIN SECTION REPEATED INNNERR...");
+                var defaultValue = 0;
+                if (this.data.values.containsKey(this.currentXormSection.id + "_inner")) {
+                  print("\nIT CONTAINS.. IT");
+                  defaultValue = (this.data.values[this.currentXormSection.id + "_inner"] as Map)["inner"];
+                }
+                print("\nDEFAULT VALUES....");
+                print(defaultValue);
+                var repeatValue = await _asyncInputDialog(context, defaultValue);
 
-                var repeatValue = await _asyncInputDialog(context);
-
-                if (currentXormSection.params.repeatMaxTimes == "inner") { // INNER
-                  if (this.data.values.containsKey(this.currentXormSection.id + "__inner")) {
-                    (this.data.values[this.currentXormSection.id + "_inner"] as Map).update("inner", (existing) => repeatValue, ifAbsent: () => repeatValue); //["inner"] = repeatValue; // + (currentXormSection.params.repeatMaxTimes == "inner" ? )
+                if (currentXormSection.params.repeatMaxTimes == "inner") {
+                  if (this.data.values.containsKey(this.currentXormSection.id + "_inner")) {
+                    (this.data.values[this.currentXormSection.id + "_inner"] as Map).update("inner", (existing) => repeatValue, ifAbsent: () => repeatValue);
                   } else {
                     this.data.values[this.currentXormSection.id + "_inner"] = {
                       "inner" : repeatValue
@@ -224,6 +239,9 @@ class _DataEntryPageState extends State<DataEntryPage> {
                 }
                 
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
+                setState(() {
+                  this.isPrevious = true;
+                });
               },
             ),
             FlatButton(
@@ -272,6 +290,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                   if (widget.id == 0) {
                     this._dataCollectedBloc.add(AddDataCollected(data: this.data));
                   } else {
+                    this.data.dataLocation = "local";
                     this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
                   }
                   
@@ -312,11 +331,15 @@ class _DataEntryPageState extends State<DataEntryPage> {
                    */
                   bool nextRepeat = false;
                   if (this.currentXormSection.params.repeat ?? false) {
+                    print("\nNEXT REPEAT???");
+                    print(nextRepeat);
+                    print(currentXormSection.params.repeatMaxTimes);
+
                     switch (currentXormSection.params.repeatMaxTimes) {
                       case "unlimitted":
                         nextRepeat = true;
                         break;
-                      case "Fixed":
+                      case "fixed":
                         if (currentXormSection.params.repeatMaxTimesFixed > (this.data.values[this.currentXormSection.id] as List).length) {
                           nextRepeat = true;
                         }
@@ -324,9 +347,13 @@ class _DataEntryPageState extends State<DataEntryPage> {
                         break;
                       case "inner":
                         int innerValue = int.parse((this.data.values[this.currentXormSection.id + "_inner"] as Map)["inner"]);
-                        if (innerValue > (this.data.values[this.currentXormSection.id] as List).length) {
+                        // if (innerValue > (this.data.values[this.currentXormSection.id] as List).length ) {
+
+                        if ((this.currentSectionDataPosition < (this.data.values[this.currentXormSection.id] as List).length - 1)
+                            || (innerValue > (this.data.values[this.currentXormSection.id] as List).length )) {
                           nextRepeat = true;
                         }
+                        print(nextRepeat);
 
                         break;
                       case "variable":
