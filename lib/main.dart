@@ -9,18 +9,22 @@ import 'package:guitou/models/project.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-requestWritePermission() async {
+Future<bool> requestWritePermission() async {
   final List<PermissionGroup> permissions = <PermissionGroup>[PermissionGroup.storage];
 
   final PermissionStatus statusFuture = await PermissionHandler()
       .checkPermissionStatus(PermissionGroup.storage); 
   
   if (statusFuture == PermissionStatus.granted) {
-    return;
+    return true;
+  } else {
+    final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
+      await PermissionHandler().requestPermissions(permissions);
+
+    return permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
   }
 
-  final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
-      await PermissionHandler().requestPermissions(permissions);
+  
 
 }
 
@@ -37,6 +41,11 @@ Future<Project> loadProject() async {
 
 Future<Widget> start() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  bool permissionGranted = await requestWritePermission();
+  if (!permissionGranted) {
+    return null;
+  }
 
   await loadProject();
   print("\nLOAD PROJECT...\n");
