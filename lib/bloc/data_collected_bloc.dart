@@ -72,7 +72,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
         await file.writeAsString(json.encode(Project.instance.toJson()));
         
         print("DOWNLOADED PROJECT... SUCCESSSS");
-
+        
         yield DownloadProjectSuccess();
       }
     }

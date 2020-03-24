@@ -9,7 +9,7 @@ void main() async {
   // await start();
 
   var configuredApp = AppConfig(
-    apiBaseUrl: 'http://192.168.8.102:8000/api',
+    apiBaseUrl: 'http://192.168.8.100:3000/api',
     child: await start(),
   );
 

@@ -20,7 +20,7 @@ class ProjectApiClient {
   }) : assert(httpClient != null);
 
   Future<Project> fetchProject() async {
-    final url = '$baseUrl/projects/${Project.instance.id}/download';
+    final url = '$baseUrl/xorms/${Project.instance.id}/download';
     print("\nFETCH PROJECT.... $url");
     final response = await this.httpClient.get(url, headers: headers);
     print(response);

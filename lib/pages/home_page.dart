@@ -297,9 +297,15 @@ class _HomePageState extends State<HomePage> {
           return ListView.builder(
             itemCount: this.datas.length,
             itemBuilder: (context, index) {
+              print("\nBLOC BUILDER ... LIST VIEW..");
+              print("\nGET THE PROJECT...");
+              print(Project.instance.toJson());
               final data = this.datas[index];
               final first = data.values.values.first;
               final form = Project.instance.xorms.firstWhere((x) => x.id == data.form).title;
+              print("\nBLOC BUILDER .. LIST VIEW BUILDER");
+              print(data.toJson());
+              print(form);
 
               return ListTile(
 
