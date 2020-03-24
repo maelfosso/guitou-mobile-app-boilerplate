@@ -215,7 +215,9 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (state is StartUploadingLocalData) {
+          print("\nSTART UPLOADING LOCAL DATA");
           this.datasToUpload = state.datas;
+          print(this.datasToUpload.length);
 
           if (this.datasToUpload.length == 0) {
             final snackBar = SnackBar(content: Text('No data to upload!!'));
@@ -242,20 +244,41 @@ class _HomePageState extends State<HomePage> {
         if (state is SuccessRemoteAddDataCollected) {
           this.datasUploaded++;
 
-          Future.delayed(Duration(seconds: 0)).then((onvalue) {
+          Future.delayed(Duration(seconds: 1)).then((onvalue) async {
+            print("\nINTO THE DELAYED....");
+            print(onvalue);
+
             pr.update(progress: 100 * this.datasUploaded.toDouble()/this.datasToUpload.length, message: "Please wait...");
+            print("\nUPDATE .. SUCCESS\N");
+
+            if (datasToUpload.length == datasUploaded) {
+              print("\nIS END ... ");
+              print(datasToUpload.length == datasUploaded);
+            
+              _dataCollectedBloc.add(EndUploadingLocalData());
+              datasUploaded = 0;
+              await pr.hide();
+
+              _showEndOperationDialog("Data uploaded", 'All the data has been correctly uploaded.');
+            } else {
+              print("\nAGAIN .. ADDD");
+              this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
+              print("\nDATA COLLECTED ... ADDED.. ");
+            }
           });
 
-          if (this.datasToUpload.length == this.datasUploaded) {
-            
-            this._dataCollectedBloc.add(EndUploadingLocalData());
-            this.datasUploaded = 0;
-            await this.pr.hide();
+          print("\nOUT OF FUTURE... NOTHING ... JUST RETURN");
 
-            _showEndOperationDialog("Data uploaded", 'All the data has been correctly uploaded.');
-          } else {
-            this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
-          }
+          // if (this.datasToUpload.length == this.datasUploaded) {
+            
+          //   this._dataCollectedBloc.add(EndUploadingLocalData());
+          //   this.datasUploaded = 0;
+          //   await this.pr.hide();
+
+          //   _showEndOperationDialog("Data uploaded", 'All the data has been correctly uploaded.');
+          // } else {
+          //   this._dataCollectedBloc.add(RemoteAddDataCollected(data: this.datasToUpload[this.datasUploaded]));
+          // }
           return;
         }
       },

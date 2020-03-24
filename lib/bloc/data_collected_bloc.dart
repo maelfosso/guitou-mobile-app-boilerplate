@@ -43,7 +43,9 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
       final datas = await repository.getAllLocalDatas();
       yield StartUploadingLocalData(datas: datas);
     } else if (event is RemoteAddDataCollected) {
+      print("\nREMOTE ADD DATA COLLECTED");
       final data = await repository.postData(event.data);
+      print(data.toJson());
       
       await repository.updateData(data);
       yield SuccessRemoteAddDataCollected(data: data);
