@@ -175,7 +175,8 @@ class XormSection {
           case 'yes-no-dont':
             return MapEntry(key, value);
           case 'multiple_choice':
-            return MapEntry(key, value);
+            // print("\nMULTIPLE CHOICE ${(value is String) ? json.decode(value).map((s) => s.toString()) : value}");
+            return MapEntry(key, (value is String) ? value.replaceAll("[","").replaceAll("]", "").split(", ") : value);
           // case 'datatable':
           //   return ;
           default:
@@ -1023,9 +1024,12 @@ class XormQuestionMultipleChoice extends XormQuestion {
 
   @override
   Widget view(Object value) {
+    print("\nXORM MULTIPLE ... ");
+
+    List items = (value is String) ? value.replaceAll("[","").replaceAll("]", "").split(", ") : value;
     return ListTile(
       title: Text(this.title),
-      subtitle: Text((value as List).map((v) => "- $v").join("\n")),
+      subtitle: Text(items.map((v) => "- $v").join("\n")),
       dense: true,
     );
   }         
