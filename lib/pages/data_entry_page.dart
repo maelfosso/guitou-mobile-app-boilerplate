@@ -261,7 +261,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     this.data.values[currentSectionKey] = {};
                   } else {
                     final ca = currentSectionData.map((key, value) {
-                      return MapEntry(key, value != null ? value.toString() : "");
+                      return MapEntry(key, value != null ? value : "");
                     });
                     
                     if (!(this.currentXormSection.params.repeat ?? false)) {

@@ -148,7 +148,7 @@ class XormSection {
     return FormBuilder(
       key: globalKey,
       initialValue: data.map((key, value) {
-        print("\nBUILDING INITIAL VIEW - ${key} - ${value}");
+        print("\nBUILDING INITIAL VIEW - ${key} - ${value} - ${value is String} - ${value is List}");
         XormQuestion q = this.questions.firstWhere(
           (q) => q.id == key || key.startsWith(q.id),
           orElse: () => null
@@ -232,11 +232,7 @@ class XormSection {
           if (question.type == 'datatable') {
             Map<String, String> values = Map.from(data as Map);
             values.removeWhere((k, v) => !k.toString().startsWith(question.id));
-              // .cast<Map<String, String>>();
-            // Map.from(data)
-              // .removeWhere((k, v) => k.toString().startsWith(question.id))
-              // .map((k) => MapEntry<String, String>(k, (data as Map)[k]));
-              // .cast<String, String>();
+            
             return (question as XormQuestionDatatable).view(values);
           } else {
             return question.view((data as Map)[question.id]);
@@ -256,14 +252,6 @@ class XormSection {
         value: (d) => d.toJson()
       )
     };
-    // {
-    //   "id": id,
-    //   "_params": params,
-    //   "questions": Map.fromIterable(questions, 
-    //     key: (d) => d.id,
-    //     value: (d) => d.sections
-    //   )
-    // };
   }
 }
 
@@ -328,14 +316,14 @@ abstract class XormQuestion {
 
   Widget build({ @required BuildContext context, String value });
 
-  Widget view(String value) {
+  Widget view(Object value) {
     print("\n QUESTION... Views... ${id}");
     print("${title} -- ${type}");
     print(value);
     
     return ListTile(
       title: Text(this.title),
-      subtitle: Text(value),
+      subtitle: Text(value.toString()),
       dense: true,
     );
   }
@@ -383,8 +371,8 @@ class XormQuestionTitleDesc extends XormQuestion {
   }
 
   @override
-  Widget view(String value) {
-    return Text(title);
+  Widget view(Object value) {
+    return Text(title.toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -711,6 +699,13 @@ class XormQuestionOptional extends XormQuestion {
     );
   }
 
+  Widget view(Object value) {
+    return ListTile(
+      title: Text(this.title),
+      subtitle: Text((value as bool) ? "Yes" : "No"),
+      dense: true,
+    );
+  }
   Map<String, dynamic> toJson() {
     return {
       // "id": id,
@@ -1025,6 +1020,15 @@ class XormQuestionMultipleChoice extends XormQuestion {
       "kv_full": kv
     };
   }
+
+  @override
+  Widget view(Object value) {
+    return ListTile(
+      title: Text(this.title),
+      subtitle: Text((value as List).map((v) => "- $v").join("\n")),
+      dense: true,
+    );
+  }         
 
 }
 
