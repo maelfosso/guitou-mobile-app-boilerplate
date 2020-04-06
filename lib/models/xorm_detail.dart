@@ -161,13 +161,17 @@ class XormSection {
           case 'text':
             return MapEntry(key, value);
           case 'date':
-            return MapEntry(key, DateTime.tryParse(value));
+            print('\nDATE ... ${value is DateTime} .... ');
+            print(value is DateTime ? value : DateTime.tryParse(value.toString()));
+            return MapEntry(key, value is DateTime ? value : DateTime.tryParse(value.toString()));
           case 'time':
-            return MapEntry(key, DateTime.tryParse(value));
+            return MapEntry(key, value is DateTime ? value : DateTime.tryParse(value.toString()));
           case 'optional':
             return MapEntry(key, value.toString().toLowerCase() == 'true');
           case 'single_choice_select':
-            return MapEntry(key, value);
+            print('\nSINGLE CHOICE SELECT.... $value .... ');
+            
+            return MapEntry(key, value == null ? "" : value.toString());
           case 'single_choice':
             return MapEntry(key, value);
           case 'yes-no':
@@ -183,9 +187,9 @@ class XormSection {
             return MapEntry(key, ""); 
         }
       }),
-      autovalidate: true,
+      // autovalidate: true,
       child: Column(
-        children: this.questions.map((q) => q.build(context: context)).toList()
+        children: this.questions.map((q) => q.build(context: context, value: data[q.id])).toList()
       ),
       onChanged: (values) {
 
@@ -735,11 +739,13 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
 
   @override
   Widget build({ @required BuildContext context,  String value }) {
-    List<DropdownMenuItem> items = this.kv.entries
+    List<DropdownMenuItem> items = [];
+    items.add(DropdownMenuItem(value: "", child: Text("")));
+    items.addAll(this.kv.entries
         .map((entry) => DropdownMenuItem(
             value: entry.key,
             child: Text(entry.value)
-      )).toList();
+      )).toList());
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -761,8 +767,9 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
                 gapPadding: 0.0
               )
             ),
-            initialValue: null,
+            // initialValue: value,
             hint: Text('Select a choice'),
+
             items: items
           )
         ]
@@ -1201,3 +1208,5 @@ class XormQuestionDatatable extends XormQuestion {
   }
 
 }
+
+// 117 367 934

@@ -216,11 +216,13 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     setState(() {
                       this.currentSectionDataPosition -= 1;
                       this.repeatIt = false;
+                      this.isPrevious = true;
                     });
                   } else {
                     setState(() {
                       this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
                       this.repeatIt = false;
+                      this.isPrevious = true;
                     });
                   }
                 } else {
@@ -229,19 +231,21 @@ class _DataEntryPageState extends State<DataEntryPage> {
                       this.currentSectionDataPosition = (this.data.values[this._currentXormDetails.sections[this.currentSectionPosition - 1].id] as List).length - 1;
                       this.currentSectionPosition = currentSectionPosition - 1;
                       this.repeatIt = false;
+                      this.isPrevious = true;
                     });
                   } else {
                     setState(() {
                       this.currentSectionPosition = currentSectionPosition == 0 ? 0 : currentSectionPosition - 1;
                       this.repeatIt = false;
+                      this.isPrevious = true;
                     });
                   }
                 }
-                
+                print("\n\t\t${this.currentSectionDataPosition} \t\t ${this.currentSectionPosition} \t\t ${this.repeatIt}");
+
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
-                setState(() {
-                  this.isPrevious = true;
-                });
+
+                print("\nCONTROLLER PREVIOUS PAGE...");
               },
             ),
             FlatButton(
