@@ -406,7 +406,6 @@ class XormQuestionString extends XormQuestion {
 
   @override
   Widget build({ @required BuildContext context,  String value }) {
-    // TODO: implement build
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -488,8 +487,23 @@ class XormQuestionNumber extends XormQuestion {
         ]
       )
     );
-    
   }
+  
+  // Widget build() {
+  //   return FormBuilderTextField(
+  //     attribute: this.id,
+  //     decoration: InputDecoration(
+  //       labelText: this.title,
+  //       alignLabelWithHint: true,
+  //     ),
+  //     maxLines: 1,
+  //     // validators: [
+  //     //   FormBuilderValidators.numeric(),
+  //     //   FormBuilderValidators.max(70),
+  //     // ],
+  //   );
+    
+  // }
 
   Map<String, dynamic> toJson() {
     return {
@@ -541,8 +555,20 @@ class XormQuestionText extends XormQuestion {
         ]
       )
     );
-    
   }
+  
+  // Widget build() {
+  //   return FormBuilderTextField(
+  //     attribute: this.id,
+  //     decoration: InputDecoration(labelText: this.title),
+  //     minLines: 3,
+  //     // validators: [
+  //     //   FormBuilderValidators.numeric(),
+  //     //   FormBuilderValidators.max(70),
+  //     // ],
+  //   );
+    
+  // }
 
   Map<String, dynamic> toJson() {
     return {
@@ -596,6 +622,14 @@ class XormQuestionDate extends XormQuestion {
       )
     );
   }
+  // Widget build() {
+  //   return FormBuilderDateTimePicker(
+  //     attribute: this.id,
+  //     inputType: InputType.date,
+  //     format: DateFormat("yyyy-MM-dd"),
+  //     decoration: InputDecoration(labelText: this.title),
+  //   );
+  // }
 
   Map<String, dynamic> toJson() {
     return {
@@ -650,6 +684,15 @@ class XormQuestionTime extends XormQuestion {
     );
   }
 
+  // Widget build() {
+  //   return FormBuilderDateTimePicker(
+  //     attribute: this.id,
+  //     inputType: InputType.time,
+  //     format: DateFormat("HH:mm"),
+  //     decoration: InputDecoration(labelText: this.title),
+  //   );
+  // }
+
   Map<String, dynamic> toJson() {
     return {
       // "id": id,
@@ -703,6 +746,20 @@ class XormQuestionOptional extends XormQuestion {
       )
     );
   }
+  
+  // Widget build() {
+  //   return FormBuilderCheckbox(
+  //     attribute: this.id,
+  //     label: Text(this.title),
+      
+  //     // validators: [
+  //     //   // FormBuilderValidators.requiredTrue(
+  //     //   //   errorText: this.errorMessage
+  //     //   //       // "You must accept terms and conditions to continue",
+  //     //   // ),
+  //     // ],
+  //   );
+  // }
 
   Widget view(Object value) {
     return ListTile(
@@ -776,6 +833,17 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
       )
     );
   }
+
+  // Widget build() {
+  //   return FormBuilderDropdown(
+  //     attribute: this.id,
+  //     decoration: InputDecoration(labelText: this.title),
+  //     // initialValue: 'Male',
+  //     hint: Text('Select a choice'),
+  //     // validators: [FormBuilderValidators.required()],
+  //     items: this.kv.entries // ['Male', 'Female', 'Other']
+  //   );
+  // }
 
   Map<String, dynamic> toJson() {
     return {

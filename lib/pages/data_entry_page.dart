@@ -125,11 +125,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
     List<Widget> widgets = <Widget>[
       Text(
         currentXormSection.params.title,
-        style: Theme.of(context).textTheme.title,
+        style: Theme.of(context).textTheme.headline5,
       ),
       Text(
         currentXormSection.params.description,
-        style: Theme.of(context).textTheme.subtitle,
+        style: Theme.of(context).textTheme.bodyText1
       ),
 
       formElts
