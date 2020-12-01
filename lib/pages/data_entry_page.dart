@@ -38,8 +38,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
     XormSection currentXormSection = this._currentXormDetails.sections[position];
 
     List<Widget> widgets = <Widget>[
-      Text(currentXormSection.params.title),
-      Text(currentXormSection.params.description),
+      Text(
+        currentXormSection.params.title,
+        style: Theme.of(context).textTheme.headline5,
+      ),
+      Text(
+        currentXormSection.params.description,
+        style: Theme.of(context).textTheme.subtitle1,
+      ),
 
       currentXormSection.build(data: this.data.containsKey(currentXormSection.id) ? this.data[currentXormSection.id] : {} )
     ];
@@ -136,7 +142,10 @@ class _DataEntryPageState extends State<DataEntryPage> {
           ],
         ),
       ),
-      body: buildPageView()
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        child: buildPageView()
+      )
     );
   }
 }
