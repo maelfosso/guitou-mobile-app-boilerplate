@@ -132,10 +132,12 @@ class XormQuestionString extends XormQuestion {
 
   @override
   Widget build() {
-    // TODO: implement build
     return FormBuilderTextField(
       attribute: this.id,
-      decoration: InputDecoration(labelText: this.title),
+      decoration: InputDecoration(
+        labelText: this.title,
+        alignLabelWithHint: true,
+      ),
       maxLines: 1,
       // validators: [
       //   FormBuilderValidators.numeric(),
@@ -160,7 +162,6 @@ class XormQuestionText extends XormQuestion {
 
   @override
   Widget build() {
-    // TODO: implement build
     return FormBuilderTextField(
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),
@@ -188,7 +189,6 @@ class XormQuestionDate extends XormQuestion {
 
   @override
   Widget build() {
-    // TODO: implement build
     return FormBuilderDateTimePicker(
       attribute: this.id,
       inputType: InputType.date,
@@ -213,7 +213,6 @@ class XormQuestionTime extends XormQuestion {
 
   @override
   Widget build() {
-    // TODO: implement build
     return FormBuilderDateTimePicker(
       attribute: this.id,
       inputType: InputType.time,
@@ -239,7 +238,6 @@ class XormQuestionOptional extends XormQuestion {
 
   @override
   Widget build() {
-    // TODO: implement build
     return FormBuilderCheckbox(
       attribute: this.id,
       label: Text(this.title),
@@ -272,7 +270,6 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
 
   @override
   Widget build() {
-    // TODO: implement build
     return FormBuilderDropdown(
       attribute: this.id,
       decoration: InputDecoration(labelText: this.title),

@@ -44,7 +44,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
       ),
       Text(
         currentXormSection.params.description,
-        style: Theme.of(context).textTheme.subtitle1,
+        style: Theme.of(context).textTheme.bodyText1
       ),
 
       currentXormSection.build(data: this.data.containsKey(currentXormSection.id) ? this.data[currentXormSection.id] : {} )
