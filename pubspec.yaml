@@ -27,7 +27,7 @@ dependencies:
   path_provider: ^1.6.0
   sembast: ^2.1.3
   flutter_bloc: ^6.1.0
-  equatable: ^1.1.0
+  equatable: ^1.2.5
   timeago: ^2.0.26
   jiffy: ^2.2.0
   progress_dialog: ^1.2.1
@@ -37,6 +37,7 @@ dependencies:
   flutter_chips_input: ^1.9.4
   get_it: ^5.0.1
   location: ^3.0.0
+  environment_config: ^2.2.4
 
 
 dev_dependencies:

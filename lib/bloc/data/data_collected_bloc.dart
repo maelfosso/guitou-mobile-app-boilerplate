@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:bloc/bloc.dart';
 import 'package:guitou/bloc/blocs.dart';
 import 'package:guitou/models/models.dart';
-import 'package:guitou/data_repository/data_repository.dart';
+import 'package:guitou/repository/repository.dart';
 
 class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
-  final DataCollectedRepository dataRepository = GetIt.I.get<DataCollectedRepository>();
+  final DataRepository dataRepository = GetIt.I.get<DataRepository>();
 
   DataCollectedBloc() : super(DataCollectedLoadInProgress()); 
 
@@ -20,18 +21,14 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
       yield* _mapDataCollectedUpdatedToState(event);
     } else if (event is DataCollectedDeleted) {
       yield* _mapDataCollectedDeletedToState(event);
-    } else if (event is ToggleAll) {
-      yield* _mapToggleAllToState();
-    } else if (event is ClearCompleted) {
-      yield* _mapClearCompletedToState();
     }
   }
 
   Stream<DataCollectedState> _mapDataCollectedLoadedToState() async* {
     try {
-      // print('\nLOADING DATA');
-      final data = await this.dataRepository.getAllDataCollected();
-      // print('\nLOADEEEDDD DATA $data');
+      // debugPrint('\nLOADING DATA');
+      final data = await this.dataRepository.getAllData();
+      // debugPrint('\nLOADEEEDDD DATA $data');
       yield DataCollectedLoadSuccess(data);
     } catch (_) {
       yield DataCollectedLoadFailure();
@@ -40,7 +37,7 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
 
   Stream<DataCollectedState> _mapDataCollectedAddedToState(DataCollectedAdded event) async* {
     if (state is DataCollectedLoadSuccess) {
-      final result = await this.dataRepository.insertDataCollected(event.data);
+      final result = await this.dataRepository.insertData(event.data);
       final List<DataCollected> updatedDataCollected = List.from((state as DataCollectedLoadSuccess).data)
         ..add(event.data.copyWith(id: result));
 
@@ -49,18 +46,18 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
   }
 
   Stream<DataCollectedState> _mapDataCollectedUpdatedToState(DataCollectedUpdated event) async* {
-    print('\n_mapDataCollectedUpdatedToState .... ${event.data} --- $state');
+    debugPrint('\n_mapDataCollectedUpdatedToState .... ${event.data} --- $state');
     if (state is DataCollectedLoadSuccess) {
-      print('\nInto mapDataCollectedUpdatedToState');
+      debugPrint('\nInto mapDataCollectedUpdatedToState');
       final List<DataCollected> updatedDataCollected = (state as DataCollectedLoadSuccess).data.map((data) {
         return data.id == event.data.id ? event.data : data;
       }).toList();
-      print('\nLOCAL UPDATE $updatedDataCollected');
+      debugPrint('\nLOCAL UPDATE $updatedDataCollected');
       
-      this.dataRepository.updateDataCollected(event.data);
+      this.dataRepository.updateData(event.data);
       yield DataCollectedLoadSuccess(updatedDataCollected);
     }
-    print('\nEnd of mapDataCollectedUpdatedToState');
+    debugPrint('\nEnd of mapDataCollectedUpdatedToState');
   }
 
   Stream<DataCollectedState> _mapDataCollectedDeletedToState(DataCollectedDeleted event) async* {
@@ -69,16 +66,9 @@ class DataCollectedBloc extends Bloc<DataCollectedEvent, DataCollectedState> {
           .data
           .where((data) => data.id != event.data.id)
           .toList();
-      this.dataRepository.deleteDataCollected(event.data.id);
+      this.dataRepository.deleteData(event.data.id);
       yield DataCollectedLoadSuccess(updatedDataCollected);
     }
-  }
-
-  Stream<DataCollectedState> _mapToggleAllToState() async* {
-
-  }
-
-  Stream<DataCollectedState> _mapClearCompletedToState() async* {
   }
 
 }

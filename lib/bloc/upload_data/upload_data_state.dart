@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:tracer/blocs/upload_data/upload_data.dart';
-import 'package:tracer/data_repository/data_entity.dart';
-import 'package:tracer/models/data.dart';
+import 'package:guitou/repository/repository.dart';
 
 abstract class UploadDataState extends Equatable {
   const UploadDataState();

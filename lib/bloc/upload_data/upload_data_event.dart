@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:tracer/blocs/upload_data/upload_data.dart';
 
 abstract class UploadDataEvent extends Equatable {
   const UploadDataEvent();

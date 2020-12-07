@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:ext_storage/ext_storage.dart';
+import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
@@ -47,19 +48,25 @@ class AppDatabase{
   }
 
   Future<Database> _openDatabase() async {
+    debugPrint("Into _openDatabase()");
     // Get a platform-specific directory where persistent app data can be stored
     final externalPublicDirectory = await ExtStorage.getExternalStorageDirectory();
     var folder = Directory("$externalPublicDirectory/Guitou/Databases");
-    if (await folder.exists()) {
-    } else {
+    debugPrint(folder.uri.toString());
+    bool isExist = await folder.exists();
+    debugPrint("Does it exists? $isExist");
+
+    if (!isExist) {
       folder = await folder.create(recursive: true);
+      debugPrint("It doesn't exists. Created ${folder.uri.toString()}");
     }
+
     // final appDocumentDir = await getApplicationDocumentsDirectory();
     // Path with the form: /platform-specific-directory/demo.db
-
-
+    debugPrint("Folder PATH Joining : ${folder.path}");
+    debugPrint("Project Instance ID : ${Project.instance.id}");
     final dbPath = join(folder.path, 'Guitou_' + Project.instance.id + '.db');
-
+    debugPrint("dbPath: $dbPath");
 
     final database = await databaseFactoryIo.openDatabase(dbPath);
 

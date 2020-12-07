@@ -1,0 +1,16 @@
+environment_config:
+  path: env_config.dart
+  fields:
+    ENV:
+      env_var: APP_ENV
+      default: 'development'
+      dotenv: true
+
+    API_URL:
+      env_var: API_URL
+      const: false
+      default: "${Platform.isAndroid ? 'http://192.168.8.101:4000' : 'http://localhost'}"
+      dotenv: true
+      
+  imports:
+    - dart:io

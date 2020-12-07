@@ -99,15 +99,15 @@ class Uuid {
     return '${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}-'
         '${_bitsDigits(16, 4)}-'
         '4${_bitsDigits(12, 3)}-'
-        '${_printDigits(special, 1)}${_bitsDigits(12, 3)}-'
+        '${_debugPrintDigits(special, 1)}${_bitsDigits(12, 3)}-'
         '${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}';
   }
 
   String _bitsDigits(int bitCount, int digitCount) =>
-      _printDigits(_generateBits(bitCount), digitCount);
+      _debugPrintDigits(_generateBits(bitCount), digitCount);
 
   int _generateBits(int bitCount) => _random.nextInt(1 << bitCount);
 
-  String _printDigits(int value, int count) =>
+  String _debugPrintDigits(int value, int count) =>
       value.toRadixString(16).padLeft(count, '0');
 }

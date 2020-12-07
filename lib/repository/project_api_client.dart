@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
 import 'package:guitou/models/project.dart';
@@ -21,31 +22,31 @@ class ProjectApiClient {
 
   Future<Project> fetchProject() async {
     final url = '$baseUrl/xorms/${Project.instance.id}/download';
-    print("\nFETCH PROJECT.... $url");
+    debugPrint("\nFETCH PROJECT.... $url");
     final response = await this.httpClient.get(url, headers: headers);
-    print(response);
+    debugPrint(response.toString());
     final statusCode = response.statusCode;
-    print("STATUS CODE ... $statusCode");
+    debugPrint("STATUS CODE ... $statusCode");
 
     if (statusCode < 200 || statusCode > 400) { //} || body == null || body['success'] != true) {
-      print("EXCEPTION ... ");
+      debugPrint("EXCEPTION ... ");
       // throw new Exception("Error while fetching data");
       return null;
     }
 
     // final body = jsonDecode(response.body);
 
-    print("\nRESPONSE");
-    print(response.body);
+    debugPrint("\nRESPONSE");
+    debugPrint(response.body);
     // if (response.statusCode != 200) {
     //   // throw new Exception('error getting quotes');
     //   return null;
     // }
     final json = jsonDecode(response.body);
-    print("\nJSON BODY");
-    print(json);
-    print(Project.fromJson(json["data"]));
-    print("\nRETURN ... EN PROJECT API.......");
+    debugPrint("\nJSON BODY");
+    debugPrint(json);
+    debugPrint(Project.fromJson(json["data"]).toString());
+    debugPrint("\nRETURN ... EN PROJECT API.......");
     return Project.fromJson(json["data"]);
   }
 

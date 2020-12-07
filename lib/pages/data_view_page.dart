@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guitou/bloc/data_collected_bloc.dart';
-import 'package:guitou/bloc/data_collected_event.dart';
-import 'package:guitou/bloc/data_collected_state.dart';
+import 'package:guitou/bloc/blocs.dart';
 import 'package:guitou/models/data_collected.dart';
 import 'package:guitou/models/project.dart';
 import 'package:guitou/pages/data_entry_page.dart';
@@ -23,8 +21,9 @@ class DataViewPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    this._dataCollectedBloc = context.bloc<DataCollectedBloc>();
-    this._dataCollectedBloc.add(QueryDataCollected(id: this.id));
+    this._dataCollectedBloc = BlocProvider.of<DataCollectedBloc>(context);
+    //  context.bloc<DataCollectedBloc>();
+    // this._dataCollectedBloc.add(QueryDataCollected(id: this.id));
 
     return Scaffold(
       appBar: AppBar(
@@ -75,30 +74,41 @@ class DataViewPage extends StatelessWidget {
               );
 
               if (isDeleted) {
-                _dataCollectedBloc.add(DeleteDataCollected(data: this._data));
+                // _dataCollectedBloc.add(DeleteDataCollected(data: this._data));
+                _dataCollectedBloc.add(DataCollectedDeleted(this._data));
                 Navigator.of(context).pop();
               }
             },
           )
         ],
       ),
-      body: BlocBuilder(
-        bloc: _dataCollectedBloc,
-        builder: (BuildContext context, DataCollectedState state) {
-          if (state is DataCollectedLoading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } 
-          if (state is DataCollectedLoaded && state.datas.length == 1) {
-            this._data = state.datas.first;            
-            this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == this._data.form);
-            return this._currentXormDetails.view(this._data.values);
-          }
+      body: BlocBuilder<DataCollectedBloc, DataCollectedState>(
+        builder: (context, state) {
           
-          return Container();
-        },
-      )
+          final data = (state as DataCollectedLoadSuccess)
+              .data
+              .firstWhere((datum) => datum.id == id, orElse: () => null);
+          
+          return this._currentXormDetails.view(data.values);
+        }
+      )  
+      // BlocBuilder(
+      //   bloc: _dataCollectedBloc,
+      //   builder: (BuildContext context, DataCollectedState state) {
+      //     if (state is DataCollectedLoading) {
+      //       return Center(
+      //         child: CircularProgressIndicator(),
+      //       );
+      //     } 
+      //     if (state is DataCollectedLoaded && state.datas.length == 1) {
+      //       this._data = state.datas.first;            
+      //       this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) => x.id == this._data.form);
+      //       return this._currentXormDetails.view(this._data.values);
+      //     }
+          
+      //     return Container();
+      //   },
+      // )
     );
  }
 

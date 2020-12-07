@@ -139,16 +139,16 @@ class XormSection {
   }
 
   Widget build({ @required BuildContext context, @required GlobalKey<FormBuilderState> globalKey, Map<String, dynamic> data }) {
-    print("\nBUILD.... \t ${id}");
-    print(data);
-    print("\n");
-    print(toJson());
-    print("\nNOW IS FORMBUILDER.... \n");
+    debugPrint("\nBUILD.... \t ${id}");
+    debugPrint(data.toString());
+    debugPrint("\n");
+    debugPrint(toJson().toString());
+    debugPrint("\nNOW IS FORMBUILDER.... \n");
 
     return FormBuilder(
       key: globalKey,
       initialValue: data.map((key, value) {
-        print("\nBUILDING INITIAL VIEW - ${key} - ${value} - ${value is String} - ${value is List}");
+        debugPrint("\nBUILDING INITIAL VIEW - ${key} - ${value} - ${value is String} - ${value is List}");
         XormQuestion q = this.questions.firstWhere(
           (q) => q.id == key || key.startsWith(q.id),
           orElse: () => null
@@ -161,15 +161,15 @@ class XormSection {
           case 'text':
             return MapEntry(key, value);
           case 'date':
-            print('\nDATE ... ${value is DateTime} .... ');
-            print(value is DateTime ? value : DateTime.tryParse(value.toString()));
+            debugPrint('\nDATE ... ${value is DateTime} .... ');
+            debugPrint(value is DateTime ? value.toString() : DateTime.tryParse(value.toString()));
             return MapEntry(key, value is DateTime ? value : DateTime.tryParse(value.toString()));
           case 'time':
             return MapEntry(key, value is DateTime ? value : DateTime.tryParse(value.toString()));
           case 'optional':
             return MapEntry(key, value.toString().toLowerCase() == 'true');
           case 'single_choice_select':
-            print('\nSINGLE CHOICE SELECT.... $value .... ');
+            debugPrint('\nSINGLE CHOICE SELECT.... $value .... ');
             
             return MapEntry(key, value == null ? "" : value.toString());
           case 'single_choice':
@@ -179,7 +179,7 @@ class XormSection {
           case 'yes-no-dont':
             return MapEntry(key, value);
           case 'multiple_choice':
-            // print("\nMULTIPLE CHOICE ${(value is String) ? json.decode(value).map((s) => s.toString()) : value}");
+            // debugPrint("\nMULTIPLE CHOICE ${(value is String) ? json.decode(value).map((s) => s.toString()) : value}");
             return MapEntry(key, (value is String) ? value.replaceAll("[","").replaceAll("]", "").split(", ") : value);
           // case 'datatable':
           //   return ;
@@ -198,10 +198,10 @@ class XormSection {
   }
 
   Widget view(Object data) {
-    print("\nVIEW SECTION .... ${id}\n");
-    print(this.params.toJson());
+    debugPrint("\nVIEW SECTION .... ${id}\n");
+    debugPrint(this.params.toJson().toString());
     if (this.params.repeat ?? false) {
-      print("\nIS REPEATED.... \n");
+      debugPrint("\nIS REPEATED.... \n");
       return Container(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -224,7 +224,7 @@ class XormSection {
         )
       );
     } else {
-      print("\nIS SIMPLET....\n");
+      debugPrint("\nIS SIMPLET....\n");
 
       
       return ListView.builder(
@@ -280,8 +280,8 @@ class XormSectionParams {
   });
 
   factory XormSectionParams.fromJson(Map<String, dynamic> json) {
-    print("\nIN XORMS SECTION PARAM");
-    print(json);
+    debugPrint("\nIN XORMS SECTION PARAM");
+    debugPrint(json.toString());
 
     return new XormSectionParams(
       title: json['title'] as String,
@@ -322,9 +322,9 @@ abstract class XormQuestion {
   Widget build({ @required BuildContext context, String value });
 
   Widget view(Object value) {
-    print("\n QUESTION... Views... ${id}");
-    print("${title} -- ${type}");
-    print(value);
+    debugPrint("\n QUESTION... Views... ${id}");
+    debugPrint("${title} -- ${type}");
+    debugPrint(value);
     
     return ListTile(
       title: Text(this.title),
@@ -1031,7 +1031,7 @@ class XormQuestionMultipleChoice extends XormQuestion {
 
   @override
   Widget view(Object value) {
-    print("\nXORM MULTIPLE ... ");
+    debugPrint("\nXORM MULTIPLE ... ");
 
     List items = (value is String) ? value.replaceAll("[","").replaceAll("]", "").split(", ") : value;
     return ListTile(
@@ -1053,10 +1053,10 @@ class XormQuestionDatatable extends XormQuestion {
     @required this.cols}) : super(id: id, title:title, hint:hint, type:type);
 
   factory XormQuestionDatatable.fromJson(String id, Map<String, dynamic> parsedJson) {
-    print("\nXormQuestionDataTable... ${id}");
-    print(parsedJson);
-    print(parsedJson["rows"]);
-    print(parsedJson["cols"]);
+    debugPrint("\nXormQuestionDataTable... $id");
+    debugPrint(parsedJson.toString());
+    debugPrint(parsedJson["rows"]);
+    debugPrint(parsedJson["cols"]);
 
     return new XormQuestionDatatable(
       id: id,
@@ -1064,13 +1064,13 @@ class XormQuestionDatatable extends XormQuestion {
       hint: parsedJson['hint'],
       type: parsedJson['type'],
       rows: (parsedJson['rows'] as List<dynamic>).map((r) {
-        // print("\nDATA TABLE PARSING... ");
-        // print(r);
+        // debugPrint("\nDATA TABLE PARSING... ");
+        // debugPrint(r);
         return (r as Map)['text'].toString();
       }).toList(),
       cols: (parsedJson['cols'] as List) //.map((c) => c.toString())
       .map((c) {
-        print("\nDATA TABLE COLDD ---- ${c.toString()}");
+        debugPrint("\nDATA TABLE COLDD ---- ${c.toString()}");
         return (c as Map)['text'].toString();
       }).toList(),
     );
@@ -1148,8 +1148,8 @@ class XormQuestionDatatable extends XormQuestion {
 
   @override
   Widget view(Object values) {
-    print("\nDATA TABLE VIEWS...");
-    print(values);
+    debugPrint("\nDATA TABLE VIEWS...");
+    debugPrint(values);
     List<String> fullCols = [""];
     fullCols.addAll(cols);
 

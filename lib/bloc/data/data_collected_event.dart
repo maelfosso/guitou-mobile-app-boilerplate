@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 import 'package:guitou/models/models.dart';
 
 abstract class DataCollectedEvent extends Equatable {
@@ -46,6 +47,11 @@ class DataCollectedDeleted extends DataCollectedEvent {
   String toString() => 'DataCollectedDeleted { data: $data }';
 }
 
-class ClearCompleted extends DataCollectedEvent {}
+class QueryDataCollected extends DataCollectedEvent {
+  final int id;
 
-class ToggleAll extends DataCollectedEvent {}
+  const QueryDataCollected({@required this.id});
+
+  @override
+  List<Object> get props => [this.id];
+}
