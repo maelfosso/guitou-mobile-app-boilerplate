@@ -28,6 +28,8 @@ class Project {
   }
 
   factory Project.fromJson(Map<String, dynamic> parsedJson) {
+    debugPrint("\nPROJECT FROM JSON ... \n $parsedJson");
+
     return Project(
       id: parsedJson['_id'],
       name: parsedJson['name'],

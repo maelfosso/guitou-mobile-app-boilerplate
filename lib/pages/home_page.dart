@@ -55,11 +55,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    super.initState();
-    // requestWritePermission();
-
-    // _dataCollectedBloc = context.bloc<DataCollectedBloc>();
-    // _dataCollectedBloc.add(LoadDataCollected());  
+    super.initState(); 
   }
 
   requestWritePermission() async {
@@ -458,25 +454,18 @@ class _HomePageState extends State<HomePage> {
 
       this._xormsList.addAll(Project.instance.xorms);
     }
-
-    // This method is rerun every time setState is called, for instance as done
-    // by the _fillAXorm method above.
-    //
+    
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        // title: Text(widget.title),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             new Text(
-              // widget.title,
               "Home",
               style: TextStyle(fontSize: 20.0),
             ),

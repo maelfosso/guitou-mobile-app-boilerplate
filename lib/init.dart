@@ -109,7 +109,7 @@ class Init {
     final jsonResponse = json.decode(jsonString);
     // debugPrint("\nLOAD PROJECT FROM ASSET ... $jsonResponse");
     // Project.instance.
-    Project.fromJson(jsonResponse);
+    return Project.fromJson(jsonResponse);
   }  
 
   // Future<Widget> start() async {

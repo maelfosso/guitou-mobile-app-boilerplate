@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 class SimpleBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object event) {
-    debugPrint(event);
+    debugPrint(event.toString());
     super.onEvent(bloc, event);
   }
 
@@ -16,7 +16,7 @@ class SimpleBlocObserver extends BlocObserver {
 
   @override
   void onError(Cubit cubit, Object error, StackTrace stackTrace) {
-    debugPrint(error);
+    debugPrint(error.toString());
     super.onError(cubit, error, stackTrace);
   }
 }
