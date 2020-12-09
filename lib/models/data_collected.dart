@@ -1,6 +1,7 @@
 import 'dart:convert';
+import 'package:equatable/equatable.dart';
 
-class DataCollected {
+class DataCollected extends Equatable {
   int id;
   String remoteId;
   
@@ -18,22 +19,22 @@ class DataCollected {
     this.form,
     this.values,
     this.id,
+    this.createdAt,
     this.remoteId,
     this.savedRemotelyAt,
-    this.createdAt,
     this.provider,
     this.dataLocation,
   });
 
-  factory DataCollected.fromJson(Map<String, dynamic> parsedJson) {
+  factory DataCollected.fromJson(int id, Map<String, dynamic> parsedJson) {
     
     return DataCollected(
       form: parsedJson['form'],
       values: parsedJson['values'],
-      id: parsedJson['id'],
+      id: id,
+      createdAt: DateTime.tryParse(parsedJson['createdAt'].toString()),
       remoteId: parsedJson['remoteId'],
       savedRemotelyAt: DateTime.tryParse(parsedJson['savedRemotelyAt'].toString()),
-      createdAt: DateTime.tryParse(parsedJson['createdAt'].toString()),
       provider: parsedJson['provider'],
       dataLocation: parsedJson['dataLocation'],
     );
@@ -48,30 +49,50 @@ class DataCollected {
   };
 
   Map<String, dynamic> toJson() => {
+    "id": this.id,
     "form": this.form,
     "values": this.values,
-    "id": this.id,
+    "createdAt": this.createdAt.toString(),
     "remoteId": this.remoteId,
     "savedRemotelyAt": this.savedRemotelyAt.toString(),
-    "createdAt": this.createdAt.toString(),
     "provider": this.provider,
     "dataLocation": this.dataLocation,
   };
 
+  DataCollected copyWith({
+    int id,
+    String form,
+    Map values,
+    String createdAt,
+    String remoteId,
+    String savedRemotelyAt,
+    String provider,
+    String dataLocation
+  }) {
+    return DataCollected(
+      id: id ?? this.id,
+      form: form ?? this.form,
+      values: values ?? this.values,
+      remoteId: remoteId ?? this.remoteId,
+      savedRemotelyAt: savedRemotelyAt ?? this.savedRemotelyAt,
+      createdAt: createdAt ?? this.createdAt,
+      provider: provider ?? this.provider,
+      dataLocation: dataLocation ?? this.dataLocation
+    );
+  }
 
-  // @override
-  // String toString() {
-  //   // TODO: implement toString
-  //   return """
-  //   "form": $form,
-  //   "values": $values,
-  //   "id": $id,
-  //   "remoteId": $remoteId,
-  //   "savedRemotelyAt": $savedRemotelyAt,
-  //   "createdAt": $createdAt,
-  //   "provider": $provider,
-  //   "dataLocation": $dataLocation,
-  //   ----------------------------------
-  //   """;
-  // }
+  @override
+  List<Object> get props => [id, form, values];
+
+  @override
+  int get hashCode => id.hashCode ^ form.hashCode ^ values.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DataCollected &&
+          runtimeType == other.runtimeType &&
+          values == other.values &&
+          form == other.form &&
+          id == other.id;
 }

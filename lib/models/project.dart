@@ -1,5 +1,6 @@
-import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:guitou/models/xorm.dart';
 import 'package:guitou/models/xorm_detail.dart';
 
@@ -27,6 +28,8 @@ class Project {
   }
 
   factory Project.fromJson(Map<String, dynamic> parsedJson) {
+    debugPrint("\nPROJECT FROM JSON ... \n $parsedJson");
+
     return Project(
       id: parsedJson['_id'],
       name: parsedJson['name'],
@@ -46,11 +49,11 @@ class Project {
       "xorms": xorms,
       "xormsDetails": Map.fromIterable(xormsDetails, 
         key: (d) {
-          print(d.id);
+          // debugPrint(d.id.toString());
           return d.id;
         },
         value: (d) {
-          print(d.toJson());
+          // debugPrint(d.toJson().toString());
           return d.toJson();
         }
       )

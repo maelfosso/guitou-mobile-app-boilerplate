@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:guitou/bloc/data_collected_bloc.dart';
-import 'package:guitou/bloc/data_collected_event.dart';
-import 'package:guitou/bloc/data_collected_state.dart';
+import 'package:guitou/bloc/blocs.dart';
 import 'package:guitou/models/data_collected.dart';
 import 'package:guitou/models/project.dart';
 
@@ -43,7 +41,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
   void initState() {
     super.initState();
 
-    _dataCollectedBloc = context.bloc<DataCollectedBloc>();  
+    _dataCollectedBloc = BlocProvider.of<DataCollectedBloc>(context);
     
     if (widget.id == 0) {
       this.data = DataCollected(form: widget.currentXorm, values: {});
@@ -170,14 +168,14 @@ class _DataEntryPageState extends State<DataEntryPage> {
               if ((this.currentXormSection.params.repeat ?? false) && 
                 (currentXormSection.params.repeatMaxTimes == "inner" || currentXormSection.params.repeatMaxTimes == "fixed")) {
                 
-                print("\nIN SECTION REPEATED INNNERR...");
+                debugPrint("\nIN SECTION REPEATED INNNERR...");
                 var defaultValue = 0;
                 if (this.data.values.containsKey(this.currentXormSection.id + "_inner")) {
-                  print("\nIT CONTAINS.. IT");
+                  debugPrint("\nIT CONTAINS.. IT");
                   defaultValue = (this.data.values[this.currentXormSection.id + "_inner"] as Map)["inner"];
                 }
-                print("\nDEFAULT VALUES....");
-                print(defaultValue);
+                debugPrint("\nDEFAULT VALUES....");
+                debugPrint(defaultValue.toString());
                 var repeatValue = await _asyncInputDialog(context, defaultValue);
 
                 if (currentXormSection.params.repeatMaxTimes == "inner") {
@@ -241,11 +239,11 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     });
                   }
                 }
-                print("\n\t\t${this.currentSectionDataPosition} \t\t ${this.currentSectionPosition} \t\t ${this.repeatIt}");
+                debugPrint("\n\t\t${this.currentSectionDataPosition} \t\t ${this.currentSectionPosition} \t\t ${this.repeatIt}");
 
                 this.controller.previousPage(duration: _kDuration, curve: _kCurve);
 
-                print("\nCONTROLLER PREVIOUS PAGE...");
+                debugPrint("\nCONTROLLER PREVIOUS PAGE...");
               },
             ),
             FlatButton(
@@ -284,7 +282,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                         (this.data.values[currentSectionKey] as List)[this.currentSectionDataPosition] = ca;
                       }
                       
-                      print(this.data.values[currentSectionKey]);
+                      debugPrint(this.data.values[currentSectionKey]);
                     }
                     
                   }
@@ -292,10 +290,12 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
                 if (isLastPage) {
                   if (widget.id == 0) {
-                    this._dataCollectedBloc.add(AddDataCollected(data: this.data));
+                    // this._dataCollectedBloc.add(AddDataCollected(data: this.data));
+                    this._dataCollectedBloc.add(DataCollectedAdded(this.data));
                   } else {
                     this.data.dataLocation = "local";
-                    this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
+                    // this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
+                    this._dataCollectedBloc.add(DataCollectedUpdated(this.data));
                   }
                   
                   if ( (currentSectionData["section_final__again"] as bool)?? false ) {
@@ -335,9 +335,9 @@ class _DataEntryPageState extends State<DataEntryPage> {
                    */
                   bool nextRepeat = false;
                   if (this.currentXormSection.params.repeat ?? false) {
-                    print("\nNEXT REPEAT???");
-                    print(nextRepeat);
-                    print(currentXormSection.params.repeatMaxTimes);
+                    debugPrint("\nNEXT REPEAT???");
+                    debugPrint(nextRepeat.toString());
+                    debugPrint(currentXormSection.params.repeatMaxTimes);
 
                     switch (currentXormSection.params.repeatMaxTimes) {
                       case "unlimitted":
@@ -357,7 +357,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
                             || (innerValue > (this.data.values[this.currentXormSection.id] as List).length )) {
                           nextRepeat = true;
                         }
-                        print(nextRepeat);
+                        debugPrint(nextRepeat.toString());
 
                         break;
                       case "variable":
@@ -458,20 +458,22 @@ class _DataEntryPageState extends State<DataEntryPage> {
           ],
         ),
       ),
-      body: BlocBuilder(
-        bloc: _dataCollectedBloc,
+      // body: BlocBuilder(
+      //   bloc: _dataCollectedBloc,
+      body: BlocBuilder<DataCollectedBloc, DataCollectedState>(
+        // builder: (context, state) {
         builder: (BuildContext context, DataCollectedState state) {
-          if (state is DataCollectedLoading) {
+          if (state is DataCollectedLoadInProgress) {
             return Center(
               child: CircularProgressIndicator(),
             );
           } 
-          if (widget.id > 0 && state is DataCollectedLoaded && state.datas.length == 1) {
+          if (widget.id > 0 && state is DataCollectedLoadSuccess && state.data.length == 1) {
             
-            if (state.datas.first == null) {
+            if (state.data.first == null) {
               this.data = DataCollected(form: widget.currentXorm, values: {});
             } else {
-              this.data = state.datas.first;            
+              this.data = state.data.first;            
             }
 
             return Padding(

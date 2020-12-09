@@ -32,7 +32,7 @@ class DataApiClient {
         throw new Exception("Error while fetching data");
       }
 
-      return DataCollected.fromJson(json.decode(body['data']));
+      return ; //DataCollected.fromJson(json.decode(body['data']));
     });    
   }
 

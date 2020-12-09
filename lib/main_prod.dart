@@ -10,7 +10,7 @@ void main() async {
 
   var configuredApp = AppConfig(
     apiBaseUrl: 'http://api.guitou.cm/api',
-    child: await start(),
+    child: Container() // await start(),
   );
 
   runApp(configuredApp);
