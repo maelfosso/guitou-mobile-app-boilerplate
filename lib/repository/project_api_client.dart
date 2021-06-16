@@ -23,7 +23,7 @@ class ProjectApiClient {
   Future<Project> fetchProject() async {
     final url = '$baseUrl/xorms/${Project.instance.id}/download';
     debugPrint("\nFETCH PROJECT.... $url");
-    final response = await this.httpClient.get(url, headers: headers);
+    final response = await this.httpClient.get(Uri.parse(url), headers: headers);
     debugPrint(response.toString());
     final statusCode = response.statusCode;
     debugPrint("STATUS CODE ... $statusCode");

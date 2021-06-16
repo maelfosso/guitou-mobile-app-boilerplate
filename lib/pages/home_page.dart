@@ -5,7 +5,7 @@ import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guitou/models/project.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+// import 'package:progress_dialog/progress_dialog.dart';
 
 import 'package:jiffy/jiffy.dart';
 
@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   List<DataCollected> datasToUpload = [];
   int datasUploaded = 0;
 
-  ProgressDialog pr, prn; 
+  // ProgressDialog pr, prn; 
 
   final List<Xorm> _xormsList = [
     Xorm(id:"all", title:"All")
@@ -59,24 +59,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   requestWritePermission() async {
-    final List<PermissionGroup> permissions = <PermissionGroup>[PermissionGroup.storage];
+    // final List<PermissionGroup> permissions = <PermissionGroup>[PermissionGroup.storage];
 
-    // ServiceStatus serviceStatus 
-    final PermissionStatus statusFuture = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
+    // // ServiceStatus serviceStatus 
+    // final PermissionStatus statusFuture = await PermissionHandler()
+    //     .checkPermissionStatus(PermissionGroup.storage);
 
-    if (statusFuture == PermissionStatus.granted) {
-      _allowWriteFile = true;
+    // if (statusFuture == PermissionStatus.granted) {
+    //   _allowWriteFile = true;
 
-      return;
-    }
+    //   return;
+    // }
 
-    final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
-        await PermissionHandler().requestPermissions(permissions);
+    // final Map<PermissionGroup, PermissionStatus> permissionRequestResult =
+    //     await PermissionHandler().requestPermissions(permissions);
 
-    setState(() {
-      _allowWriteFile = permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
-    });
+    // setState(() {
+    //   _allowWriteFile = permissionRequestResult[PermissionGroup.storage] == PermissionStatus.granted;
+    // });
   }
 
   Future get _localPath async {
@@ -437,16 +437,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    this.pr = ProgressDialog(context,
-      type: ProgressDialogType.Download, 
-      isDismissible: true, 
-      showLogs: true
-    );
-    this.prn = ProgressDialog(context,
-      type: ProgressDialogType.Normal, 
-      isDismissible: true, 
-      showLogs: true
-    );
+    // this.pr = ProgressDialog(context,
+    //   type: ProgressDialogType.Download, 
+    //   isDismissible: true, 
+    //   showLogs: true
+    // );
+    // this.prn = ProgressDialog(context,
+    //   type: ProgressDialogType.Normal, 
+    //   isDismissible: true, 
+    //   showLogs: true
+    // );
     
 
     if (this._xormsList.length == 1) {

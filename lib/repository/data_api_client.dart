@@ -22,7 +22,7 @@ class DataApiClient {
       "Accept": "application/json"
     };
 
-    return http.post(url, headers: headers, body: json.encode(data)).then((http.Response response) {
+    return http.post(Uri.parse(url), headers: headers, body: json.encode(data)).then((http.Response response) {
       
       final int statusCode = response.statusCode;
 
@@ -38,7 +38,7 @@ class DataApiClient {
 
   Future<Quote> fetchQuote() async {
     final url = 'https://quote-garden.herokuapp.com/quotes/random';
-    final response = await this.httpClient.get(url);
+    final response = await this.httpClient.get(Uri.parse(url));
     if (response.statusCode != 200) {
       throw new Exception('error getting quotes');
     }

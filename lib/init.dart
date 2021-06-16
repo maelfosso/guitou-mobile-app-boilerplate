@@ -84,19 +84,19 @@ class Init {
   }
 
   static Future<bool> requestWritePermission() async {
-    final List<ph.PermissionGroup> permissions = <ph.PermissionGroup>[ph.PermissionGroup.storage];
+    // final List<ph.PermissionGroup> permissions = <ph.PermissionGroup>[ph.PermissionGroup.storage];
 
-    final ph.PermissionStatus statusFuture = await ph.PermissionHandler()
-        .checkPermissionStatus(ph.PermissionGroup.storage); 
+    // final ph.PermissionStatus statusFuture = await ph.PermissionHandler()
+    //     .checkPermissionStatus(ph.PermissionGroup.storage); 
     
-    if (statusFuture == ph.PermissionStatus.granted) {
-      return true;
-    } else {
-      final Map<ph.PermissionGroup, ph.PermissionStatus> permissionRequestResult =
-        await ph.PermissionHandler().requestPermissions(permissions);
+    // if (statusFuture == ph.PermissionStatus.granted) {
+    //   return true;
+    // } else {
+    //   final Map<ph.PermissionGroup, ph.PermissionStatus> permissionRequestResult =
+    //     await ph.PermissionHandler().requestPermissions(permissions);
 
-      return permissionRequestResult[ph.PermissionGroup.storage] == ph.PermissionStatus.granted;
-    }
+    //   return permissionRequestResult[ph.PermissionGroup.storage] == ph.PermissionStatus.granted;
+    // }
 
   }
 

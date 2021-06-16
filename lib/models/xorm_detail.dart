@@ -190,9 +190,9 @@ class XormSection {
       child: Column(
         children: this.questions.map((q) => q.build(context: context, value: data[q.id])).toList()
       ),
-      onChanged: (values) {
+      // onChanged: (values) {
 
-      },
+      // },
     );
   }
 
@@ -207,7 +207,7 @@ class XormSection {
           child: DataTable(
             columns: questions.map((question) {
                 return DataColumn(
-                  label: Text(question.title)
+                  label:  Text(question.title)
                 );
               })
               .toList(),
@@ -416,7 +416,7 @@ class XormQuestionString extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderTextField(
-            attribute: this.id,
+            // name: this.id,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               hasFloatingPlaceholder: false,
@@ -469,7 +469,7 @@ class XormQuestionNumber extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderTextField(
-            attribute: this.id,
+            // name: this.id,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               hasFloatingPlaceholder: false,
@@ -479,9 +479,9 @@ class XormQuestionNumber extends XormQuestion {
               )
             ),
             maxLines: 1,
-            validators: [
-              FormBuilderValidators.numeric(errorText: "You should enter a number")
-            ],
+            // validators: [
+            //   FormBuilderValidators.numeric(errorText: "You should enter a number")
+            // ],
           )
         ]
       )
@@ -490,7 +490,7 @@ class XormQuestionNumber extends XormQuestion {
   
   // Widget build() {
   //   return FormBuilderTextField(
-  //     attribute: this.id,
+  //     name: this.id,
   //     decoration: InputDecoration(
   //       labelText: this.title,
   //       alignLabelWithHint: true,
@@ -540,7 +540,7 @@ class XormQuestionText extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderTextField(
-            attribute: this.id,
+            name: this.id,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               hasFloatingPlaceholder: false,
@@ -558,7 +558,7 @@ class XormQuestionText extends XormQuestion {
   
   // Widget build() {
   //   return FormBuilderTextField(
-  //     attribute: this.id,
+  //     name: this.id,
   //     decoration: InputDecoration(labelText: this.title),
   //     minLines: 3,
   //     // validators: [
@@ -605,7 +605,7 @@ class XormQuestionDate extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderDateTimePicker(
-            attribute: this.id,
+            name: this.id,
             inputType: InputType.date,
             format: DateFormat("yyyy-MM-dd"),
             decoration: InputDecoration(
@@ -623,7 +623,7 @@ class XormQuestionDate extends XormQuestion {
   }
   // Widget build() {
   //   return FormBuilderDateTimePicker(
-  //     attribute: this.id,
+  //     name: this.id,
   //     inputType: InputType.date,
   //     format: DateFormat("yyyy-MM-dd"),
   //     decoration: InputDecoration(labelText: this.title),
@@ -666,7 +666,7 @@ class XormQuestionTime extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderDateTimePicker(
-            attribute: this.id,
+            name: this.id,
             inputType: InputType.time,
             format: DateFormat("HH:mm"),
             decoration: InputDecoration(
@@ -685,7 +685,7 @@ class XormQuestionTime extends XormQuestion {
 
   // Widget build() {
   //   return FormBuilderDateTimePicker(
-  //     attribute: this.id,
+  //     name: this.id,
   //     inputType: InputType.time,
   //     format: DateFormat("HH:mm"),
   //     decoration: InputDecoration(labelText: this.title),
@@ -730,8 +730,8 @@ class XormQuestionOptional extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderCheckbox(
-            attribute: this.id,
-            label: Text(this.title),
+            name: this.id,
+            title: Text(this.title),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               hasFloatingPlaceholder: false,
@@ -748,8 +748,8 @@ class XormQuestionOptional extends XormQuestion {
   
   // Widget build() {
   //   return FormBuilderCheckbox(
-  //     attribute: this.id,
-  //     label: Text(this.title),
+  //     name: this.id,
+  //     title:  Text(this.title),
       
   //     // validators: [
   //     //   // FormBuilderValidators.requiredTrue(
@@ -814,7 +814,7 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
           FormBuilderDropdown(
-            attribute: this.id,
+            name: this.id,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
               hasFloatingPlaceholder: false,
@@ -835,7 +835,7 @@ class XormQuestionSingleChoiceSelect extends XormQuestion {
 
   // Widget build() {
   //   return FormBuilderDropdown(
-  //     attribute: this.id,
+  //     name: this.id,
   //     decoration: InputDecoration(labelText: this.title),
   //     // initialValue: 'Male',
   //     hint: Text('Select a choice'),
@@ -886,19 +886,19 @@ class XormQuestionSingleChoice extends XormQuestion {
             this.id + ".  " + this.title,
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
-          FormBuilderRadio(
-            attribute: this.id,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              hasFloatingPlaceholder: false,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(0)),
-                gapPadding: 0.0
-              )
-            ),
-            initialValue: null,
-            options: options,
-          )
+          // FormBuilderRadio(
+          //   name: this.id,
+          //   decoration: InputDecoration(
+          //     contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+          //     hasFloatingPlaceholder: false,
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.all(Radius.circular(0)),
+          //       gapPadding: 0.0
+          //     )
+          //   ),
+          //   initialValue: null,
+          //   options: options,
+          // )
         ]
       )
     );
@@ -947,19 +947,19 @@ class XormQuestionYesNo extends XormQuestion {
             this.id + ".  " + this.title,
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
-          FormBuilderRadio(
-            attribute: this.id,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              hasFloatingPlaceholder: false,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(0)),
-                gapPadding: 0.0
-              )
-            ),
-            initialValue: null,
-            options: options,
-          )
+          // FormBuilderRadio(
+          //   name: this.id,
+          //   decoration: InputDecoration(
+          //     contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+          //     hasFloatingPlaceholder: false,
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.all(Radius.circular(0)),
+          //       gapPadding: 0.0
+          //     )
+          //   ),
+          //   initialValue: null,
+          //   options: options,
+          // )
         ]
       )
     );
@@ -1008,19 +1008,19 @@ class XormQuestionYesNoDont extends XormQuestion {
             this.id + ".  " + this.title,
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
-          FormBuilderRadio(
-            attribute: this.id,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              hasFloatingPlaceholder: false,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(0)),
-                gapPadding: 0.0
-              )
-            ),
-            initialValue: null,
-            options: options,
-          )
+          // FormBuilderRadio(
+          //   name: this.id,
+          //   decoration: InputDecoration(
+          //     contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+          //     hasFloatingPlaceholder: false,
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.all(Radius.circular(0)),
+          //       gapPadding: 0.0
+          //     )
+          //   ),
+          //   initialValue: null,
+          //   options: options,
+          // )
         ]
       )
     );
@@ -1068,19 +1068,19 @@ class XormQuestionMultipleChoice extends XormQuestion {
             this.id + ".  " + this.title,
             style: Theme.of(context).inputDecorationTheme.labelStyle,
           ),
-          FormBuilderCheckboxList(
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              hasFloatingPlaceholder: false,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(0)),
-                gapPadding: 0.0
-              )
-            ),
-            attribute: this.id,
-            options: options,
-            // onChanged: ,
-          )
+          // FormBuilderCheckboxList(
+          //   decoration: InputDecoration(
+          //     contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
+          //     hasFloatingPlaceholder: false,
+          //     border: OutlineInputBorder(
+          //       borderRadius: BorderRadius.all(Radius.circular(0)),
+          //       gapPadding: 0.0
+          //     )
+          //   ),
+          //   name: this.id,
+          //   options: options,
+          //   // onChanged: ,
+          // )
         ]
       )
     );
@@ -1167,7 +1167,7 @@ class XormQuestionDatatable extends XormQuestion {
               child:  DataTable(
               columns: fullCols.map((col) {
                 return DataColumn(
-                  label: Text(col),
+                  label:  Text(col),
 
                 );
               }).toList(),
@@ -1188,7 +1188,7 @@ class XormQuestionDatatable extends XormQuestion {
                         Container(
                           width: 100, //SET width
                           child: FormBuilderTextField(
-                            attribute: "${this.id}__row_${row.key}__col_${entry.key}",
+                            name: "${this.id}__row_${row.key}__col_${entry.key}",
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
                               hasFloatingPlaceholder: false,
@@ -1225,7 +1225,7 @@ class XormQuestionDatatable extends XormQuestion {
         scrollDirection: Axis.horizontal,
         child:  DataTable(
           columns: fullCols.map((col) {
-            return DataColumn(label: Text(col));
+            return DataColumn(label:  Text(col));
           }).toList(),
           rows: rows.asMap().entries.map((row) {
             List<String> fullRow = [row.value];

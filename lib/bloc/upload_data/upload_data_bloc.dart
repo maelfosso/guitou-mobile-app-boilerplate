@@ -49,7 +49,7 @@ class UploadDataBloc extends Bloc<UploadDataEvent, UploadDataState> {
 
   Future<DataEntity> postData(DataCollected data) async {
     final http.Response response = await http.post(
-      '${EnvConfig.API_URL}/api/data',
+      Uri.parse('${EnvConfig.API_URL}/api/data'),
       headers: <String, String> {
         'Content-Type': 'application/json; charset=UTF-8'
       },
