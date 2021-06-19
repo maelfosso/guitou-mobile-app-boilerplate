@@ -1,4 +1,4 @@
-package cm.guitou.mobile.evaluation_des_radios_communautaires
+package cm.guitou.mobile.{{ .Author.email | toId }}.p{{ .Id }}
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
