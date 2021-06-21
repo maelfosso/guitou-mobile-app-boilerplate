@@ -1,0 +1,9 @@
+stages:
+  - test # All jobs related for testing such as Unit Test
+
+flutter_test: # Name of the lane
+  stage: test # Type of stage
+  script:
+    - flutter test # Run flutter test
+  tags:
+    - flutter # Tags for runner
