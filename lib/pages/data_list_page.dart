@@ -1,0 +1,232 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:ext_storage/ext_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:guitou/models/data_model.dart';
+import 'package:guitou/models/project.dart';
+import 'package:guitou/models/xorm.dart';
+import 'package:guitou/pages/data_entry_page.dart';
+import 'package:guitou/widgets/data_list.dart';
+import 'package:guitou/widgets/no_data.dart';
+import 'package:provider/provider.dart';
+
+class DataListPage extends StatefulWidget {
+  DataListPage({Key key}) : super(key: key);
+
+  @override
+  _DataListPage createState() => _DataListPage();
+}
+
+class _DataListPage extends State<DataListPage> {
+
+  final List<Xorm> _xormsList = [
+    Xorm(id:"all", title:"All")
+  ];
+
+  Xorm _currentlySelectedXorm = Xorm(id:"all", title:"All");
+  bool _allowWriteFile = false;
+
+  Future get _localPath async {
+    // Application documents directory: /data/user/0/{package_name}/{app_name}
+    // final applicationDirectory = await getApplicationDocumentsDirectory();
+ 
+    // External storage directory: /storage/emulated/0
+    // final externalDirectory = await getExternalStorageDirectory();
+    final externalPublicDirectory = await ExtStorage.getExternalStorageDirectory();
+    var folder = Directory("$externalPublicDirectory/Guitou/Exports");
+    if (await folder.exists()) {
+      return folder.path;
+    } else {
+      folder = await folder.create(recursive: true);
+      return folder.path;
+    }
+  }
+
+  Future _writeToFile(String filename, String text) async {
+
+    if (!_allowWriteFile) {
+      return null;
+    }
+    final path = await _localPath;
+    final file = File('$path/$filename');
+ 
+    // Write the file
+    File result = await file.writeAsString('$text');
+    if (result == null ) {
+      debugPrint("Writing to file failed");
+    } else {
+      debugPrint("Successfully writing to file");
+      debugPrint(result.toString());
+    }
+  }
+
+  // void _fillAXorm() async {
+  //   String selectedXorm = await _asyncSelectXormDialog(context);
+  //   if (selectedXorm != null && selectedXorm.isNotEmpty) {
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+  //     );
+  //   }
+  // }
+
+  void _uploadLocalData() async {
+    // this._dataCollectedBloc.add(UploadDataCollected());
+  }
+
+  void _downloadXorm() async {
+    // this._dataCollectedBloc.add(DownloadProject());
+    // this.prn.style(
+    //   message: 'Download update...',
+    // );
+    // await this.prn.show();
+  }
+
+  // void _saveCSV() async {
+  //   debugPrint(jsonEncode(this.datas));
+  //   _writeToFile(Project.instance.id + '_' + DateTime.now().toString() + '.json', jsonEncode(this.datas));
+  // }
+
+  void _showEndOperationDialog(String title, String body) {
+    // showDialog<void>(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return AlertDialog(
+    //       title: Text(title),
+    //       content: Text(body),
+    //       actions: <Widget>[
+    //         FlatButton(
+    //           child: Text('Ok'),
+    //           onPressed: () {
+    //             Navigator.of(context).pop();
+    //           },
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
+  }
+
+  Future<String> _asyncSelectXormDialog(BuildContext context) async {
+    return await showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Select the xorm'),
+          children: Project.instance.xorms.map((Xorm xorm) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, xorm.id);
+              },
+              child: Text(xorm.title),
+            );
+          }).toList(),
+        );
+      }
+    );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    Provider.of<DataModel>(context, listen: false).getAllData();
+
+    return Consumer<DataModel>(
+      builder: (context, datas, child) {
+        int numOfDatas = datas.datasCount;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                new Text(
+                  "Home",
+                  style: TextStyle(fontSize: 20.0),
+                ),
+                this._currentlySelectedXorm != null && this._currentlySelectedXorm.id != "all" ? Text(
+                  this._currentlySelectedXorm.title,
+                  style: TextStyle(fontSize: 14.0),
+                ) : Container()
+              ],
+            ),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.cloud_download),
+                onPressed: _downloadXorm
+              ),
+              IconButton(
+                icon: Icon(Icons.save),
+                onPressed: () {
+                  debugPrint(jsonEncode(datas));
+                  _writeToFile(Project.instance.id + '_' + DateTime.now().toString() + '.json', jsonEncode(datas));
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () async {
+                  String selectedXorm = await _asyncSelectXormDialog(context);
+                  if (selectedXorm != null && selectedXorm.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+                    );
+                  }
+                }
+              ),
+              IconButton(
+                icon: Icon(Icons.cloud_upload),
+                onPressed: _uploadLocalData
+              ),
+              PopupMenuButton<Xorm>(
+                onSelected: (Xorm value) {
+                  setState(() {
+                    this._currentlySelectedXorm = value;
+                  });
+                },
+                itemBuilder: (BuildContext context) {
+                  return _xormsList.map((Xorm choice) {
+                    return PopupMenuItem<Xorm>(
+                      value: choice,
+                      child: 
+                      Row(
+                        children: [
+                          this._currentlySelectedXorm.id == choice.id ? Icon(
+                            Icons.check, 
+                            color: Colors.black
+                          ) : Container(),
+                          Expanded(
+                            child: Text(choice.title),
+                            flex: 1,
+                          )
+                        ]                    
+                      ),
+                    );
+                  }).toList();
+                },
+              )
+            ],
+          ),
+          body: (numOfDatas == 0) ? NoData() : DataList(),
+          floatingActionButton: FloatingActionButton(
+            tooltip: 'Increment',
+            child: Icon(Icons.add),
+            onPressed: () async {
+              String selectedXorm = await _asyncSelectXormDialog(context);
+              if (selectedXorm != null && selectedXorm.isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+                );
+              }
+            }
+          ),
+        );
+      }
+    );
+  }
+}

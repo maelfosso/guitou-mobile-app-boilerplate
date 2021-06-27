@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 import 'package:meta/meta.dart';
-import 'package:guitou/models/data_collected.dart';
+import 'package:guitou/models/data.dart';
 
 class DataApiClient {
   final String baseUrl;
@@ -14,7 +14,7 @@ class DataApiClient {
     @required this.httpClient,
   }) : assert(httpClient != null);
 
-  Future<DataCollected> postData(DataCollected data) async {
+  Future<Data> postData(Data data) async {
     final url = '$baseUrl/forms/${data.form}/data';
 
     var headers = {
@@ -32,7 +32,7 @@ class DataApiClient {
         throw new Exception("Error while fetching data");
       }
 
-      return ; //DataCollected.fromJson(json.decode(body['data']));
+      return ; //Data.fromJson(json.decode(body['data']));
     });    
   }
 

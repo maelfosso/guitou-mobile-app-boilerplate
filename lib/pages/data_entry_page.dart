@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:guitou/bloc/blocs.dart';
-import 'package:guitou/models/data_collected.dart';
+import 'package:guitou/models/data.dart';
+import 'package:guitou/models/data_model.dart';
 import 'package:guitou/models/project.dart';
+import 'package:provider/provider.dart';
 
 import '../models/project.dart';
 import '../models/xorm_detail.dart';
@@ -21,7 +19,10 @@ class DataEntryPage extends StatefulWidget {
 }
 
 class _DataEntryPageState extends State<DataEntryPage> {
-  DataCollectedBloc _dataCollectedBloc;
+
+  static const String pageId = '/data_entry_page';
+
+  // DataBloc _dataCollectedBloc;
   XormDetails _currentXormDetails;
 
   PageController controller = PageController();
@@ -35,27 +36,28 @@ class _DataEntryPageState extends State<DataEntryPage> {
   bool repeatIt = false;
   bool isPrevious = false;
 
-  DataCollected data;
+  Data data;
 
   @override
   void initState() {
     super.initState();
-
-    _dataCollectedBloc = BlocProvider.of<DataCollectedBloc>(context);
     
-    if (widget.id == 0) {
-      this.data = DataCollected(form: widget.currentXorm, values: {});
-    } else {
-      _dataCollectedBloc.add(QueryDataCollected(id: widget.id));
-    }
+    getData();
 
-    
     setState(() {
       currentSectionPosition = 0;
       currentSectionDataPosition = 0;
       repeatIt = false;
       isPrevious = false;
     });
+  }
+
+  void getData() async {
+    if (widget.id == 0) {
+      this.data = Data(form: widget.currentXorm, values: {});
+    } else {
+      this.data = await Provider.of<DataModel>(context, listen: false).getData(widget.id);
+    }
   }
 
   Future<String> _asyncInputDialog(BuildContext context, num defaultValue) async {
@@ -84,7 +86,7 @@ class _DataEntryPageState extends State<DataEntryPage> {
             ],
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop(repeatValue);
@@ -202,12 +204,15 @@ class _DataEntryPageState extends State<DataEntryPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(
                 "Previous",
                 style: TextStyle(color: Colors.white)
               ),
-              color: Colors.blue,
+              // color: Colors.blue,
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue)
+              ),
               onPressed: () {
                 if (this.currentXormSection.params.repeat ?? false) {
                   if (this.currentSectionDataPosition > 0) {
@@ -246,12 +251,12 @@ class _DataEntryPageState extends State<DataEntryPage> {
                 debugPrint("\nCONTROLLER PREVIOUS PAGE...");
               },
             ),
-            FlatButton(
+            TextButton(
               child: Text(
                 isLastPage ? "Save it" : "Next",
                 style: TextStyle(color: Colors.white)
               ),
-              color: Colors.blue,
+              style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.blue)),
               onPressed: () async {
                 final String currentSectionKey = this.currentXormSection.id;
                 Map<String, dynamic> currentSectionData = new Map();
@@ -290,16 +295,16 @@ class _DataEntryPageState extends State<DataEntryPage> {
 
                 if (isLastPage) {
                   if (widget.id == 0) {
-                    // this._dataCollectedBloc.add(AddDataCollected(data: this.data));
-                    this._dataCollectedBloc.add(DataCollectedAdded(this.data));
+                    // this._dataCollectedBloc.add(AddData(data: this.data));
+                    // this._dataCollectedBloc.add(DataAdded(this.data));
                   } else {
                     this.data.dataLocation = "local";
-                    // this._dataCollectedBloc.add(UpdateDataCollected(data: this.data));
-                    this._dataCollectedBloc.add(DataCollectedUpdated(this.data));
+                    // this._dataCollectedBloc.add(UpdateData(data: this.data));
+                    // this._dataCollectedBloc.add(DataUpdated(this.data));
                   }
                   
                   if ( (currentSectionData["section_final__again"] as bool)?? false ) {
-                    this.data = DataCollected(form: widget.currentXorm, values: {});
+                    this.data = Data(form: widget.currentXorm, values: {});
                     
                     setState(() {
                       this.currentSectionPosition = 0;
@@ -315,13 +320,13 @@ class _DataEntryPageState extends State<DataEntryPage> {
                     title: Text("Repeat it"),
                     content: Text("Do you want to repeat this section again?"),
                     actions: [
-                      FlatButton(
+                      TextButton(
                         child: Text("Yes"),
                         onPressed:  () {
                           Navigator.of(context).pop(true);
                         },
                       ),
-                      FlatButton(
+                      TextButton(
                         child: Text("No"),
                         onPressed:  () {
                           Navigator.of(context).pop(false);
@@ -435,7 +440,6 @@ class _DataEntryPageState extends State<DataEntryPage> {
     this._currentXormDetails = Project.instance.xormsDetails.firstWhere((x) {
       return  x.id == widget.currentXorm;
     });
-
     
     String currentXormTitle = Project.instance.xorms.firstWhere((x) => x.id == widget.currentXorm).title;
     this.currentXormSection = this._currentXormDetails.sections[this.currentSectionPosition];
@@ -458,44 +462,51 @@ class _DataEntryPageState extends State<DataEntryPage> {
           ],
         ),
       ),
-      // body: BlocBuilder(
-      //   bloc: _dataCollectedBloc,
-      body: BlocBuilder<DataCollectedBloc, DataCollectedState>(
-        // builder: (context, state) {
-        builder: (BuildContext context, DataCollectedState state) {
-          if (state is DataCollectedLoadInProgress) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } 
-          if (widget.id > 0 && state is DataCollectedLoadSuccess && state.data.length == 1) {
-            
-            if (state.data.first == null) {
-              this.data = DataCollected(form: widget.currentXorm, values: {});
-            } else {
-              this.data = state.data.first;            
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                top: 8.0
-              ),
-              child: buildPageView()
-            );
-          }
-
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-              top: 8.0
-            ),
-            child: buildPageView()
-          );
-        }
+      body: Container(
+        padding: EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          top: 8.0
+        ),
+        child: buildPageView(),
       )
+      // BlocBuilder<DataBloc, DataState>(
+      //   // builder: (context, state) {
+      //   builder: (BuildContext context, DataState state) {
+      //     if (state is DataLoadInProgress) {
+      //       return Center(
+      //         child: CircularProgressIndicator(),
+      //       );
+      //     }
+
+      //     if (widget.id > 0 && state is DataLoadSuccess && state.data.length == 1) {
+            
+      //       if (state.data.first == null) {
+      //         this.data = Data(form: widget.currentXorm, values: {});
+      //       } else {
+      //         this.data = state.data.first;            
+      //       }
+
+      //       return Padding(
+      //         padding: EdgeInsets.only(
+      //           left: 16.0,
+      //           right: 16.0,
+      //           top: 8.0
+      //         ),
+      //         child: buildPageView()
+      //       );
+      //     }
+
+      //     return Padding(
+      //       padding: EdgeInsets.only(
+      //         left: 16.0,
+      //         right: 16.0,
+      //         top: 8.0
+      //       ),
+      //       child: buildPageView()
+      //     );
+      //   }
+      // )
     );
   }
 }

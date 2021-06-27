@@ -1,113 +1,92 @@
-import 'dart:math';
-import 'package:equatable/equatable.dart';
-
-class Data extends Equatable {
-  final String name;
-  final String sex;
-  final int age;
-  final double longitude;
-  final double latitude;
-  final double altitude;
-  final int id;
-  int state; // = VisibilityFilter.notsynchronized.index.toInt();
-
-  Data(
-    this.name, 
-    this.sex, 
-    this.age, 
-    this.longitude,
-    this.latitude,
-    this.altitude, 
-    this.id,
-    { this.state }
-  );
+class Data {
+  int id;
+  String remoteId;
   
-  factory Data.fromMap(int id, Map<String, dynamic> map) {
+  DateTime savedRemotelyAt;
+  DateTime createdAt = DateTime.now();
+  DateTime updatedAt;
+
+  String provider = 'mobile';
+  String dataLocation = 'local';
+
+  String form;
+  Map<String, Object> values = {};
+
+  Data({
+    this.form,
+    this.values,
+    this.id,
+    this.createdAt,
+    this.remoteId,
+    this.savedRemotelyAt,
+    this.provider,
+    this.dataLocation,
+  });
+
+  factory Data.fromJson(int id, Map<String, dynamic> parsedJson) {
+    
     return Data(
-      map['name'],
-      map['sex'],
-      map['age'],
-      map['longitude'],
-      map['latitude'],
-      map['altitude'],
-      id,
-      state: map['state']
+      form: parsedJson['form'],
+      values: parsedJson['values'],
+      id: id,
+      createdAt: DateTime.tryParse(parsedJson['createdAt'].toString()),
+      remoteId: parsedJson['remoteId'],
+      savedRemotelyAt: DateTime.tryParse(parsedJson['savedRemotelyAt'].toString()),
+      provider: parsedJson['provider'],
+      dataLocation: parsedJson['dataLocation'],
     );
   }
 
-  Data copyWith({String name, String sex, int id, int age, 
-      double longitude, double latitude, double altitude, 
-      String state
+  Map<String, dynamic> toSave() => {
+    "form": this.form,
+    "values": this.values,
+    "createdAt": DateTime.now().toString(),
+    "provider": "mobile",
+    "dataLocation": "local"
+  };
+
+  Map<String, dynamic> toJson() => {
+    "id": this.id,
+    "form": this.form,
+    "values": this.values,
+    "createdAt": this.createdAt.toString(),
+    "remoteId": this.remoteId,
+    "savedRemotelyAt": this.savedRemotelyAt.toString(),
+    "provider": this.provider,
+    "dataLocation": this.dataLocation,
+  };
+
+  Data copyWith({
+    int id,
+    String form,
+    Map values,
+    String createdAt,
+    String remoteId,
+    String savedRemotelyAt,
+    String provider,
+    String dataLocation
   }) {
     return Data(
-      name ?? this.name,
-      sex ?? this.sex,
-      age ?? this.age,
-      longitude ?? this.longitude,
-      latitude ?? this.latitude,
-      altitude ?? this.latitude,
-      id ?? this.id,
-      state: state ?? this.state
+      id: id ?? this.id,
+      form: form ?? this.form,
+      values: values ?? this.values,
+      remoteId: remoteId ?? this.remoteId,
+      savedRemotelyAt: savedRemotelyAt ?? this.savedRemotelyAt,
+      createdAt: createdAt ?? this.createdAt,
+      provider: provider ?? this.provider,
+      dataLocation: dataLocation ?? this.dataLocation
     );
   }
 
   @override
-  int get hashCode =>
-      name.hashCode ^ sex.hashCode ^ age.hashCode ^ longitude.hashCode ^ latitude.hashCode ^ altitude.hashCode;
-
-  @override
-  List<Object> get props => [id, name, age, sex, longitude, latitude, altitude];
+  int get hashCode => id.hashCode ^ form.hashCode ^ values.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Data &&
           runtimeType == other.runtimeType &&
-          name == other.name &&
-          sex == other.sex &&
-          age == other.age &&
-          longitude == other.longitude &&
-          latitude == other.latitude &&
-          altitude == other.altitude &&
+          values == other.values &&
+          form == other.form &&
           id == other.id;
-
-  Map<String, Object> toMap() {
-    return {
-      'name': name,
-      'sex': sex,
-      'age': age,
-      'longitude': longitude,
-      'latitude': latitude,
-      'altitude': altitude,
-      'id': id,
-      'state': state
-    };
-  }
-
-  @override
-  String toString() {
-    return 'Data{name: $name, sex: $sex, age: $age, longitude: $longitude, latitude: $latitude, altitude: $altitude, id: $id, state: $state}';
-  }
-}
-
-class Uuid {
-  final Random _random = Random();
-
-  String generateV4() {
-    final int special = 8 + _random.nextInt(4);
-
-    return '${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}-'
-        '${_bitsDigits(16, 4)}-'
-        '4${_bitsDigits(12, 3)}-'
-        '${_debugPrintDigits(special, 1)}${_bitsDigits(12, 3)}-'
-        '${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}${_bitsDigits(16, 4)}';
-  }
-
-  String _bitsDigits(int bitCount, int digitCount) =>
-      _debugPrintDigits(_generateBits(bitCount), digitCount);
-
-  int _generateBits(int bitCount) => _random.nextInt(1 << bitCount);
-
-  String _debugPrintDigits(int value, int count) =>
-      value.toRadixString(16).padLeft(count, '0');
 }

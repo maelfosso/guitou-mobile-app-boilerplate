@@ -543,13 +543,13 @@ class XormQuestionText extends XormQuestion {
             name: this.id,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              hasFloatingPlaceholder: false,
+              // hasFloatingPlaceholder: false,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(0)),
                 gapPadding: 0.0
               )
             ),
-            minLines: 5,
+            // minLines: 5,
           )
         ]
       )
@@ -732,9 +732,10 @@ class XormQuestionOptional extends XormQuestion {
           FormBuilderCheckbox(
             name: this.id,
             title: Text(this.title),
+            initialValue: false,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 8.0),
-              hasFloatingPlaceholder: false,
+              // hasFloatingPlaceholder: false,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(0)),
                 gapPadding: 0.0
