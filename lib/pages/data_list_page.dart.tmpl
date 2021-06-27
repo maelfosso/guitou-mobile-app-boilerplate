@@ -116,14 +116,24 @@ class _DataListPage extends State<DataListPage> {
       builder: (BuildContext context) {
         return SimpleDialog(
           title: const Text('Select the xorm'),
-          children: Project.instance.xorms.map((Xorm xorm) {
-            return SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, xorm.id);
-              },
-              child: Text(xorm.title),
-            );
-          }).toList(),
+          children: [
+            {{ range $index, $xorm := .Xorms }}
+              SingleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, {{ $xorm.id }});
+                },
+                child: Text("{{ $xorm.title }}")
+              ),
+            {{ end }}
+          ]
+          // Project.instance.xorms.map((Xorm xorm) {
+          //   return SimpleDialogOption(
+          //     onPressed: () {
+          //       Navigator.pop(context, xorm.id);
+          //     },
+          //     child: Text(xorm.title),
+          //   );
+          // }).toList(),
         );
       }
     );
