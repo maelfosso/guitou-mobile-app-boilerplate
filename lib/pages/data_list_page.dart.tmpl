@@ -121,9 +121,9 @@ class _DataListPage extends State<DataListPage> {
             {{ range .Xorms }}
               SingleDialogOption(
                 onPressed: () {
-                  Navigator.pop(context, {{ .id }});
+                  Navigator.pop(context, {{ .Id }});
                 },
-                child: Text("{{ .title }}")
+                child: Text("{{ .Title }}")
               ),
             {{ end }}
           ]
