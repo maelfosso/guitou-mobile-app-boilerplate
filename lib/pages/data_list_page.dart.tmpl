@@ -117,12 +117,13 @@ class _DataListPage extends State<DataListPage> {
         return SimpleDialog(
           title: const Text('Select the xorm'),
           children: [
-            {{ range $index, $xorm := .Xorms }}
+            // TEMPLATING HERE
+            {{ range .Xorms }}
               SingleDialogOption(
                 onPressed: () {
-                  Navigator.pop(context, {{ $xorm.id }});
+                  Navigator.pop(context, {{ .id }});
                 },
-                child: Text("{{ $xorm.title }}")
+                child: Text("{{ .title }}")
               ),
             {{ end }}
           ]
