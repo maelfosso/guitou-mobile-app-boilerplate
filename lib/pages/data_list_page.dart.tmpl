@@ -109,6 +109,7 @@ class _DataListPage extends State<DataListPage> {
     // );
   }
 
+  {{ if gt (len .Xorms) 1 }}
   Future<String> _asyncSelectXormDialog(BuildContext context) async {
     return await showDialog<String>(
       context: context,
@@ -121,23 +122,72 @@ class _DataListPage extends State<DataListPage> {
             {{ range .Xorms }}
               SingleDialogOption(
                 onPressed: () {
-                  Navigator.pop(context, {{ .Id }});
+                  Navigator.pop(context, "{{ .Id }}");
                 },
                 child: Text("{{ .Title }}")
               ),
             {{ end }}
           ]
-          // Project.instance.xorms.map((Xorm xorm) {
-          //   return SimpleDialogOption(
-          //     onPressed: () {
-          //       Navigator.pop(context, xorm.id);
-          //     },
-          //     child: Text(xorm.title),
-          //   );
-          // }).toList(),
         );
       }
     );
+  }
+  {{ end }}
+
+  {{ if eq (len .Xorms) 0 }}
+  Future<void> _noXormDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Xo Questionnaire'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text('There are no questionnaire in this project.'),
+                Text('Go back to Guitou (https://app.guitou.com) to create questionnaire for this project and regenerate the application.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  {{ end }}
+
+  {{ if ge (len .Xorms) 1 }}
+  void _openXorm(String xormToOpen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: xormToOpen)),
+    );
+  }
+  {{ end }}
+
+  void _addData(BuildContext context) {
+    {{ if eq (len .Xorms) 0 }}
+    _noXormDialog();
+    {{ else if eq (len .Xorms) 1 }}
+    _openXorm({{ (index .Xorms 0).id }});
+    {{ else }}
+    String selectedXorm = await _asyncSelectXormDialog(context);
+    if (selectedXorm != null && selectedXorm.isNotEmpty) {
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
+      // );
+      _openXorm(selectedXorm);
+    }
+    {{ end }}
   }
   
   @override
@@ -180,14 +230,7 @@ class _DataListPage extends State<DataListPage> {
               IconButton(
                 icon: Icon(Icons.add),
                 onPressed: () async {
-                  String selectedXorm = await _asyncSelectXormDialog(context);
-                  if (selectedXorm != null && selectedXorm.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
-                    );
-                  }
-                }
+                  _addData(context);
               ),
               IconButton(
                 icon: Icon(Icons.cloud_upload),
@@ -227,13 +270,7 @@ class _DataListPage extends State<DataListPage> {
             tooltip: 'Increment',
             child: Icon(Icons.add),
             onPressed: () async {
-              String selectedXorm = await _asyncSelectXormDialog(context);
-              if (selectedXorm != null && selectedXorm.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => DataEntryPage(currentXorm: selectedXorm)),
-                );
-              }
+              _addData(context);
             }
           ),
         );
