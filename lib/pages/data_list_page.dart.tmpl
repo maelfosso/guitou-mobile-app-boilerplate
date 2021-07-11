@@ -120,7 +120,7 @@ class _DataListPage extends State<DataListPage> {
           children: [
             // TEMPLATING HERE
             {{ range .Xorms }}
-              SingleDialogOption(
+              SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, "{{ .Id }}");
                 },
